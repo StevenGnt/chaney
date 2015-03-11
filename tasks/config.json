@@ -1,0 +1,16 @@
+{
+	"server": {
+		"host": "192.168.144.100",
+		"port": "8080",
+		"directory": "app"
+	},
+	"app": {
+		"livereload": {
+			"extraWatched": ["app/*.html"]
+		},
+		"less": {
+			"input": "app/styles/less",
+			"output": "app/styles/css"
+		}
+	}
+}
