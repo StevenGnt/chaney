@@ -5,21 +5,20 @@ var gulp = require('gulp'),
 	watch = require('gulp-watch'),
 	config = require('./config.json');
 
+// Watched directories and files for livereload
+var watched = config.app.livereload.extraWatched || [];
+watched.push(config.app.less.output);	// LESS output directory
+
+console.log('Watched for livereload: ');
+for (var i in watched) {
+	console.log(' - ' + watched[i]);
+}
+
 gulp.task('livereload', function() {
-	// Watched directories and files for livereload
-	var watched = [];
-	watched.push(config.app.less.output);	// LESS output directory
+	gulp.watch(watched, ['livereload:reload']);
+});
 
-	// Add dirs / files from configuration
-	watched = watched.concat(config.app.livereload.extraWatched);
-
-	// watch(watched)
-		// .pipe(connect.reload());
-
-	// gulp.watch(watched, ['livereload.reload']);
-	// return;
-	// Watch candidate directories for livereload
-	gulp.src(watched)
-		// .pipe(watch(watched))
+gulp.task('livereload:reload', function() {
+	return gulp.src(watched)
 		.pipe(connect.reload());
 });

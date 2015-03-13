@@ -6,7 +6,7 @@
 	},
 	"app": {
 		"livereload": {
-			"extraWatched": ["app/*.html"]
+			"extraWatched": ["app/*.*", "app/styles/css/**/*.*", "app/components/**/*.*"]
 		},
 		"less": {
 			"input": "app/styles/less",
