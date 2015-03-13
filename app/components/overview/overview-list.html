@@ -1,0 +1,6 @@
+<dl>
+	<dt>Recurring</dt>
+	<dd ng-repeat="recurring in recurrings" ng-class="recurring.value < 0 ? 'expense' : 'income'">
+		{{ recurring.name}} : {{ recurring.value | number : 2 }} €
+	</dd>
+</dl>

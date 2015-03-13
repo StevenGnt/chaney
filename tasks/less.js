@@ -2,13 +2,14 @@
 
 var gulp = require('gulp'),
 	less = require('gulp-less'),
+	concat = require('gulp-concat'),
 	connect = require('gulp-connect'),
 	config = require('./config.json');
 
-gulp.task('less', function() {
+gulp.task('less:compile', function() {
 	// Compile LESS files
-	gulp.src(config.app.less.input)
+	return gulp.src(config.app.less.input)
 		.pipe(less())
-		.pipe(gulp.dest(config.app.less.output))
-		.pipe(connect.reload());
+		.pipe(concat('main.css'))
+		.pipe(gulp.dest(config.app.less.output));
 });

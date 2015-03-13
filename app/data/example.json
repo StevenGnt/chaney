@@ -1,0 +1,39 @@
+{
+    "parameters": {
+        "start": "04/2015",
+        "length": 6,
+		"startValue": 1000
+    },
+    "recurring": [
+        {
+            "name": "Income",
+            "value": 1500,
+            "day": 5
+        },
+        {
+            "name": "Car insurance",
+            "value": -50,
+            "day": 7
+        }
+    ],
+    "once": [
+        {
+            "name": "New phone",
+            "value": -100
+        }
+    ],
+    "simulation": {
+        "recurring": [
+            {
+                "name": "House debt",
+                "value": -500
+            }
+        ],
+        "once": [
+            {
+                "name": "Foo",
+                "value": -1000
+            }
+        ]
+    }
+}

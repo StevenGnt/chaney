@@ -1,0 +1,36 @@
+/* Import Less files */
+/* Variables */
+/* Fonts */
+@font-face {
+  font-family: "Lobster";
+  src: url("/assets/fonts/Lobster.otf");
+}
+/* Main styles */
+body {
+  background-image: url("/assets/images/pink-fur-texture.jpg");
+}
+.chaney-title h1 {
+  font-family: "Lobster";
+  font-size: 50px;
+  color: #ee0055;
+}
+.chaney-title h2 {
+  font-family: "Lobster";
+  font-size: 20px;
+  margin-top: -10px;
+  margin-left: 70px;
+}
+.main-color {
+  color: #ee0055;
+}
+.chaney-container {
+  background-color: #F7F7F7;
+  min-height: 500px;
+}
+/* List styles */
+.expense {
+  color: red;
+}
+.income {
+  color: green;
+}

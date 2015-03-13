@@ -1,8 +1,41 @@
+<!DOCTYPE html>
 <html>
 	<head>
 		<title>Chaney</title>
+		<link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico">
+
+		<!-- bower:css -->
+		<link rel="stylesheet" href="vendor/c3/c3.css" />
+		<link rel="stylesheet" href="vendor/angular-circular-navigation/angular-circular-navigation.css" />
+		<link rel="stylesheet" href="vendor/bootstrap/dist/css/bootstrap.css" />
+		<!-- endbower -->
+
+		<!-- bower:js -->
+		<script src="vendor/jquery/dist/jquery.js"></script>
+		<script src="vendor/angular/angular.js"></script>
+		<script src="vendor/d3/d3.js"></script>
+		<script src="vendor/c3/c3.js"></script>
+		<script src="vendor/angular-circular-navigation/angular-circular-navigation.js"></script>
+		<script src="vendor/angular-chart/angular-chart.js"></script>
+		<script src="vendor/bootstrap/dist/js/bootstrap.js"></script>
+		<!-- endbower -->
+
+		<!-- App assets -->
+		<!-- app:js -->
+		<script src="/components/app.js"></script>
+		<script src="/components/overview/overview.js"></script>
+		<!-- app:css -->
+		<link href="assets/css/main.css" rel="stylesheet" />
 	</head>
-	<body>
-		It works !
+	<body class="container">
+		<!-- App body -->
+		<div ng-app="Chaney">
+			<div ng-include="'/components/shared/header.html'"></div>
+			<div class="chaney-container">
+				<div ui-view="body"></div>
+				<div ng-controller="OverviewCtrl" class="row">
+				</div>
+			</div>
+		</div>
 	</body>
 </html>

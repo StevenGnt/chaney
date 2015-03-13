@@ -5,5 +5,5 @@ var gulp = require('gulp'),
 
 gulp.task('watch', function() {
 	// Watch LESS files, trigger compilation
-	gulp.watch(config.app.less.input + '/*.less', ['less']);
+	return gulp.watch(config.app.less.watch, ['less:compile']);
 });

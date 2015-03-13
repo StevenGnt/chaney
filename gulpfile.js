@@ -5,5 +5,13 @@ var gulp = require('gulp');
 // Load every task
 require('require-dir')('./tasks');
 
-// "server" task as default task
-gulp.task('default', ['watch', 'server', 'less', 'livereload'], function() {});
+// Default runned tasks
+var defaultTasks = [
+	'watch',
+	'less:compile',
+	'wiredep',
+	'server',
+	'livereload'
+];
+
+gulp.task('default', defaultTasks, function() {});

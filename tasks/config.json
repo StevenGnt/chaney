@@ -5,12 +5,20 @@
 		"directory": "app"
 	},
 	"app": {
+		"wiredep": {
+			"html": "app/*.html",
+			"dest": "app",
+			"options": {
+				"directory": "app/vendor"
+			}
+		},
 		"livereload": {
-			"extraWatched": ["app/*.*", "app/styles/css/**/*.*", "app/components/**/*.*"]
+			"watched": ["app/*.*", "app/assets/css/**/*.css", "app/components/**/*.*"]
 		},
 		"less": {
-			"input": "app/styles/less",
-			"output": "app/styles/css"
+			"watch": "app/styles/less/**",
+			"input": "app/styles/less/main.less",
+			"output": "app/assets/css"
 		}
 	}
 }

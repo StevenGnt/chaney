@@ -1,0 +1,36 @@
+{
+    "parameters": {
+        "start": "04/2015",
+        "length": 6,
+		"startValue": 560
+    },
+    "recurring": [
+        {
+            "name": "Salaire",
+            "value": 1900,
+            "day": 5
+        },
+        {
+            "name": "Loyer",
+            "value": -560,
+            "day": 7
+        }
+    ],
+    "once": [
+        {
+            "name": "Location Ski",
+            "value": -60
+        }
+    ],
+    "simulation": {
+        "recurring": [
+
+        ],
+        "once": [
+            {
+                "name": "Apport voiture",
+                "value": -1000
+            }
+        ]
+    }
+}
