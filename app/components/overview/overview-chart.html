@@ -1,4 +1,9 @@
+<canvas class="chart chart-line" data="chartData" legend="true" labels="labels" series="series"></canvas>
+<pre>
+chartData
 {{ chartData | json }}
-<canvas class="chart chart-line" data="chartData" legend="true" labels="labels">
-	
-</canvas>
+labels
+{{ labels | json }}
+series
+{{ series | json }}
+</pre>

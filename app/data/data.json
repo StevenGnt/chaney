@@ -1,36 +1,51 @@
 {
     "parameters": {
-        "start": "04/2015",
-        "length": 6,
-		"startValue": 560
+        "start": "14/04/2015",
+        "duration": 6,
+        "startValue": 1000
     },
-    "recurring": [
+    "recurrings": [
         {
-            "name": "Salaire",
-            "value": 1900,
+            "name": "Income",
+            "value": 1500,
             "day": 5
         },
         {
-            "name": "Loyer",
-            "value": -560,
+            "name": "Bonus",
+            "value": 250,
+            "day": 5
+        },
+        {
+            "name": "Rent",
+            "value": -450,
+            "day": 7
+        },
+        {
+            "name": "Car insurance",
+            "value": -50,
             "day": 7
         }
     ],
-    "once": [
+    "uniques": [
         {
-            "name": "Location Ski",
-            "value": -60
+            "name": "New phone",
+            "value": -100
         }
     ],
     "simulation": {
-        "recurring": [
-
-        ],
-        "once": [
-            {
-                "name": "Apport voiture",
-                "value": -1000
-            }
-        ]
+        "New house": {
+            "recurrings": [
+                {
+                    "name": "House debt",
+                    "value": -500
+                }
+            ],
+            "uniques": [
+                {
+                    "name": "Foo",
+                    "value": -1000
+                }
+            ]
+        }
     }
 }

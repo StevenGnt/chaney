@@ -7,7 +7,7 @@
 }
 /* Main styles */
 body {
-  background-image: url("/assets/images/pink-fur-texture.jpg");
+  background-image: url("/assets/images/chaney-background.jpg");
 }
 .chaney-title h1 {
   font-family: "Lobster";
@@ -19,12 +19,13 @@ body {
   font-size: 20px;
   margin-top: -10px;
   margin-left: 70px;
+  color: #eeeeee;
 }
 .main-color {
   color: #ee0055;
 }
 .chaney-container {
-  background-color: #F7F7F7;
+  background-color: #eeeeee;
   min-height: 500px;
 }
 /* List styles */
@@ -33,4 +34,8 @@ body {
 }
 .income {
   color: green;
+}
+.chart {
+  height: 500px;
+  padding: 20px;
 }

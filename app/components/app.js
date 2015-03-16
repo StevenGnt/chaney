@@ -1,13 +1,24 @@
 ;'use strict';
 angular
-	.module('Chaney', [], function ($scope){
-		$scope.foo = "barr";
-		console.log('okay');
+	.module('Chaney', ['ui.router', 'chart.js'])
+	.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouteProvider) {
+		// Default goes to the "overview" state
+		$urlRouteProvider.otherwise('/overview');
 
-	})
-	.config([], function(){
-		console.log('ok');
-	})
-	.run([], function(){
-		console.log('ok');
-	});
+		$stateProvider
+			// Overview state
+			.state('overview', {
+				url: '/overview',
+				resolve: {
+					'configuration': function(ConfigHandler){
+						return ConfigHandler.promise;
+					}
+				},
+				views: {
+					'body@': {
+						templateUrl: 'components/overview/overview.html',
+						controller: 'OverviewCtrl'
+					}
+				}
+			});
+	}]);
