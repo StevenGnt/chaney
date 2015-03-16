@@ -14,9 +14,10 @@
 		<script src="vendor/angular/angular.js"></script>
 		<script src="vendor/Chart.js/Chart.js"></script>
 		<script src="vendor/angular-chart.js/dist/angular-chart.js"></script>
-		<script src="vendor/ui-router/release/angular-ui-router.js"></script>
-		<script src="vendor/bootstrap/dist/js/bootstrap.js"></script>
 		<script src="vendor/moment/moment.js"></script>
+		<script src="vendor/angular-moment/angular-moment.js"></script>
+		<script src="vendor/bootstrap/dist/js/bootstrap.js"></script>
+		<script src="vendor/ui-router/release/angular-ui-router.js"></script>
 		<!-- endbower -->
 
 		<!-- App assets -->
@@ -29,11 +30,11 @@
 		<link href="assets/css/main.css" rel="stylesheet" />
 
 	</head>
-	<body class="container">
+	<body>
 		<!-- App body -->
 		<div ng-app="Chaney">
 			<div ng-include="'/components/shared/header.html'"></div>
-			<div class="chaney-container">
+			<div class="container">
 				<div ui-view="body"></div>
 			</div>
 		</div>

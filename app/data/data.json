@@ -1,7 +1,8 @@
 {
     "parameters": {
-        "start": "14/04/2015",
+        "start": "16/04/2015",
         "duration": 6,
+		"durationUnit": "months",
         "startValue": 1000
     },
     "recurrings": [
@@ -32,7 +33,7 @@
             "value": -100
         }
     ],
-    "simulation": {
+    "simulations": {
         "New house": {
             "recurrings": [
                 {

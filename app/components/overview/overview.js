@@ -13,7 +13,7 @@ angular
 		// Compute chart values
 		regular = Calculator
 			.setStart(config.parameters.start)
-			.setDuration(config.parameters.duration)
+			.setDuration(config.parameters.duration, config.parameters.durationUnit)
 			.setStartValue(config.parameters.startValue)
 			.setRecurrings(config.recurrings)
 			.setUniques(config.uniques)
@@ -23,7 +23,10 @@ angular
 		$scope.series.push('Regular');
 
 		// @todo Compute actual labels
-		$scope.labels = [5, 987, 984, 6516, 51, 65, 1, 65, 1, 65, 1];
+		for(var i in regular){
+			$scope.labels.push(i);
+		}
+		// @todo:end
 
 		// Send some parameters to the $scope
 		$scope.recurrings = config.recurrings;

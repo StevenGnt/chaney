@@ -6,9 +6,9 @@
   "dependencies": {
     "angular": "1.3.*",
     "angular-chart.js": "*",
-    "ui-router": "*",
+    "angular-moment": "*",
     "bootstrap": "*",
-    "moment": "*"
+    "ui-router": "*"
   },
   "authors": [
     "Steven Gangnant"

@@ -1,6 +1,6 @@
 ;'use strict';
 angular
-	.module('Chaney', ['ui.router', 'chart.js'])
+	.module('Chaney', ['ui.router', 'chart.js', 'angularMoment'])
 	.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouteProvider) {
 		// Default goes to the "overview" state
 		$urlRouteProvider.otherwise('/overview');

@@ -1,4 +1,4 @@
-<table class="table table-striped table-hover">
+<table class="table-condensed table table-striped table-hover">
 	<caption>Recurring</caption>
 	<thead>
 		<tr>
@@ -7,13 +7,13 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-repeat="row in recurrings | orderBy : '-value'" ng-class="row.value < 0 ? 'expense' : 'income'">
-			<td>{{ row.name }}</td><td>{{ row.value | number : 2 }} €</td>
+		<tr ng-repeat="row in recurrings | orderBy : '-value'">
+			<td>{{ row.name }}</td><td><span class="label"ng-class="row.value < 0 ? 'label-danger' : 'label-success'">{{ row.value | number : 2 }} €</span></td>
 		</tr>
 	</tbody>
 </table>
 
-<table class="table table-stripped">
+<table class="table-condensed table table-striped table-hover">
 	<caption>Uniques</caption>
 	<thead>
 		<tr>
@@ -22,8 +22,8 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-repeat="row in uniques | orderBy : '-value'" ng-class="row.value < 0 ? 'expense' : 'income'">
-			<td>{{ row.name }}</td><td>{{ row.value | number : 2 }} €</td>
+		<tr ng-repeat="row in uniques | orderBy : '-value'">
+			<td>{{ row.name }}</td><td><span class="label"ng-class="row.value < 0 ? 'label-danger' : 'label-success'">{{ row.value | number : 2 }} €</span></td>
 		</tr>
 	</tbody>
 </table>
