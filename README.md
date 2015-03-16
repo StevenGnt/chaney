@@ -11,7 +11,5 @@ This little app allows you to foresee your money speendings, considering your re
 
 ## TODOS
 - Simulation feature
-- Export the current configuration or find a way to save the data.json (server side)
-- Load the configuration from the JSON file
-- Inject the configuration everywhere it is required
-- Sort lists
+- Export the current configuration as JSON or find a way to save the data.json (server side)
+- Actually computing data
