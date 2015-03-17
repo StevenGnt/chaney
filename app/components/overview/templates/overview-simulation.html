@@ -1,7 +1,7 @@
 <table class="table-condensed table table-striped table-hover">
-	<caption>{{ 'GLOBAL.SIMULATIONS' | translate}}</caption>
+	<caption>{{ 'OVERVIEW.SIMULATIONS' | translate}}</caption>
 	<tbody>
-		<tr ng-repeat="(name, simulation) in simulations | orderBy : name">
+		<tr ng-repeat="(name, simulation) in config.simulations | orderBy : name">
             <td><input type="checkbox" name="{{ name }}" ng-model="enabledSimulations[name]" ng-change="changeSimulationStatus()"/></td>
 			<td>{{ name }}</td>
 		</tr>

@@ -1,5 +1,5 @@
 <table class="table-condensed table table-striped table-hover">
-	<caption>{{ 'GLOBAL.RECURRINGS' | translate}}</caption>
+	<caption>{{ 'OVERVIEW.RECURRINGS' | translate}}</caption>
 	<thead>
 		<tr>
 			<th>{{ 'GLOBAL.NAME' | translate }}</th>
@@ -7,14 +7,14 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-repeat="row in recurrings | orderBy : '-value'">
+		<tr ng-repeat="row in config.recurrings | orderBy : '-value'">
 			<td>{{ row.name }}</td><td><span class="label"ng-class="row.value < 0 ? 'label-danger' : 'label-success'">{{ row.value | number : 2 }} €</span></td>
 		</tr>
 	</tbody>
 </table>
 
 <table class="table-condensed table table-striped table-hover">
-	<caption>{{ 'GLOBAL.UNIQUES' | translate}}</caption>
+	<caption>{{ 'OVERVIEW.UNIQUES' | translate}}</caption>
 	<thead>
 		<tr>
 			<th>{{ 'GLOBAL.NAME' | translate }}</th>
@@ -22,7 +22,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-repeat="row in uniques | orderBy : '-value'">
+		<tr ng-repeat="row in config.uniques | orderBy : '-value'">
 			<td>{{ row.name }}</td><td><span class="label"ng-class="row.value < 0 ? 'label-danger' : 'label-success'">{{ row.value | number : 2 }} €</span></td>
 		</tr>
 	</tbody>

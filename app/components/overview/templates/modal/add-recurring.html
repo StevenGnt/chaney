@@ -1,0 +1,13 @@
+<div class="modal-content">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">{{ 'OVERVIEW.ADD_RECURRING' | translate}}</h4>
+    </div>
+    <div class="modal-body">
+        <input ng-model="newElement.name" type="textfield" required="true"/>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="ok()">OK</button>
+        <button class="btn" ng-click="cancel()">Cancel</button>
+    </div>
+</div>

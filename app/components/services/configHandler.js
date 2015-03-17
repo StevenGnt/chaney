@@ -3,17 +3,22 @@ angular
 	.module('Chaney')
 	.service('ConfigHandler', function($http) {
 		// This service handles the loading of the app's config
-		var config,
-			configUrl = window.location.origin + '/data/data.json',
-			promise = $http.get(configUrl)
+		var service = {},
+            config = {};
+
+            service.promise = $http.get(window.location.origin + '/data/data.json')
 				.success(function(data){
-					config = data;
+					service.setParameters(data);
 				});
 
-			return {
-				promise: promise,
-				getConfig: function(){
-					return config;
-				}
-			};
+
+            service.setParameters = function(parameters) {
+                angular.extend(config, parameters);
+            };
+
+            service.getConfig = function() {
+                return config;
+            };
+
+            return service;
 	});

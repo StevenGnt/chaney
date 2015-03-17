@@ -5,11 +5,11 @@
   "description": "Basic JS app to foresee your spendings",
   "dependencies": {
     "angular": "1.3.*",
+    "angular-bootstrap": "*",
     "angular-chart.js": "*",
     "angular-moment": "*",
     "angular-translate": "*",
     "bootstrap": "*",
-    "ui-bootstrap": "*",
     "ui-router": "*"
   },
   "authors": [
