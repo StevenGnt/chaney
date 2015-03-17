@@ -13,7 +13,7 @@
 			}
 		},
 		"livereload": {
-			"watched": ["app/*.*", "app/assets/css/**/*.css", "app/components/**/*.*"]
+			"watched": ["app/*.*", "app/assets/css/**/*.css", "app/components/**/*.*", "app/data/data.json"]
 		},
 		"less": {
 			"watch": "app/styles/less/**",

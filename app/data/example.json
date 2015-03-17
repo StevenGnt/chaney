@@ -1,7 +1,8 @@
 {
     "parameters": {
-        "start": "14/04/2015",
-        "duration": 6,
+        "start": "16/04/2015",
+        "duration": 2,
+		"durationUnit": "months",
         "startValue": 1000
     },
     "recurrings": [
@@ -12,8 +13,8 @@
         },
         {
             "name": "Bonus",
-            "value": 250,
-            "day": 5
+            "value": 100,
+            "day": 7
         },
         {
             "name": "Rent",
@@ -24,12 +25,20 @@
             "name": "Car insurance",
             "value": -50,
             "day": 7
+        },
+		{
+            "name": "Car credit",
+            "value": -250,
+            "day": 10,
+			"start": "01/03/2015",
+			"end": "01/05/2017"
         }
     ],
     "uniques": [
         {
             "name": "New phone",
-            "value": -100
+            "value": -100,
+			"date": "03/05/2015"
         }
     ],
     "simulations": {
