@@ -1,7 +1,7 @@
 {
     "parameters": {
         "start": "16/04/2015",
-        "duration": 2,
+        "duration": 6,
 		"durationUnit": "months",
         "startValue": 1000
     },
@@ -25,13 +25,6 @@
             "name": "Car insurance",
             "value": -50,
             "day": 7
-        },
-		{
-            "name": "Car credit",
-            "value": -250,
-            "day": 10,
-			"start": "01/03/2015",
-			"end": "01/05/2017"
         }
     ],
     "uniques": [
@@ -42,17 +35,21 @@
         }
     ],
     "simulations": {
-        "New house": {
+        "Buying a new car": {
             "recurrings": [
                 {
-                    "name": "House debt",
-                    "value": -500
+                    "name": "Car credit",
+                    "value": -250,
+                    "day": 10,
+                    "start": "01/03/2015",
+                    "end": "01/05/2017"
                 }
             ],
             "uniques": [
                 {
-                    "name": "Foo",
-                    "value": -1000
+                    "name": "Contribution",
+                    "value": -1000,
+                    "date": "03/06/2015"
                 }
             ]
         }

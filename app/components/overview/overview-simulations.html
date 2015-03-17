@@ -1,0 +1,9 @@
+<table class="table-condensed table table-striped table-hover">
+	<caption>Simulations</caption>
+	<tbody>
+		<tr ng-repeat="(name, simulation) in simulations | orderBy : name">
+            <td><input type="checkbox" name="{{ name }}" ng-model="enabledSimulations[name]" ng-change="simulationStatus()"/></td>
+			<td>{{ name }}</td>
+		</tr>
+	</tbody>
+</table>
