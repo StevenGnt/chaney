@@ -1,0 +1,10 @@
+<!-- Single button -->
+<div class="btn-group">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+    {{ 'GLOBAL.ADD' | translate }} <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" role="menu">
+    <li><a href="#" ng-click="openAddModal('recurring')">{{ 'GLOBAL.RECURRING' | translate}}</a></li>
+    <li><a href="#" ng-click="openAddModal('unique')">{{ 'GLOBAL.UNIQUE' | translate }}</a></li>
+    </ul>
+</div>

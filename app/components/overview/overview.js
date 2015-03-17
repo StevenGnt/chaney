@@ -35,7 +35,8 @@ angular
                 : '');
 		}
 
-        $scope.simulationStatus = function() {
+        // ng-click callbacks
+        $scope.changeSimulationStatus = function() {
             var i, j, simulationConfig;
 
             initChartData();
@@ -60,6 +61,10 @@ angular
                     .computeValues());
                 $scope.series.push(i);
             }
+        };
+
+        $scope.openAddModal = function(name) {
+            console.log(name);
         };
 
 		// Send some parameters to the $scope
