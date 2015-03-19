@@ -13,5 +13,6 @@ You can also simulate any spending to compare with a "regular" timeline.x
 ## TODOS
 - Display per day spending instead of the day's value on the point label
 - Make base parameters editable (start value, date ...)
-- Validation on modals
-- [Issue] Weird behaviour when adding data
+- Validation on modals fields
+- Use constant for a global config
+- [Issue] Fix simulations adding

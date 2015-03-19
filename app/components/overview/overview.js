@@ -2,19 +2,26 @@
 angular
 	.module('Chaney')
 	.controller('OverviewCtrl', function($scope, $modal, $filter, ConfigHandler, Calculator, amMoment) {
-		// var config = ConfigHandler.getConfig(),
-        var regular = [],
-            i, m;
-
 		// Send parameters to the $scope
         $scope.config = ConfigHandler.getConfig();
 
-		// Init scope vars
-		$scope.labels = [];
-        $scope.enabledSimulations = [];
+        resetScopeValues = function() {
+            $scope.labels = [];
+            $scope.chartData = [];
+            $scope.series = [];
+            $scope.recurringSum = 0;
+        };
 
-        // Compute regular chart values
-        computeRegular = function() {
+		// Init scope vars
+        $scope.enabledSimulations = [];
+        resetScopeValues();
+
+        $scope.computeScopeData = function() {
+            var regular, i, m;
+
+            // Reset scope values
+            resetScopeValues();
+
             regular = Calculator
                 .setStart($scope.config.parameters.start)
                 .setDuration($scope.config.parameters.duration, $scope.config.parameters.durationUnit)
@@ -22,39 +29,23 @@ angular
                 .setRecurrings($scope.config.recurrings)
                 .setUniques($scope.config.uniques)
                 .computeValues();
-        };
 
-        // Reset chart data values
-        initChartData = function() {
-            $scope.chartData = [regular];
-            $scope.series = [$filter('translate')('GLOBAL.REGULAR')];
-        };
-        
-        // Compute recurring sum
-        $scope.recurringSum = '- -';
-        computeRecurringSum = function() {
-            $scope.recurringSum = 0;
+            // Set values in scope
+            $scope.chartData.push(regular);
+            $scope.series.push([$filter('translate')('GLOBAL.REGULAR')]);
+
+            // Build labels
+            for (i in regular) {
+                m = Calculator.toMoment($scope.config.parameters.start).add(i, 'days');
+                $scope.labels.push(parseInt(m.format('D')) % 5 === 0 ? m.format('DD/MM/YY') : '');
+            }
+
+            // Compute sum
             angular.forEach($scope.config.recurrings, function(value){
                 $scope.recurringSum += value.value;
             });
-        };
 
-        computeRegular();
-        initChartData();
-        computeRecurringSum();
-
-        // Build labels
-		for (i in regular) {
-            m = Calculator.toMoment($scope.config.parameters.start).add(i, 'days');
-            $scope.labels.push(parseInt(m.format('D')) % 5 === 0 ? m.format('DD/MM/YY') : '');
-		}
-
-        // ng-click callbacks
-        $scope.changeSimulationStatus = function() {
-            var i, j, simulationConfig;
-
-            initChartData();
-
+            // Handles simulations
             for (i in $scope.enabledSimulations) {
                 if (!$scope.enabledSimulations[i]) {
                     continue;
@@ -81,7 +72,9 @@ angular
             }
         };
 
-        // Modals
+        $scope.computeScopeData();
+
+        // Modals callback
         $scope.openAddModal = function(type) {
             var modal = $modal.open({
                 templateUrl: 'components/overview/templates/modal/add-' + type + '.html',
@@ -90,34 +83,22 @@ angular
             });
 
             modal.result.then(function (newElement) {
-                var elt = angular.copy(newElement),
-                    prepDate = function(date) {
-                        return amMoment.preprocessDate(elt.date).format('DD/MM/YYYY');
-                    },
-                    attr;
-                switch (type) {
-                    case 'recurring':
-                        attr = 'recurrings';
-                        if (elt.start) {
-                            elt.start = prepDate(elt.start);
-                        }
-                        if (elt.end) {
-                            elt.end = prepDate(elt.end);
-                        }
-                        break;
-
-                    case 'unique':
-                        attr = 'uniques';
-                        elt.date = prepDate(elt.date);
-                        break;
-
-                    case 'simulation':
-                        break;
-                }
-
-                // Add the new element where it belongs
+                var elt = angular.copy(newElement);
                 if (type !== 'simulation') {
+                    // Prepare the new element (unique / recurring)
+                    elt.value = parseInt(elt.value);
+                    if (type === 'unique') {
+                        elt.date = amMoment.preprocessDate(elt.date).format('DD/MM/YYYY');
+                    } else {
+                        angular.forEach(['start', 'end'], function(val){
+                            if (elt[val]) {
+                                elt[val] = amMoment.preprocessDate(elt[val]).format('DD/MM/YYYY');
+                            }
+                        });
+                    }
 
+                    var attr = type === 'unique' ?
+                        'uniques' : 'recurrings';
                     if (elt.simulation) {
                         delete elt.simulation;
                         $scope.config.simulations[newElement.simulation][attr].push(elt);
@@ -125,6 +106,7 @@ angular
                         $scope.config[attr].push(elt);
                     }
                 } else {
+                    // Build a new simulation
                     $scope.config.simulations[elt.name] = {
                         recurrents: [],
                         uniques: []
@@ -133,8 +115,7 @@ angular
 
                 ConfigHandler.setParameters($scope.config);
 
-                computeRegular();
-                initChartData();
+                $scope.computeScopeData();
             });
         };
 
