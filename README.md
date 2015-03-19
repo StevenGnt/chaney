@@ -16,4 +16,3 @@ You can also simulate any spending to compare with a "regular" timeline.x
 - Display per day spending instead of the day's value on the point label
 - Validation on modals
 - [Issue] Weird behaviour when adding data
-- [Issue] Master the chart size (height increases when disabling / enabling any simulation)

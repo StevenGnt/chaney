@@ -29,9 +29,6 @@
 }
 /* List styles */
 /* Chart styles */
-.chart-container {
-  height: 700px;
-}
 .chart-container canvas {
-  height: 200px;
+  height: 100%;
 }
