@@ -59,7 +59,11 @@ angular
                     NAME: 'Nom',
                     VALUE: 'Valeur'
                 },
-                EXPORT_CFG: 'Exporter la configuration'
+                EDIT_PARAMETERS: 'Modifier les paramètrs de base',
+                EXPORT_CFG: 'Exporter la configuration',
+                START_DATE: 'Date de début',
+                START_VALUE: 'Valeur de départ',
+                DURATION: 'Durée'
             }
         });
 

@@ -20,12 +20,17 @@
 	<thead>
 		<tr>
 			<th>{{ 'GLOBAL.NAME' | translate }}</th>
+			<th>{{ 'GLOBAL.DATE' | translate }}</th>
 			<th>{{ 'GLOBAL.VALUE' | translate }}</th>
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-repeat="row in config.uniques track by $index | orderBy : '-value'">
-			<td>{{ row.name }}</td><td><span class="label"ng-class="row.value < 0 ? 'label-danger' : 'label-success'">{{ row.value | number : 2 }} €</span></td>
+		<tr ng-repeat="row in config.uniques track by $index">
+			<td>{{ row.name }}</td>
+			<td>{{ row.date }}</td>
+            <td>
+                <span class="label"ng-class="row.value < 0 ? 'label-danger' : 'label-success'">{{ row.value | number : 2 }} €</span>
+            </td>
 		</tr>
 	</tbody>
 </table>

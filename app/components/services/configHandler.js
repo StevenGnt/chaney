@@ -1,12 +1,12 @@
 'use strict';
 angular
 	.module('Chaney')
-	.service('ConfigHandler', function($http) {
+	.service('ConfigHandler', function($http, ChaneyConfig) {
 		// This service handles the loading of the app's config
 		var service = {},
             config = {};
 
-            service.promise = $http.get(window.location.origin + '/data/data.json')
+            service.promise = $http.get(window.location.origin + ChaneyConfig.configPath)
 				.success(function(data){
 					service.setParameters(data);
 				});

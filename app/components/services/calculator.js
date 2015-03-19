@@ -1,7 +1,7 @@
 'use strict';
 angular
     .module('Chaney')
-    .service('Calculator', function(amMoment) {
+    .service('Calculator', function(amMoment, ChaneyConfig) {
         // Shouldn't this service be a factory ?
         var service = {}, parameters = {},
             setParameter = function(key, value){
@@ -10,7 +10,7 @@ angular
             };
 
         service.toMoment = function(string) {
-            return amMoment.preprocessors.utc(string, 'DD/MM/YYYY');
+            return amMoment.preprocessors.utc(string, ChaneyConfig.dateFormat);
         };
 
         // Define setters
@@ -19,7 +19,7 @@ angular
         };
 
         service.setDuration = function(duration, unit){
-            setParameter('durationUnit', unit || 'month');
+            setParameter('durationUnit', unit || ChaneyConfig.defaultDurationUnit);
             return setParameter('duration', duration);
         };
 
@@ -57,7 +57,7 @@ angular
             while(start <= end){
                 var value = values[values.length - 1],
                     d = start.format('D'),
-                    string = start.format('DD/MM/YYYY');
+                    string = start.format(ChaneyConfig.dateFormat);
 
                 // Process recurring operations
                 angular.forEach(parameters.recurrings, function(recurring) {

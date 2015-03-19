@@ -1,20 +1,23 @@
 ;'use strict';
 angular
 	.module('Chaney')
-	.controller('OverviewCtrl', function($scope, $modal, $filter, ConfigHandler, Calculator, amMoment) {
+	.controller('OverviewCtrl', function($scope, $modal, $filter, ConfigHandler, Calculator, amMoment, ChaneyConfig) {
 		// Send parameters to the $scope
         $scope.config = ConfigHandler.getConfig();
+        $scope.enabledSimulations = [];
 
         resetScopeValues = function() {
+            // Reset every scope value to its initial state
             $scope.labels = [];
             $scope.chartData = [];
             $scope.series = [];
             $scope.recurringSum = 0;
         };
 
-		// Init scope vars
-        $scope.enabledSimulations = [];
-        resetScopeValues();
+        prepareDate = function(date){
+            // Prepare a date from a datepicker to the config format
+            return amMoment.preprocessDate(date).format(ChaneyConfig.dateFormat);
+        };
 
         $scope.computeScopeData = function() {
             var regular, i, m;
@@ -37,7 +40,7 @@ angular
             // Build labels
             for (i in regular) {
                 m = Calculator.toMoment($scope.config.parameters.start).add(i, 'days');
-                $scope.labels.push(parseInt(m.format('D')) % 5 === 0 ? m.format('DD/MM/YY') : '');
+                $scope.labels.push(parseInt(m.format('D')) % 5 === 0 ? m.format(ChaneyConfig.dateFormat) : '');
             }
 
             // Compute sum
@@ -72,13 +75,11 @@ angular
             }
         };
 
-        $scope.computeScopeData();
-
         // Modals callback
         $scope.openAddModal = function(type) {
             var modal = $modal.open({
                 templateUrl: 'components/overview/templates/modal/add-' + type + '.html',
-                controller: 'OverviewModalCtrl',
+                controller: 'OverviewAddModalCtrl',
                 size: 'lg'
             });
 
@@ -88,11 +89,11 @@ angular
                     // Prepare the new element (unique / recurring)
                     elt.value = parseInt(elt.value);
                     if (type === 'unique') {
-                        elt.date = amMoment.preprocessDate(elt.date).format('DD/MM/YYYY');
+                        elt.date = prepareDate(elt.date);
                     } else {
                         angular.forEach(['start', 'end'], function(val){
                             if (elt[val]) {
-                                elt[val] = amMoment.preprocessDate(elt[val]).format('DD/MM/YYYY');
+                                elt[val] = prepareDate(elt[val]);
                             }
                         });
                     }
@@ -113,20 +114,46 @@ angular
                     };
                 }
 
-                ConfigHandler.setParameters($scope.config);
-
-                $scope.computeScopeData();
+                updateConfig();
             });
         };
 
         $scope.openExportModal = function() {
             $modal.open({
                 templateUrl: 'components/overview/templates/modal/export-config.html',
-                controller: 'OverviewModalCtrl'
+                controller: 'OverviewCtrl'
             });
         };
+
+        $scope.openParametersModal = function() {
+            var modal = $modal.open({
+                templateUrl: 'components/overview/templates/modal/edit-parameters.html',
+                controller: 'OverviewParametersCtrl'
+            });
+
+            modal.result.then(function(parameters){
+                var _parameters = angular.copy(parameters);
+                // Prepare the parameters
+                _parameters.startValue = parseInt(_parameters.startValue);
+                _parameters.duration = parseInt(_parameters.duration);
+                _parameters.start = prepareDate(_parameters.start);
+
+                // Update scope's config
+                $scope.config.parameters = _parameters;
+                updateConfig();
+            });
+        };
+
+        function updateConfig() {
+            ConfigHandler.setParameters($scope.config);
+            $scope.computeScopeData();
+        };
+
+		// Init scope vars
+        resetScopeValues();
+        $scope.computeScopeData();
 	})
-    .controller('OverviewModalCtrl', function($scope, $modalInstance, ConfigHandler) {
+    .controller('OverviewAddModalCtrl', function($scope, $modalInstance, ConfigHandler) {
         // Handle overview modals
         $scope.config = ConfigHandler.getConfig();
         $scope.newElement = {};
@@ -145,6 +172,19 @@ angular
 
         $scope.ok = function() {
             $modalInstance.close($scope.newElement);
+        };
+
+        $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+        };
+    })
+    .controller('OverviewParametersCtrl', function($scope, $modalInstance, ConfigHandler, Calculator) {
+        $scope.parameters = ConfigHandler.getConfig().parameters;
+
+        $scope.parameters.start = Calculator.toMoment($scope.parameters.start).toDate();
+
+        $scope.ok = function() {
+            $modalInstance.close($scope.parameters);
         };
 
         $scope.cancel = function() {
