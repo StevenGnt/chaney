@@ -39,7 +39,10 @@ angular
                 DATE: 'Date',
                 OK: 'OK',
                 CANCEL: 'Annuler',
-                NONE: 'Aucun(e)'
+                NONE: 'Aucun(e)',
+                START: 'Début',
+                END: 'Fin',
+                DAY: 'Jour'
             },
             OVERVIEW: {
                 RECURRING: 'Récurrent',

@@ -82,15 +82,24 @@ angular
 
             modal.result.then(function (newElement) {
                 var elt = angular.copy(newElement),
+                    prepDate = function(date) {
+                        return amMoment.preprocessDate(elt.date).format('DD/MM/YYYY');
+                    },
                     attr;
                 switch (type) {
                     case 'recurring':
                         attr = 'recurrings';
+                        if (elt.start) {
+                            elt.start = prepDate(elt.start);
+                        }
+                        if (elt.end) {
+                            elt.end = prepDate(elt.end);
+                        }
                         break;
 
                     case 'unique':
                         attr = 'uniques';
-                        elt.date = amMoment.preprocessDate(elt.date).format('DD/MM/YYYY');
+                        elt.date = prepDate(elt.date);
                         break;
 
                     case 'simulation':
@@ -137,6 +146,11 @@ angular
             for (var i in $scope.config.simulations) {
                 $scope.simulations.push(i);
             }
+        }
+
+        $scope.days = [];
+        for (var i = 1; i <= 30; i++) {
+            $scope.days.push(i);
         }
 
         $scope.ok = function() {
