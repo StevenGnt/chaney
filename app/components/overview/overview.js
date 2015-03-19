@@ -13,22 +13,24 @@ angular
 		$scope.labels = [];
         $scope.enabledSimulations = [];
 
-        // Compute chart values
-        regular = Calculator
-            .setStart($scope.config.parameters.start)
-            .setDuration($scope.config.parameters.duration, $scope.config.parameters.durationUnit)
-            .setStartValue($scope.config.parameters.startValue)
-            .setRecurrings($scope.config.recurrings)
-            .setUniques($scope.config.uniques)
-            .computeValues();
-
-        initChartData = function() {
-            $scope.chartData = [];
-            $scope.series = [];
-            $scope.chartData.push(regular);
-            $scope.series.push('Regular');
+        // Compute regular chart values
+        computeRegular = function() {
+            regular = Calculator
+                .setStart($scope.config.parameters.start)
+                .setDuration($scope.config.parameters.duration, $scope.config.parameters.durationUnit)
+                .setStartValue($scope.config.parameters.startValue)
+                .setRecurrings($scope.config.recurrings)
+                .setUniques($scope.config.uniques)
+                .computeValues();
         };
 
+        // Reset chart data values
+        initChartData = function() {
+            $scope.chartData = [regular];
+            $scope.series = ['Regular'];
+        };
+
+        computeRegular();
         initChartData();
 
         // Build labels
@@ -70,6 +72,7 @@ angular
             }
         };
 
+        // Modals
         $scope.openAddModal = function(type) {
             var modal = $modal.open({
                 templateUrl: 'components/overview/templates/modal/add-' + type + '.html',
@@ -78,17 +81,63 @@ angular
             });
 
             modal.result.then(function (newElement) {
-                // @todo Keep this abstract to handle different types
-                // @todo Handle dates
-                console.log(newElement);
-                $scope.config.uniques.push(newElement);
+                var elt = angular.copy(newElement),
+                    attr;
+                switch (type) {
+                    case 'recurring':
+                        attr = 'recurrings';
+                        break;
+
+                    case 'unique':
+                        attr = 'uniques';
+                        elt.date = amMoment.preprocessDate(elt.date).format('DD/MM/YYYY');
+                        break;
+
+                    case 'simulation':
+                        break;
+                }
+
+                // Add the new element where it belongs
+                if (type !== 'simulation') {
+
+                    if (elt.simulation) {
+                        delete elt.simulation;
+                        $scope.config.simulations[newElement.simulation][attr].push(elt);
+                    } else {
+                        $scope.config[attr].push(elt);
+                    }
+                } else {
+                    $scope.config.simulations[elt.name] = {
+                        recurrents: [],
+                        uniques: []
+                    };
+                }
+
                 ConfigHandler.setParameters($scope.config);
+
+                computeRegular();
+                initChartData();
+            });
+        };
+
+        $scope.openExportModal = function() {
+            $modal.open({
+                templateUrl: 'components/overview/templates/modal/export-config.html',
+                controller: 'OverviewModalCtrl'
             });
         };
 	})
-    .controller('OverviewModalCtrl', function($scope, $modalInstance) {
+    .controller('OverviewModalCtrl', function($scope, $modalInstance, ConfigHandler) {
         // Handle overview modals
+        $scope.config = ConfigHandler.getConfig();
         $scope.newElement = {};
+
+        $scope.simulations = [];
+        if ($scope.config.simulations) {
+            for (var i in $scope.config.simulations) {
+                $scope.simulations.push(i);
+            }
+        }
 
         $scope.ok = function() {
             $modalInstance.close($scope.newElement);

@@ -38,7 +38,8 @@ angular
                 VALUE: 'Valeur',
                 DATE: 'Date',
                 OK: 'OK',
-                CANCEL: 'Annuler'
+                CANCEL: 'Annuler',
+                NONE: 'Aucun(e)'
             },
             OVERVIEW: {
                 RECURRING: 'Récurrent',
@@ -49,7 +50,12 @@ angular
                 ADD_UNIQUE: 'Ajouter une opération unique',
                 SIMULATION: 'Simulation',
                 SIMULATIONS: 'Simulations',
-                ADD_UNIQUE: 'Ajouter une simulation'
+                ADD_SIMULATION: 'Ajouter une simulation',
+                PLACEHOLDER: {
+                    NAME: 'Nom',
+                    VALUE: 'Valeur'
+                },
+                EXPORT_CFG: 'Exporter la configuration'
             }
         });
 
