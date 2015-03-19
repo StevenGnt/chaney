@@ -11,8 +11,7 @@ You can also simulate any spending to compare with a "regular" timeline.x
 2. Run gulp in the top-level directory (you might want to adjust some settings in the tasks/config.json file)and access to the app via your server.
 
 ## TODOS
-- Improve chart rendering (labels, points)
-- Make base parameters editable (start value, date ...)
 - Display per day spending instead of the day's value on the point label
+- Make base parameters editable (start value, date ...)
 - Validation on modals
 - [Issue] Weird behaviour when adding data

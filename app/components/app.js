@@ -41,6 +41,7 @@ angular
                 CANCEL: 'Annuler',
                 NONE: 'Aucun(e)',
                 START: 'Début',
+                REGULAR: 'Régulier',
                 END: 'Fin',
                 DAY: 'Jour'
             },

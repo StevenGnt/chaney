@@ -1,5 +1,7 @@
 <table class="table-condensed table table-striped table-hover">
-	<caption>{{ 'OVERVIEW.RECURRINGS' | translate}}</caption>
+	<caption>
+        {{ 'OVERVIEW.RECURRINGS' | translate}} | <span ng-class="recurringSum < 0 ? 'label-danger' : 'label-success'" class="label label-default">{{ recurringSum }} €</span>
+    </caption>
 	<thead>
 		<tr>
 			<th>{{ 'GLOBAL.NAME' | translate }}</th>
@@ -8,7 +10,7 @@
 	</thead>
 	<tbody>
 		<tr ng-repeat="row in config.recurrings track by $index | orderBy : '-value'">
-			<td>{{ row.name }}</td><td><span class="label"ng-class="row.value < 0 ? 'label-danger' : 'label-success'">{{ row.value | number : 2 }} €</span></td>
+			<td>{{ row.name }}</td><td><span class="label" ng-class="row.value < 0 ? 'label-danger' : 'label-success'">{{ row.value | number : 2 }} €</span></td>
 		</tr>
 	</tbody>
 </table>

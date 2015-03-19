@@ -1,10 +1,10 @@
 ;'use strict';
 angular
 	.module('Chaney')
-	.controller('OverviewCtrl', function($scope, $modal, ConfigHandler, Calculator, amMoment) {
+	.controller('OverviewCtrl', function($scope, $modal, $filter, ConfigHandler, Calculator, amMoment) {
 		// var config = ConfigHandler.getConfig(),
         var regular = [],
-            i;
+            i, m;
 
 		// Send parameters to the $scope
         $scope.config = ConfigHandler.getConfig();
@@ -27,17 +27,26 @@ angular
         // Reset chart data values
         initChartData = function() {
             $scope.chartData = [regular];
-            $scope.series = ['Regular'];
+            $scope.series = [$filter('translate')('GLOBAL.REGULAR')];
+        };
+        
+        // Compute recurring sum
+        $scope.recurringSum = '- -';
+        computeRecurringSum = function() {
+            $scope.recurringSum = 0;
+            angular.forEach($scope.config.recurrings, function(value){
+                $scope.recurringSum += value.value;
+            });
         };
 
         computeRegular();
         initChartData();
+        computeRecurringSum();
 
         // Build labels
 		for (i in regular) {
-            $scope.labels.push(i % 5 === 0 ?
-                Calculator.toMoment($scope.config.parameters.start).add(i, 'days').format('DD/MM/YY')
-                : '');
+            m = Calculator.toMoment($scope.config.parameters.start).add(i, 'days');
+            $scope.labels.push(parseInt(m.format('D')) % 5 === 0 ? m.format('DD/MM/YY') : '');
 		}
 
         // ng-click callbacks
