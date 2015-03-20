@@ -75,6 +75,14 @@ angular
             }
         };
 
+        $scope.dateInInterval = function(date) {
+            var m = Calculator.toMoment(date),
+                s = Calculator.toMoment($scope.config.parameters.start),
+                e = s.clone().add($scope.config.parameters.duration, $scope.config.parameters.durationUnit);
+
+            return m >= s && m <= e;
+        };
+
         // Modals callback
         $scope.openAddModal = function(type) {
             var modal = $modal.open({

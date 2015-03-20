@@ -43,6 +43,7 @@ angular
                 START: 'Début',
                 REGULAR: 'Régulier',
                 END: 'Fin',
+                UNUSED: 'Inutilisé',
                 DAY: 'Jour'
             },
             OVERVIEW: {
