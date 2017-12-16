@@ -1,9 +1,0 @@
-<table class="table-condensed table table-striped table-hover">
-	<caption>{{ 'OVERVIEW.SIMULATIONS' | translate}}</caption>
-	<tbody>
-		<tr ng-repeat="(name, simulation) in config.simulations | orderBy : name">
-            <td><input type="checkbox" name="{{ name }}" ng-model="enabledSimulations[name]" ng-change="computeScopeData()"/></td>
-			<td>{{ name }}</td>
-		</tr>
-	</tbody>
-</table>
