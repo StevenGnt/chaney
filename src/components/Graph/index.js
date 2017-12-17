@@ -160,7 +160,7 @@ class Graph extends React.Component {
         // Build every line of the graph
         const graphLines = [];
         metadata.usedFluxModelsNames.forEach((fluxModelName, i) => {
-            graphLines.push(<Line type="monotone" key={i} dataKey={fluxModelName} stroke={getLineColor()} />);
+            graphLines.push(<Line unit="€" type="monotone" key={i} dot={false} dataKey={fluxModelName} stroke={getLineColor()} />);
         });
 
         return (

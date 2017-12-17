@@ -7,11 +7,14 @@ import FluxModelRow from './FluxModelRow';
 class FluxModel extends React.Component {
 
     renderFluxModelRows(rows, type, title) {
+        const sortField = type === 'punctual' ? 'date' : 'day';
+        rows.sort((a, b) => a[sortField] - b[sortField]);
+
         const renderedRow = rows.map((row, index) => <FluxModelRow key={index} type={type} row={row} />);
         return (
             <div className="{type}">
                 <span className="title">{title}</span>
-                <div>{renderedRow}</div>
+                <ul>{renderedRow}</ul>
             </div>
         );
     }
