@@ -1,0 +1,28 @@
+#app-header{
+    background-color:rebeccapurple;
+    font-size: 40px;
+    font-style: oblique;
+    line-height: 100px;
+    font-weight:bold;
+    color:white;
+}
+
+#toolbar {
+    padding: 5px 0px;
+    display:flex;
+    justify-content: space-between;
+}
+
+.flux-model dt{
+    width: 90px;
+}
+
+.flux-model dd{
+    margin-left: 110px;
+}
+
+.flux-model .label{
+    display:inline-block;
+    width: 60px;
+    font-size: 11px;
+}

@@ -3,6 +3,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
+import AppHeader from 'src/components/AppHeader';
 import Toolbar from 'src/components/Toolbar';
 import Graph from 'src/components/Graph';
 import FluxModel from 'src/components/FluxModel';
@@ -42,8 +43,11 @@ class MainView extends React.Component {
 
         return (
             <div>
-                <div><Toolbar config={config} /></div>
-                {content}
+                <AppHeader />
+                <div className="container">
+                    <div><Toolbar config={config} /></div>
+                    {content}
+                </div>
             </div>
         );
     }

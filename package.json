@@ -25,5 +25,9 @@
     "start:dev": "./node_modules/.bin/webpack-dev-server --inline --hot"
   },
   "author": "StevenGnt",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "css-loader": "^0.28.7",
+    "style-loader": "^0.19.1"
+  }
 }

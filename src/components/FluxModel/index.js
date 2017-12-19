@@ -4,42 +4,66 @@ import React from 'react';
 
 import FluxModelRow from './FluxModelRow';
 
-class FluxModel extends React.Component {
-
-    renderFluxModelRows(rows, type, title) {
-        const sortField = type === 'punctual' ? 'date' : 'day';
-        rows.sort((a, b) => a[sortField] - b[sortField]);
-
-        const renderedRow = rows.map((row, index) => <FluxModelRow key={index} type={type} row={row} />);
-        return (
-            <div className="{type}">
-                <span className="title">{title}</span>
-                <ul>{renderedRow}</ul>
-            </div>
-        );
+/**
+ * Render the rows of a flux model
+ * @param {Object} fluxModel 
+ * @param {String} type Type of rows to render
+ * @returns {JSXTemplate}
+ */
+function renderFluxModelRows(rows, type) {
+    // No data
+    if (rows.length < 1) {
+        return '';
     }
+
+    // Sort data chronologically
+    const sortField = type === 'punctual' ? 'date' : 'day';
+    rows.sort((a, b) => a[sortField] - b[sortField]);
+
+    const renderedRow = rows.map((row, index) =>
+        <span key={index}>
+            <FluxModelRow type={type} row={row} /><br />
+        </span>);
+
+    return <div>{renderedRow}</div>;
+}
+class FluxModel extends React.Component {
 
     render() {
         const expenses = {};
 
-        if (this.props.fluxModel.monthly) {
-            expenses.monthly = this.renderFluxModelRows(this.props.fluxModel.monthly, 'monthly', 'Monthly');
-        }
+        // Render each section of the flux model per type
+        const sections = [{
+            name: 'Monthly',
+            render: renderFluxModelRows(this.props.fluxModel.monthly || [], 'monthly')
+        }, {
+            name: 'Weekly',
+            render: renderFluxModelRows(this.props.fluxModel.weekly || [], 'weekly')
+        }, {
+            name: 'Punctual',
+            render: renderFluxModelRows(this.props.fluxModel.punctual || [], 'punctual')
+        }];
 
-        if (this.props.fluxModel.weekly) {
-            expenses.weekly = this.renderFluxModelRows(this.props.fluxModel.weekly, 'weekly', 'Weekly');
-        }
+        // Rewrap each rendered section
+        const renderedSections = sections
+            .filter(section => !!section.render) // Remove empty renders (= no info)
+            .map((section, index) => (
+                <div key={index} className="col-md-4">
+                    <dl className="flux-model dl-horizontal">
+                        <dt>{section.name}</dt>
+                        <dd>{section.render}</dd>
+                    </dl>
+                </div>));
 
-        if (this.props.fluxModel.punctual) {
-            expenses.punctual = this.renderFluxModelRows(this.props.fluxModel.punctual, 'punctual', 'Punctual');
-        }
-
-        if (expenses.monthly || expenses.weekly || expenses.punctual) {
+        if (renderedSections.length > 0) {
             return (
-                <div className="flux-model">
-                    {expenses.monthly}
-                    {expenses.weekly}
-                    {expenses.punctual}
+                <div>
+                    <h3>{this.props.fluxModel.name}</h3>
+                    <div className="well well-sm">
+                        <div className="row">
+                            {renderedSections}
+                        </div>
+                    </div>
                 </div>
             );
         } else {

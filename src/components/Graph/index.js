@@ -1,14 +1,9 @@
 import React from 'react';
 import moment from 'moment';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'Recharts';
-
-const graphSize = {
-    width: 1200, 
-    height: 600
-};
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'Recharts';
 
 const dateLabelFormat = 'DD/MM/YY';
-const linesColors = ['#8884d8', '#82ca9d'];
+const linesColors = ['rebeccapurple', '#82ca9d'];
 
 /**
  * Generate a random color that does not belong to the initial
@@ -18,8 +13,8 @@ const linesColors = ['#8884d8', '#82ca9d'];
 function getRandomColor() {
     let i = 0;
 
-    // Attempt (10 times max) to generate a non-used random color
-    while (i < 10) {
+    // Attempt (100 times max) to generate a non-used random color
+    while (i < 100) {
         i++;
         const color = '#' + Math.random().toString(16).substr(-6);
         if (!linesColors.includes(color)) {
@@ -37,7 +32,7 @@ function getRandomColor() {
  * @param {Object} date 
  * @return {Boolean}
  */
-function isTransactionActiveAtGivenDate (transaction, date) {
+function isTransactionActiveAtGivenDate(transaction, date) {
     const hasStarted = 'start' in transaction ? moment(transaction.start) <= date : true;
     const hasNotFinished = 'end' in transaction ? moment(transaction.end) >= date : true;
 
@@ -164,16 +159,18 @@ class Graph extends React.Component {
         });
 
         return (
-            <LineChart width={graphSize.width} height={graphSize.height} data={graphData}>
-                <XAxis dataKey="dateName" />
-                <YAxis />
-                {graphLines}
-                <CartesianGrid strokeDasharray="3 3"/>
-                <Tooltip/>
-                <Legend />
-            </LineChart>
+            <ResponsiveContainer width={"100%"} height={600}>
+                <LineChart data={graphData}>
+                    <XAxis dataKey="dateName" />
+                    <YAxis />
+                    {graphLines}
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <Tooltip />
+                    <Legend />
+                </LineChart>
+            </ResponsiveContainer>
         );
     }
 }
-    
+
 export default Graph;
