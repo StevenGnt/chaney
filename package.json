@@ -22,7 +22,7 @@
     "webpack-dev-server": "^2.9.7"
   },
   "scripts": {
-    "start:dev": "./node_modules/.bin/webpack-dev-server --inline --hot"
+    "start": "./node_modules/.bin/webpack-dev-server --inline --hot"
   },
   "author": "StevenGnt",
   "license": "MIT",
