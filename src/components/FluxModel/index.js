@@ -16,9 +16,18 @@ function renderFluxModelRows(rows, type) {
         return '';
     }
 
-    // Sort data chronologically
-    const sortField = type === 'punctual' ? 'date' : 'day';
-    rows.sort((a, b) => a[sortField] - b[sortField]);
+    const sort = type === 'punctual' ?
+        (a, b) => a.date - b.date : // Sort date
+        (a, b) => { // Positive amounts first, then negative, then by date
+            if (a.amount > 0 && b.amount < 0) {
+                return -1;
+            } else if (a.amount < 0 && b.amount > 0) {
+                return 1;
+            } else {
+                return a.day - b.day;
+            }
+        };
+    rows.sort(sort);
 
     const renderedRow = rows.map((row, index) =>
         <span key={index}>
