@@ -1,6 +1,5 @@
-'use strict';
-
-const path = require('path');
+import mockBackend from './mockBackend/server';
+import path from 'path';
 
 const config = {
     entry: './src/index.js',
@@ -29,7 +28,8 @@ const config = {
         }]
     },
     devServer: {
-        contentBase: path.resolve(__dirname, 'dist')
+        contentBase: path.resolve(__dirname, 'dist'),
+        before: mockBackend
     }
 };
 

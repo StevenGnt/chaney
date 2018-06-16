@@ -27,6 +27,7 @@
   "author": "StevenGnt",
   "license": "MIT",
   "devDependencies": {
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
     "css-loader": "^0.28.7",
     "style-loader": "^0.19.1"
   }

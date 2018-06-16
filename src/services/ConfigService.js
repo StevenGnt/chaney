@@ -1,22 +1,12 @@
-import moment from 'moment';
-
 import conf from 'src/conf';
 
-// @todo Temporary
-import mockConfig from 'src/mocks/config';
+const ENDPOINT_CONFIG = `${conf.backendUrl}/config`;
 
 /**
  * Fetch the config from backend
  * @return {Promise}
  */
-function fetchConfig() {
-    // @todo Use backend
-    return new Promise(resolve => {
-        setTimeout(() => {
-            resolve(mockConfig);
-        }, 500);
-    })
-}
+const fetchConfig = () => fetch(ENDPOINT_CONFIG).then(data => data.json());
 
 /**
  * Save the config in the backend
@@ -25,11 +15,7 @@ function fetchConfig() {
  */
 function saveConfig(config) {
     // @todo Use backend
-    return new Promise(resolve => {
-        setTimeout(() => {
-            _mockAppConfig = config;
-        }, 500);
-    });
+    return new Promise(resolve => setTimeout(resolve, 3000));
 }
 
 const ConfigService = { fetchConfig, saveConfig };

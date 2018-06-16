@@ -1,19 +1,11 @@
 import conf from 'src/conf';
 
-// @todo Temporary
-import mockFluxModels from 'src/mocks/fluxModels';
+const ENDPOINT_FLUX_MODELS = `${conf.backendUrl}/flux-models`;
 
 /**
  * @return {Promise}
  */
-function getModels() {
-    // @todo Use backend
-    return new Promise(resolve => {
-        setTimeout(() => {
-            resolve(mockFluxModels);
-        }, 500);
-    })
-}
+const getModels = () => fetch(ENDPOINT_FLUX_MODELS).then(data => data.json());
 
 /**
  * @param {Object} fluxModel
@@ -21,11 +13,7 @@ function getModels() {
  */
 function save(fluxModel) {
     // @todo Use backend
-    return new Promise(resolve => {
-        setTimeout(() => {
-            resolve();
-        }, 3000);
-    })
+    return new Promise(resolve => setTimeout(resolve, 3000));
 }
 
 const FluxModelService = { getModels, save };
