@@ -15,7 +15,7 @@ const readFile = filepath => new Promise((resolve, reject) => {
   });
 });
 
-const getMockfilePath = file => `${__dirname}\\assets\\${file}`;
+const getMockfilePath = file => `${__dirname}/assets/${file}`;
 
 const server = app => {
   const BACKEND_PATH_PREFIX = '/api';
