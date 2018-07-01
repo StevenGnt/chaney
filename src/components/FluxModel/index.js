@@ -17,7 +17,7 @@ function renderFluxModelRows(rows, type) {
     }
 
     const sort = type === 'punctual' ?
-        (a, b) => a.date - b.date : // Sort date
+        (a, b) => new Date(a.date) - new Date(b.date) : // Sort date
         (a, b) => { // Positive amounts first, then negative, then by date
             if (a.amount > 0 && b.amount < 0) {
                 return -1;
