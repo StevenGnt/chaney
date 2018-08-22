@@ -1,8 +1,9 @@
 import React from 'react';
 import AmountLabel from './AmountLabel';
+import { getTransactionDays } from '../Account.utils';
 
 function formatMonthlyDay(day) {
-  return (Array.isArray(day) ? day : [day]).join(', ');
+  return getTransactionDays(day).join(', ');
 }
 
 export default props => {

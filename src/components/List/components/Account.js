@@ -6,31 +6,39 @@ import WeeklyTransaction from './transactions/WeeklyTransaction';
 import MonthlyTransaction from './transactions/MonthlyTransaction';
 import UniqueTransaction from './transactions/UniqueTransaction';
 
+import { sortDaily, sortMultipleDays } from './Account.utils';
 import './Account.css';
 
 const transactionTypes = [
-  { key: 'monthly', name: 'Monthly', renderer: MonthlyTransaction },
-  { key: 'weekly', name: 'Weekly', renderer: WeeklyTransaction },
-  { key: 'unique', name: 'Unique', renderer: UniqueTransaction },
+  { key: 'monthly', name: 'Monthly', renderer: MonthlyTransaction, sort: sortMultipleDays },
+  { key: 'weekly', name: 'Weekly', renderer: WeeklyTransaction, sort: sortMultipleDays },
+  { key: 'unique', name: 'Unique', renderer: UniqueTransaction, sort: sortDaily },
 ];
 
 class Account extends React.Component {
   render() {
     const { transactions } = this.props.account;
 
-    const renderedParts = transactionTypes.map(({ key, name, renderer: Renderer }) => {
-      const renderedTransactions = key in transactions && transactions[key].length > 0
-        ? (
-          <ul>
-            {transactions[key].map((transaction, i) => <li key={i}><Renderer transaction={transaction} /></li>)}
-          </ul>
-        )
-        : (<span className="no-transaction">Nothing</span>);
+    const renderedParts = transactionTypes.map(({ key, name, sort, renderer: Renderer }) => {
+      const partTransaction = key in transactions
+        ? transactions[key].concat()
+        : [];
+
+      if (sort) {
+        console.log('[SG]', 'sorting because has sort', name);
+        partTransaction.sort(sort);
+      }
 
       return (
         <div className="account-transactions-list" key={key}>
           <h4>{name}</h4>
-          {renderedTransactions}
+          {partTransaction.length > 0
+            ? (
+              <ul>
+                {partTransaction.map((transaction, i) => <li key={i}><Renderer transaction={transaction} /></li>)}
+              </ul>
+            )
+            : <span className="no-transaction">Nothing</span>}
         </div>
       );
     });
