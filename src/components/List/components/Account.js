@@ -25,7 +25,6 @@ class Account extends React.Component {
         : [];
 
       if (sort) {
-        console.log('[SG]', 'sorting because has sort', name);
         partTransaction.sort(sort);
       }
 
