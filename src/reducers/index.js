@@ -1,8 +1,13 @@
-import { combineReducers } from 'redux';
+import Actions from '../actions/actions';
 
-import config from 'src/reducers/ConfigReducer';
-import fluxModels from 'src/reducers/FluxModelsReducer';
+const defaultReducer = (state, { type, payload }) => {
+  switch (type) {
+    case Actions.ACCOUNTS_RECIEVED:
+      return { ...state, accounts: payload.accounts };
 
-const appReducer = combineReducers({ config, fluxModels });
+    default:
+      return {};
+  }
+};
 
-export default appReducer;
+export default defaultReducer;
