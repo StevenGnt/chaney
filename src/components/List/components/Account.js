@@ -2,59 +2,23 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import FontAwesome from 'react-fontawesome';
 
+import WeeklyTransaction from './transactions/WeeklyTransaction';
+import MonthlyTransaction from './transactions/MonthlyTransaction';
+import UniqueTransaction from './transactions/UniqueTransaction';
+
 import './Account.css';
 
-const AmountLabel = props => {
-  const { amount } = props;
-
-  let className;
-
-  if (amount === 0) {
-    className = 'info';
-  } else if (amount > 0) {
-    className = 'success';
-  } else {
-    className = 'danger';
-  }
-
-  return <span className={'badge badge-' + className}>{amount}€</span>;
-};
-
-const MonthlyTransaction = props => {
-  const { name, day, amount } = props.transaction;
-  return <span><AmountLabel amount={amount} /> {name} every <b>{day}</b></span>;
-};
-
-/**
- * Get the name of a day from its ordinal
- * @param {number} day
- * @returns {string}
- */
-function getDayName(day) {
-  return ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][day - 1];
-}
-
-const WeeklyTransaction = props => {
-  const { name, day, amount } = props.transaction;
-  return <span><AmountLabel amount={amount} /> {name} every <b>{getDayName(day)}</b></span>;
-};
-
-const UniqueTransaction = props => {
-  const { name, date, amount } = props.transaction;
-  return <span><AmountLabel amount={amount} /> {name} on <b>{date}</b></span>;
-};
+const transactionTypes = [
+  { key: 'monthly', name: 'Monthly', renderer: MonthlyTransaction },
+  { key: 'weekly', name: 'Weekly', renderer: WeeklyTransaction },
+  { key: 'unique', name: 'Unique', renderer: UniqueTransaction },
+];
 
 class Account extends React.Component {
   render() {
     const { transactions } = this.props.account;
 
-    const parts = [
-      { name: 'Monthly', key: 'monthly', renderer: MonthlyTransaction },
-      { name: 'Weekly', key: 'weekly', renderer: WeeklyTransaction },
-      { name: 'Unique', key: 'unique', renderer: UniqueTransaction },
-    ];
-
-    const renderedParts = parts.map(({ key, name, renderer: Renderer }) => {
+    const renderedParts = transactionTypes.map(({ key, name, renderer: Renderer }) => {
       const renderedTransactions = key in transactions && transactions[key].length > 0
         ? (
           <ul>
