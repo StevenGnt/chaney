@@ -12,6 +12,9 @@ import {
   Line
 } from 'recharts';
 
+// @todo Include this in Graph component instance
+const usedColors = [];
+
 /**
  * Check wether a transaction happens on a given day
  * @param {Object} transaction 
@@ -27,18 +30,24 @@ function shouldUseTransaction(transaction, type, date) {
   }
 
   switch (type) {
-    case 'monthly':
-      return moment(date).format('D') == transaction.day; // eslint-disable-line eqeqeq
-    case 'weekly':
-      return moment(date).format('E') == transaction.day; // eslint-disable-line eqeqeq
+    case 'monthly': {
+      const formatedDay = moment(date).format('D');
+      return Array.isArray(transaction.day)
+        ? transaction.day.map(day => day.toString()).includes(formatedDay)
+        : formatedDay == transaction.day; // eslint-disable-line eqeqeq
+    }
+    case 'weekly': {
+      const formatedDay = moment(date).format('E');
+      return Array.isArray(transaction.day)
+        ? transaction.day.map(day => day.toString()).includes(formatedDay)
+        : formatedDay == transaction.day; // eslint-disable-line eqeqeq
+    }
     case 'unique':
       return date === transaction.date;
     default:
       return false;
   }
 }
-
-const usedColors = [];
 
 /**
  * Get the color of the stroke for an account (from settings or a random non-used color)
