@@ -1,5 +1,7 @@
 import React from 'react';
 
+import './AmountLabel.css';
+
 export default props => {
   const { amount } = props;
 
@@ -13,5 +15,5 @@ export default props => {
     className = 'danger';
   }
 
-  return <span className={'badge badge-' + className}>{amount}€</span>;
+  return <span className={'amount-label badge badge-' + className}>{amount}€</span>;
 };

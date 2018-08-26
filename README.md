@@ -14,6 +14,5 @@ This app allows you to foresee your money speendings, considering your recurring
 ## Evolutions and TODOs
 - Simulations
 - Unsync accounts start date + visualization start date
-- Detailed informations on click on a chart's line
 - Backend (store configurations)
 - i18n
