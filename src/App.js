@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import actionsCreators from './actions/actionsCreators';
 import MainPage from './containers/MainPage/MainPage.container';
 
+import './assets/fonts/BAD GRUNGE.ttf';
 import './App.css';
 
 class App extends Component {
@@ -15,7 +16,7 @@ class App extends Component {
     return (
       <div className="App">
         <header className="App-header">
-          <h1 className="App-title">Chaney III</h1>
+          <h1 className="App-title">Chaney 3</h1>
         </header>
         <MainPage />
       </div>
