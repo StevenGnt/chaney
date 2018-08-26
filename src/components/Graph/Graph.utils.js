@@ -2,8 +2,6 @@ import React from 'react';
 import moment from 'moment';
 import { Line } from 'recharts';
 
-const usedColors = [];
-
 /**
  * Check wether a transaction happens on a given day
  * @param {Object} transaction 
@@ -35,30 +33,6 @@ function shouldUseTransaction(transaction, type, date) {
       return date === transaction.date;
     default:
       return false;
-  }
-}
-
-/**
- * Get the color of the stroke for an account (from settings or a random non-used color)
- * @param {Object} account 
- * @returns {String}
- */
-function getAccountStrokeColor(account) {
-  if ('color' in account) {
-    usedColors.push(account.color);
-    return account.color;
-  }
-
-  let randomColor;
-
-  while (!randomColor) {
-    randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
-    if (usedColors.includes(randomColor)) {
-      randomColor = null;
-    } else {
-      usedColors.push(randomColor);
-      return randomColor;
-    }
   }
 }
 
@@ -96,8 +70,6 @@ export function getAccountsDateTransactions(accounts, date) {
  * Prepare <Line /> elements for the graph
  * @param {Array} accounts 
  * @returns {Array}
- * @todo Strokes colors should be handled somewhere else above this component
- * to avoid color change
  */
 export function prepareGraphLines(accounts) {
   return accounts.map((account, i) => (
@@ -106,7 +78,7 @@ export function prepareGraphLines(accounts) {
       key={i}
       dot={false}
       dataKey={account.name}
-      stroke={getAccountStrokeColor(account)}
+      stroke={account.color}
     />
   ));
 }

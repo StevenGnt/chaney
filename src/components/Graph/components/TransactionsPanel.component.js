@@ -37,7 +37,6 @@ const TransactionsPanel = props => {
   );
 };
 
-
 TransactionsPanel.propTypes = {
   accounts: PropTypes.array,
   date: PropTypes.string,

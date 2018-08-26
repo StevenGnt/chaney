@@ -1,8 +1,9 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import './AmountLabel.css';
 
-export default props => {
+const AmountLabel = props => {
   const { amount } = props;
 
   let className;
@@ -17,3 +18,9 @@ export default props => {
 
   return <span className={'amount-label badge badge-' + className}>{amount}€</span>;
 };
+
+AmountLabel.propTypes = {
+  amount: PropTypes.number,
+};
+
+export default AmountLabel;
