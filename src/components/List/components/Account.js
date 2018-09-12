@@ -17,7 +17,8 @@ const transactionTypes = [
 
 class Account extends React.Component {
   render() {
-    const { transactions } = this.props.account;
+    const { account } = this.props;
+    const { transactions } = account;
 
     const renderedParts = transactionTypes.map(({ key, name, sort, renderer: Renderer }) => {
       const partTransaction = key in transactions
@@ -34,7 +35,7 @@ class Account extends React.Component {
           {partTransaction.length > 0
             ? (
               <ul>
-                {partTransaction.map((transaction, i) => <li key={i}><Renderer transaction={transaction} /></li>)}
+                {partTransaction.map((transaction, i) => <li key={i}><Renderer transaction={transaction} account={account} /></li>)}
               </ul>
             )
             : <span className="no-transaction">Nothing</span>}

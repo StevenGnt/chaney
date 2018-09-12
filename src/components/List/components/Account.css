@@ -35,3 +35,7 @@
   margin: 0px 0px;
   border-left: 1px solid #CCC;
 }
+
+.account-transactions .unique-passed {
+  text-decoration: line-through;
+}
