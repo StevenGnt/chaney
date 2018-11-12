@@ -8,7 +8,7 @@ class List extends React.Component {
     const renderedAccounts = this.props.accounts
       .map(account => <Account key={account.id} account={account} />);
 
-    return <div>{renderedAccounts}</div>;
+    return <React.Fragment>{renderedAccounts}</React.Fragment>;
   }
 }
 
