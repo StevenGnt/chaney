@@ -12,16 +12,21 @@ function formatWeeklyDay(day) {
 }
 
 const WeeklyTransaction = props => {
-  const { name, day, amount } = props.transaction;
-  return <span><AmountLabel amount={amount} /> {name} every <b>{formatWeeklyDay(day)}</b></span>;
+  const { transaction, unit } = props;
+  const { name, day, amount } = transaction;
+
+  return <span><AmountLabel amount={amount} unit={unit} /> {name} every <b>{formatWeeklyDay(day)}</b></span>;
 };
 
 
-
 WeeklyTransaction.propTypes = {
-  name: PropTypes.string,
-  day: PropTypes.string,
-  amount: PropTypes.number,
+  transaction: PropTypes.shape({
+    name: PropTypes.string,
+    // day: PropTypes.arrayOf(PropTypes.number),
+    day: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.number), PropTypes.number]),
+    amount: PropTypes.number,
+  }),
+  unit: PropTypes.string,
 };
 
 export default WeeklyTransaction;

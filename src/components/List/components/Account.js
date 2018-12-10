@@ -20,6 +20,8 @@ class Account extends React.Component {
     const { account } = this.props;
     const { transactions } = account;
 
+    const unit = account.unit || '€';
+
     const renderedParts = transactionTypes.map(({ key, name, sort, renderer: Renderer }) => {
       const partTransaction = key in transactions
         ? transactions[key].concat()
@@ -35,7 +37,9 @@ class Account extends React.Component {
           {partTransaction.length > 0
             ? (
               <ul>
-                {partTransaction.map((transaction, i) => <li key={i}><Renderer transaction={transaction} account={account} /></li>)}
+                {partTransaction.map(
+                  (transaction, i) => <li key={i}><Renderer transaction={transaction} account={account} unit={unit} /></li>
+                )}
               </ul>
             )
             : <span className="no-transaction">Nothing</span>}
@@ -61,13 +65,16 @@ class Account extends React.Component {
       sign = '';
     }
 
-    const balanceLabel = `${sign}${monthlyBalance}€`;
-
-    const balance = <span title={`Per month balance : ${balanceLabel}`} className={badgeClass}>{balanceLabel}</span>
+    // Account balance
+    let balance;
+    if (account.showMonthlyBalance) {
+      const balanceLabel = `${sign}${monthlyBalance}${unit}`;
+      balance = (<span title={`Per month balance : ${balanceLabel}`} className={badgeClass}> {balanceLabel}</span>);
+    }
 
     return (
       <div className="account-details">
-        <h3><FontAwesome name="book" /> {this.props.account.name} {balance}</h3>
+        <h3><FontAwesome name="book" /> {this.props.account.name}{balance}</h3>
         <div className="account-transactions">{renderedParts}</div>
       </div>
     );

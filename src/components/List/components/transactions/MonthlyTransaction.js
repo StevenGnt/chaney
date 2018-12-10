@@ -9,14 +9,18 @@ function formatMonthlyDay(day) {
 }
 
 const MonthlyTransaction = props => {
-  const { name, day, amount } = props.transaction;
-  return <span><AmountLabel amount={amount} /> {name} every <b>{formatMonthlyDay(day)}</b></span>;
+  const { transaction, unit } = props;
+  const { name, day, amount } = transaction;
+  return <span><AmountLabel amount={amount} unit={unit} /> {name} every <b>{formatMonthlyDay(day)}</b></span>;
 };
 
 MonthlyTransaction.propTypes = {
-  name: PropTypes.string,
-  day: PropTypes.string,
-  amount: PropTypes.number,
+  transaction: PropTypes.shape({
+    name: PropTypes.string,
+    day: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.number), PropTypes.number]),
+    amount: PropTypes.number,
+  }),
+  unit: PropTypes.string,
 };
 
 export default MonthlyTransaction;

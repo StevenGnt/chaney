@@ -73,7 +73,7 @@ export function getAccountsDateTransactions(accounts, date) {
  */
 export function prepareGraphLines(accounts) {
   return accounts.map((account, i) => (
-    <Line unit="€"
+    <Line unit={account.unit || '€'}
       type="monotone"
       key={i}
       dot={false}
