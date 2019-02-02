@@ -5,6 +5,8 @@ import { connect } from 'react-redux'
 import Graph from '../../components/Graph/Graph.component';
 import List from '../../components/List/List.component';
 
+import CONFIG from '../../config';
+
 const usedColors = [];
 
 /**
@@ -43,9 +45,9 @@ class MainPage extends React.Component {
     }
 
     const graphOptions = {
-      duration: 6,
-      durationUnit: 'months',
-      dateFormat: 'YYYY-MM-DD',
+      duration: CONFIG.DURATION,
+      durationUnit: CONFIG.DURATION_UNIT,
+      dateFormat: CONFIG.DATE_FORMAT,
     };
 
     const preparedGraphAccounts = accounts.map(account => ({

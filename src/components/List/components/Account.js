@@ -52,24 +52,23 @@ class Account extends React.Component {
     const sumWeekly = (transactions.weekly || []).reduce((acc, transaction) => acc + transaction.amount, 0);
     const monthlyBalance = sumMonthly + 4 * sumWeekly;
 
-    let sign = '';
-    let badgeClass = 'badge ';
-    if (monthlyBalance > 0) {
-      badgeClass += 'badge-success';
-      sign = '+';
-    } else if (monthlyBalance < 0) {
-      badgeClass += 'badge-danger';
-      sign = '';
-    } else {
-      badgeClass += 'badge-secondary';
-      sign = '';
-    }
-
     // Account balance
     let balance;
     if (account.showMonthlyBalance) {
+      let sign = '';
+      let badgeClass = 'badge ';
+      if (monthlyBalance > 0) {
+        badgeClass += 'badge-success';
+        sign = '+';
+      } else if (monthlyBalance < 0) {
+        badgeClass += 'badge-danger';
+      } else {
+        badgeClass += 'badge-secondary';
+      }
+
       const balanceLabel = `${sign}${monthlyBalance}${unit}`;
-      balance = (<span title={`Per month balance : ${balanceLabel}`} className={badgeClass}> {balanceLabel}</span>);
+      const title = `Per month balance : ${balanceLabel}`;
+      balance = (<span> <span title={title} className={badgeClass}>{balanceLabel}</span></span>);
     }
 
     return (
