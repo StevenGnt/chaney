@@ -1,0 +1,67 @@
+[
+  {
+    "id": 0,
+    "name": "Daily",
+    "date": "2018-08-10",
+    "amount": 1000,
+    "color": "blue",
+    "transactions": {
+      "monthly": [
+        {
+          "name": "Pay",
+          "amount": 1500,
+          "day": 1
+        },
+        {
+          "name": "Rent",
+          "amount": -500,
+          "day": 5
+        }
+      ],
+      "weekly": [
+        {
+          "name": "Groceries",
+          "amount": -50,
+          "day": 2
+        }
+      ],
+      "unique": [
+        {
+          "name": "Fridge",
+          "amount": -150,
+          "date": "2018-12-25"
+        }
+      ]
+    }
+  },
+  {
+    "id": 1,
+    "name": "Food stamps",
+    "date": "2018-08-05",
+    "amount": 100,
+    "transactions": {
+      "monthly": [
+        {
+          "name": "Reload",
+          "amount": 250,
+          "day": 25
+        }
+      ]
+    }
+  },
+  {
+    "id": 2,
+    "name": "Savings",
+    "date": "2018-08-15",
+    "amount": 1000,
+    "transactions": {
+      "monthly": [
+        {
+          "name": "Save",
+          "amount": 100,
+          "day": 10
+        }
+      ]
+    }
+  }
+]

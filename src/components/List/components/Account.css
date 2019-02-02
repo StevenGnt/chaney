@@ -1,0 +1,41 @@
+.account-details h3 {
+  font-size: 1.5em;
+}
+
+.account-details .no-transaction  {
+  color: #BBB;
+  display: inline-block;
+  text-align: center;
+  width: 100%;
+  margin: 5px;
+}
+
+.account-transactions {
+  display: flex;
+  flex-direction: row;
+  font-size: 0.95em;
+}
+
+.account-transactions-list {
+  flex: 1;
+  min-height: 100px;
+  min-width: 250px;
+  padding: 10px;
+  margin: 10px;
+  background-color:#F8F8F8;
+}
+
+.account-transactions h4 {
+  font-size: 1.2em;
+}
+
+.account-transactions-list ul {
+  list-style: none;
+  padding: 10px;
+  margin: 0px 0px;
+  border-left: 1px solid #CCC;
+}
+
+.account-transactions .unique-passed {
+  text-decoration: line-through;
+}

@@ -1,0 +1,25 @@
+@font-face {
+  font-family: "Bad Grunge";
+  src: url("assets/fonts/BAD GRUNGE.ttf");
+}
+
+.App {
+  width: 1200px;
+  margin: auto;
+}
+
+.App-header {
+  background-color: #222;
+  padding: 10px 30px;
+  color: white;
+  text-align: center;
+}
+
+.App-title {
+  font-size: 4em;
+  font-family: "Bad Grunge";
+}
+
+.App-intro {
+  font-size: large;
+}

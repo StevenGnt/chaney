@@ -1,19 +1,24 @@
-'use strict';
-
-import css from 'src/chaney.css';
-
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
+import { Provider } from 'react-redux'
+import { createStore, applyMiddleware } from 'redux'
+import thunk from 'redux-thunk';
 
-import MainView from 'src/views/MainView';
+import registerServiceWorker from './registerServiceWorker';
+import App from './App';
+import reducers from './reducers';
 
-import configureStore from 'src/store';
+import './index.css';
 
-const store = configureStore();
+import 'bootstrap/dist/css/bootstrap.css'
 
-ReactDOM.render(
-	<Provider store={store}>
-		<MainView />
-	</Provider>,
-	document.getElementById('chaney-app'));
+const store = createStore(reducers, applyMiddleware(thunk));
+
+const ConnectedApp = (
+  <Provider store={store}>
+    <App />
+  </Provider>
+);
+
+ReactDOM.render(ConnectedApp, document.getElementById('root'));
+registerServiceWorker();
