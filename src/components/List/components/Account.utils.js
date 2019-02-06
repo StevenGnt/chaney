@@ -39,6 +39,10 @@ export function sortMultipleDays(a, b) {
  * @returns {Number}
  */
 export function sortDaily(a, b) {
+  if (a.date === b.date) {
+    return a.name.localeCompare(b.name);
+  }
+
   return a.date > b.date ? 1 : -1;
 }
 
