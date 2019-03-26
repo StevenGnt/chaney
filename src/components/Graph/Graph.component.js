@@ -71,7 +71,7 @@ class Graph extends React.Component {
           <LineChart data={data} onClick={this.onChartClick}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" />
-            <YAxis />
+            <YAxis scale="linear" />
             <Tooltip />
             <Legend />
             {lines}
