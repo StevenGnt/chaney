@@ -120,11 +120,21 @@ export function prepareGraphData(accounts, options) {
   while (endDate > cursor) {
     const date = cursor.format(dateFormat);
 
+    // Gather the value of each account at the given date
     const accountsValues = accounts.reduce((values, account) => {
-      values[account.name] = getDateTransactions(account.transactions, date)
-        .reduce((value, transaction) => value += transaction.amount, previousValues[account.name]);
+      const transactions = getDateTransactions(account.transactions, date);
 
-      previousValues[account.name] = values[account.name];
+      if (transactions.length === 0) {
+        // No operation for this account for this day, use previous value
+        values[account.name] = previousValues[account.name];
+      } else {
+        // Compute the account's delta after the day's transactions
+        const accountDailyDelta = transactions.reduce((delta, transaction) => delta + transaction.amount, 0);
+        values[account.name] = (parseFloat(previousValues[account.name]) + parseFloat(accountDailyDelta)).toFixed(2);
+
+        previousValues[account.name] = values[account.name];
+      }
+
 
       return values;
     }, {});
