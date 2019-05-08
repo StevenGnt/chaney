@@ -7,6 +7,7 @@ import MonthlyTransaction from './transactions/MonthlyTransaction';
 import UniqueTransaction from './transactions/UniqueTransaction';
 
 import { sortDaily, sortMultipleDays } from './Account.utils';
+import { addAmounts } from '../../../utils/maths';
 import './Account.css';
 
 const transactionTypes = [
@@ -14,6 +15,37 @@ const transactionTypes = [
   { key: 'weekly', name: 'Weekly', renderer: WeeklyTransaction, sort: sortMultipleDays },
   { key: 'unique', name: 'Unique', renderer: UniqueTransaction, sort: sortDaily },
 ];
+
+/**
+ * Compute the delta given by the sum of a list of transactions
+ * @param {Array} transactions
+ * @returns {number}
+ */
+function computeTransactionsDelta(transactions) {
+  return transactions && transactions.length > 0
+    ? transactions.reduce((acc, transaction) => addAmounts(acc, transaction.amount), 0)
+    : 0;
+}
+
+function MonthlyBalance({ transactions, unit }) {
+  // Build monthly badge
+  const monthlyBalance = addAmounts(computeTransactionsDelta(transactions.monthly), 4 * computeTransactionsDelta(transactions.weekly));
+
+  let sign = '';
+  let badgeClass = 'badge ';
+  if (monthlyBalance > 0) {
+    badgeClass += 'badge-success';
+    sign = '+';
+  } else if (monthlyBalance < 0) {
+    badgeClass += 'badge-danger';
+  } else {
+    badgeClass += 'badge-secondary';
+  }
+
+  const balanceLabel = `${sign}${monthlyBalance}${unit}`;
+  const title = `Per month balance : ${balanceLabel}`;
+  return (<span> <span title={title} className={badgeClass}>{balanceLabel}</span></span>);
+}
 
 class Account extends React.Component {
   render() {
@@ -47,33 +79,9 @@ class Account extends React.Component {
       );
     });
 
-    // Build monthly badge
-    const sumMonthly = (transactions.monthly || []).reduce((acc, transaction) => acc + transaction.amount, 0);
-    const sumWeekly = (transactions.weekly || []).reduce((acc, transaction) => acc + transaction.amount, 0);
-    const monthlyBalance = sumMonthly + 4 * sumWeekly;
-
-    // Account balance
-    let balance;
-    if (account.showMonthlyBalance) {
-      let sign = '';
-      let badgeClass = 'badge ';
-      if (monthlyBalance > 0) {
-        badgeClass += 'badge-success';
-        sign = '+';
-      } else if (monthlyBalance < 0) {
-        badgeClass += 'badge-danger';
-      } else {
-        badgeClass += 'badge-secondary';
-      }
-
-      const balanceLabel = `${sign}${monthlyBalance}${unit}`;
-      const title = `Per month balance : ${balanceLabel}`;
-      balance = (<span> <span title={title} className={badgeClass}>{balanceLabel}</span></span>);
-    }
-
     return (
       <div className="account-details">
-        <h3><FontAwesome name="book" /> {this.props.account.name}{balance}</h3>
+        <h3><FontAwesome name="book" /> {this.props.account.name}{account.showMonthlyBalance ? <MonthlyBalance transactions={transactions} unit={unit} /> : null}</h3>
         <div className="account-transactions">{renderedParts}</div>
       </div>
     );

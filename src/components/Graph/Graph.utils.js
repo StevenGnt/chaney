@@ -2,6 +2,8 @@ import React from 'react';
 import moment from 'moment';
 import { Line } from 'recharts';
 
+import { addAmounts } from '../../utils/maths';
+
 /**
  * Check wether a transaction happens on a given day
  * @param {Object} transaction 
@@ -130,7 +132,7 @@ export function prepareGraphData(accounts, options) {
       } else {
         // Compute the account's delta after the day's transactions
         const accountDailyDelta = transactions.reduce((delta, transaction) => delta + transaction.amount, 0);
-        values[account.name] = (parseFloat(previousValues[account.name]) + parseFloat(accountDailyDelta)).toFixed(2);
+        values[account.name] = addAmounts(previousValues[account.name], accountDailyDelta);
 
         previousValues[account.name] = values[account.name];
       }
