@@ -1,0 +1,23 @@
+[
+    {
+        "title": "💰",
+        "accounts": [
+            0,
+            1,
+            2,
+            21,
+            991,
+            992
+        ],
+        "graphOptions": {
+            "duration": 18
+        }
+    },
+    {
+        "title": "🌴",
+        "accounts": [
+            3,
+            4
+        ]
+    }
+]

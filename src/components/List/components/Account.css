@@ -39,3 +39,7 @@
 .account-transactions .unique-passed {
   text-decoration: line-through;
 }
+
+.monthly-transaction-date-bracket {
+  font-style: italic;
+}

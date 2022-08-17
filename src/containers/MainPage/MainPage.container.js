@@ -5,8 +5,6 @@ import { connect } from 'react-redux'
 import Graph from '../../components/Graph/Graph.component';
 import List from '../../components/List/List.component';
 
-import CONFIG from '../../config';
-
 const usedColors = [];
 
 /**
@@ -33,10 +31,39 @@ function getAccountStrokeColor(account) {
   }
 }
 
-class MainPage extends React.Component {
+function DetailedGraph({ accounts, graphConfig }) {
+  const preparedGraphAccounts = accounts.map(account => ({
+    ...account,
+    color: getAccountStrokeColor(account),
+  }));
 
+  return (
+    <div>
+      <h2>{graphConfig.title}</h2>
+      <Graph accounts={preparedGraphAccounts} options={graphConfig.graphOptions} />
+      <List accounts={accounts} />
+    </div>
+  );
+}
+
+function getQueryParameters() {
+  return window.location.search.replace('?', '')
+    .split('&')
+    .reduce((final, row) => {
+      const [key, value] = row.split('=');
+      return { ...final, [key]: value };
+    }, {});
+}
+
+function getQueryParameter(name) {
+  const parameters = getQueryParameters();
+
+  return parameters[name];
+}
+
+class MainPage extends React.Component {
   render() {
-    const { accounts } = this.props;
+    const { accounts, graphsConfig } = this.props;
 
     if (!accounts) {
       return '...';
@@ -44,21 +71,40 @@ class MainPage extends React.Component {
       return <div>No account</div>;
     }
 
-    const graphOptions = {
-      duration: CONFIG.DURATION,
-      durationUnit: CONFIG.DURATION_UNIT,
-      dateFormat: CONFIG.DATE_FORMAT,
+    // @todo Actually implement a simulation feature
+    const simulationName = getQueryParameter('simulation');
+    const filterFn = transaction => {
+      const { simulation } = transaction;
+      if (!simulation) {
+        return true;
+      }
+
+      return (typeof simulation === 'string' ? [simulation] : simulation).includes(simulationName);
     };
 
-    const preparedGraphAccounts = accounts.map(account => ({
-      ...account,
-      color: getAccountStrokeColor(account),
-    }));
+    const preparedAccounts = accounts.map(account => {
+      return {
+        ...account,
+        transactions: {
+          ...account.transactions,
+          monthly: (account.transactions.monthly || []).filter(filterFn),
+          weekly: (account.transactions.weekly || []).filter(filterFn),
+          unique: (account.transactions.unique || []).filter(filterFn),
+        },
+      }
+    });
 
     return (
       <React.Fragment>
-        <Graph accounts={preparedGraphAccounts} options={graphOptions} />
-        <List accounts={accounts} />
+        {
+          graphsConfig.map((graphConfig, i) => (
+            <DetailedGraph
+              key={i}
+              graphConfig={graphConfig}
+              accounts={preparedAccounts.filter(account => graphConfig.accounts.includes(account.id))}
+            />
+          ))
+        }
       </React.Fragment>
     );
   }
@@ -68,8 +114,11 @@ MainPage.propTypes = {
   accounts: PropTypes.array
 };
 
-const mapStateToProps = state => ({
-  accounts: state.accounts
-});
+function mapStateToProps(state) {
+  return {
+    accounts: state.accounts,
+    graphsConfig: state.graphsConfig,
+  }
+}
 
 export default connect(mapStateToProps)(MainPage);

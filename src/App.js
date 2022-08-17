@@ -10,6 +10,7 @@ import './App.css';
 class App extends Component {
   componentDidMount() {
     this.props.dispatch(actionsCreators.fetchAccounts());
+    this.props.dispatch(actionsCreators.fetchGraphsConfig());
   }
 
   render() {

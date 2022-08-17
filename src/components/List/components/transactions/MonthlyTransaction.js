@@ -10,8 +10,24 @@ function formatMonthlyDay(day) {
 
 const MonthlyTransaction = props => {
   const { transaction, unit } = props;
-  const { name, day, amount } = transaction;
-  return <span><AmountLabel amount={amount} unit={unit} /> {name} every <b>{formatMonthlyDay(day)}</b></span>;
+  const { name, day, amount, start, end } = transaction;
+
+  let transactionDateBracket = '';
+
+  if (start && end) {
+    transactionDateBracket = `From ${start} to ${end}`;
+  } else if (start) {
+    transactionDateBracket = `Starting ${start}`;
+  } else if (end) {
+    transactionDateBracket = `Until ${end}`;
+  }
+
+
+  return (
+    <span className={transactionDateBracket && 'monthly-transaction-date-bracket'} title={transactionDateBracket}>
+      <AmountLabel amount={amount} unit={unit} /> {name} every <b>{formatMonthlyDay(day)}</b>
+    </span>
+  );
 };
 
 MonthlyTransaction.propTypes = {

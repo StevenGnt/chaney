@@ -20,6 +20,12 @@ import TransactionsPanel from './components/TransactionsPanel.component';
 
 import './GraphComponent.css';
 
+const DEFAULT_GRAPH_OPTIONS = {
+  duration: 6,
+  durationUnit: 'months',
+  dateFormat: 'YYYY-MM-DD',
+};
+
 class Graph extends React.Component {
   constructor() {
     super();
@@ -51,8 +57,10 @@ class Graph extends React.Component {
   }
 
   render() {
-    const { accounts, options } = this.props;
+    const { accounts, options: propsOptions } = this.props;
     const { transactionDetailsDate } = this.state;
+
+    const options = { ...DEFAULT_GRAPH_OPTIONS, ...propsOptions };
 
     const data = prepareGraphData(accounts, options);
     const lines = prepareGraphLines(accounts, options);
@@ -65,13 +73,26 @@ class Graph extends React.Component {
       />
       : null;
 
+    const { min, max } = data.reduce((outputMinMax, dayValues) => {
+      const { date, ...values } = dayValues;
+
+      const comparedValues = [...Object.values(values), outputMinMax.min, outputMinMax.max]
+        .filter(value => !!value)
+        .map(parseFloat);
+
+      return {
+        min: Math.min(...comparedValues),
+        max: Math.max(...comparedValues),
+      }
+    }, {});
+
     return (
       <div className="graph-component-wrapper">
         <ResponsiveContainer width="100%" height={500}>
           <LineChart data={data} onClick={this.onChartClick}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" />
-            <YAxis scale="linear" />
+            <YAxis scale="linear" domain={[min, max]} />
             <Tooltip />
             <Legend />
             {lines}
