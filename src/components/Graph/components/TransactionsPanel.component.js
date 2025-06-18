@@ -5,6 +5,7 @@ import FontAwesome from 'react-fontawesome';
 import AmountLabel from '../../AmountLabel/AmountLabel.component';
 
 import './TransactionsPanel.css';
+import TransactionText from '../../TransactionText/TransactionText.component';
 
 const TransactionsPanel = props => {
   const { accounts, date } = props;
@@ -25,7 +26,9 @@ const TransactionsPanel = props => {
               <span className="account-name">{account.name}</span>
               <ul>
                 {account.transactions.map((transaction, i) =>
-                  <li key={i}><AmountLabel amount={transaction.amount} /> {transaction.name}</li>
+                  <li key={i}>
+                    <AmountLabel amount={transaction.amount} /> <TransactionText transaction={transaction} />
+                  </li>
                 )}
               </ul>
             </div>

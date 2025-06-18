@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import AmountLabel from '../../../AmountLabel/AmountLabel.component';
 import { getTransactionDays } from '../Account.utils';
+import TransactionText from '../../../TransactionText/TransactionText.component';
 
 function formatMonthlyDay(day) {
   return getTransactionDays(day).join(', ');
@@ -10,7 +11,7 @@ function formatMonthlyDay(day) {
 
 const MonthlyTransaction = props => {
   const { transaction, unit } = props;
-  const { name, day, amount, start, end } = transaction;
+  const { day, amount, start, end } = transaction;
 
   let transactionDateBracket = '';
 
@@ -25,7 +26,7 @@ const MonthlyTransaction = props => {
 
   return (
     <span className={transactionDateBracket && 'monthly-transaction-date-bracket'} title={transactionDateBracket}>
-      <AmountLabel amount={amount} unit={unit} /> {name} every <b>{formatMonthlyDay(day)}</b>
+      <AmountLabel amount={amount} unit={unit} /> <TransactionText transaction={transaction} /> every <b>{formatMonthlyDay(day)}</b>
     </span>
   );
 };

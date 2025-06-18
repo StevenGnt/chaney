@@ -131,7 +131,16 @@ export function prepareGraphData(accounts, options) {
         values[account.name] = previousValues[account.name];
       } else {
         // Compute the account's delta after the day's transactions
-        const accountDailyDelta = transactions.reduce((delta, transaction) => delta + transaction.amount, 0);
+        const accountDailyDelta = transactions.reduce(
+          (delta, transaction) => {
+            const { amount, tax } = transaction;
+            const transactionAmount = tax
+              ? amount - (amount * (tax / 100))
+              : amount;
+            return delta + transactionAmount;
+          },
+          0
+        );
         values[account.name] = addAmounts(previousValues[account.name], accountDailyDelta);
 
         previousValues[account.name] = values[account.name];

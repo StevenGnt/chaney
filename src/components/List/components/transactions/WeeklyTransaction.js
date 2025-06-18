@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import AmountLabel from '../../../AmountLabel/AmountLabel.component';
+import TransactionText from '../../../TransactionText/TransactionText.component';
 
 const daysNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -13,11 +14,10 @@ function formatWeeklyDay(day) {
 
 const WeeklyTransaction = props => {
   const { transaction, unit } = props;
-  const { name, day, amount } = transaction;
+  const { day, amount } = transaction;
 
-  return <span><AmountLabel amount={amount} unit={unit} /> {name} every <b>{formatWeeklyDay(day)}</b></span>;
+  return <span><AmountLabel amount={amount} unit={unit} /> <TransactionText transaction={transaction} /> every <b>{formatWeeklyDay(day)}</b></span>;
 };
-
 
 WeeklyTransaction.propTypes = {
   transaction: PropTypes.shape({
