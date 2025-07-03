@@ -73,16 +73,35 @@ export function getAccountsDateTransactions(accounts, date) {
  * @param {Array} accounts 
  * @returns {Array}
  */
-export function prepareGraphLines(accounts) {
-  return accounts.map((account, i) => (
+export function prepareGraphLines(accounts, options) {
+  // @todo This is ugly, it works because accounts and lines are iterated over in the same order in 
+  // prepareGraphLines and prepareGraphData. Eww.
+  let linesIterator = -1;
+
+  const lines = accounts.map((account, i) => (
     <Line unit={account.unit || '€'}
       type="monotone"
-      key={i}
+      key={linesIterator++}
       dot={false}
       dataKey={account.name}
       stroke={account.color}
     />
   ));
+
+  if ('lines' in options) {
+    options.lines.forEach((line, i) => {
+      lines.push(
+        <Line unit={line.unit || '€'}
+          type="monotone"
+          key={linesIterator++}
+          dot={false}
+          dataKey={line.name}
+          stroke={line.color} />
+      );
+    });
+  }
+
+  return lines;
 }
 
 /**
@@ -146,9 +165,15 @@ export function prepareGraphData(accounts, options) {
         previousValues[account.name] = values[account.name];
       }
 
-
       return values;
     }, {});
+
+    // Add static lines
+    if ('lines' in options) {
+      options.lines.forEach(({ name, value }) => {
+        accountsValues[name] = value;
+      });
+    }
 
     data.push({ date, ...accountsValues });
 
