@@ -23,5 +23,5 @@ yarn-error.log*
 package-lock.json
 yarn.lock
 
-src/mock/account.json
+src/mock/accounts.json
 src/mock/graphs.json
