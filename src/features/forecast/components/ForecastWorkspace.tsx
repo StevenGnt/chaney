@@ -7,7 +7,7 @@ import { RangeSelector } from '@/features/forecast/components/RangeSelector';
 import { ForecastChart } from '@/features/forecast/components/ForecastChart';
 import { useForecastQuery } from '@/features/forecast/hooks/useForecastQuery';
 import type { ForecastRange } from '@/lib/finance/projection';
-import { formatCurrency, formatDateVerbose } from '@/lib/format';
+import { formatDateVerbose } from '@/lib/format';
 
 const DEFAULT_RANGE_START = new Date().toISOString().slice(0, 10);
 const DEFAULT_RANGE_MONTHS = 12;
@@ -194,35 +194,12 @@ export function ForecastWorkspace() {
 				thresholds={forecastQuery.data.thresholds}
 			/>
 
-			<div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
-				<div className="grid gap-4 sm:grid-cols-2">
-					{selectedAccounts.map((account) => {
-						const summary = summaries[account.id];
-						const delta = summary.delta;
-						const deltaLabel = delta >= 0 ? '+' : '';
-
-						return (
-							<div key={account.id} className="rounded-2xl border border-white/10 bg-black/30 p-4">
-								<p className="text-xs uppercase tracking-[0.3em] text-slate-400">{account.name}</p>
-								<p className="text-2xl font-semibold text-white">
-									{formatCurrency(summary.endBalance, account.currency)}
-								</p>
-								<p className={['text-xs', delta >= 0 ? 'text-emerald-300' : 'text-rose-300'].join(' ')}>
-									{deltaLabel}
-									{formatCurrency(delta, account.currency)} vs start
-								</p>
-							</div>
-						);
-					})}
-				</div>
-
-				<AccountToggleList
-					accounts={forecastQuery.data.accounts}
-					selectedIds={selectedAccountIds}
-					onToggle={toggleAccount}
-					summaries={summaries}
-				/>
-			</div>
+			<AccountToggleList
+				accounts={forecastQuery.data.accounts}
+				selectedIds={selectedAccountIds}
+				onToggle={toggleAccount}
+				summaries={summaries}
+			/>
 		</section>
 	);
 }
