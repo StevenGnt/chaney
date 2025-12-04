@@ -18,7 +18,12 @@
 				"DESCRIPTION": "Vite, Vitest, RTL, Storybook, Husky et GitHub Actions configurés."
 			}
 		},
+		"TRANSACTIONS": {
+			"TITLE": "Transactions incluses sur cette période",
+			"HINT": "Groupées par compte et type de récurrence pour l’intervalle sélectionné."
+		},
 		"FOOTER": {
+			"MADE_WITH": "Réalisé avec",
 			"STATUS": "Base MVP prête • Données mockées via TanStack Query",
 			"NEXT_MILESTONE": "Prochaine étape : moteur de calcul + graphes interactifs"
 		}
@@ -30,6 +35,10 @@
 			"START": "Du",
 			"END": "Au",
 			"NEXT_MONTHS": "Prochains {{count}} mois"
+		},
+		"ACCOUNTS": {
+			"TITLE": "Comptes",
+			"HINT": "Active les comptes pris en compte dans la prévision."
 		},
 		"HERO": {
 			"PILL": "MVP Prévision",

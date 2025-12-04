@@ -281,23 +281,30 @@ export function ForecastWorkspace() {
 				onRangeChange={handleRangeChange}
 			/>
 
+			<section className="rounded-2xl border border-white/10 bg-white/5 p-4">
+				<header className="mb-3 flex items-center justify-between">
+					<p className="text-sm font-semibold text-white">{t('FORECAST.ACCOUNTS.TITLE')}</p>
+					<span className="text-xs text-slate-400">{t('FORECAST.ACCOUNTS.HINT')}</span>
+				</header>
+				<AccountToggleList
+					accounts={forecastQuery.data.accounts}
+					selectedIds={selectedAccountIds}
+					onToggle={toggleAccount}
+					summaries={summaries}
+				/>
+			</section>
+
 			<ForecastChart
 				data={dataset}
 				accounts={selectedAccounts.length > 0 ? selectedAccounts : forecastQuery.data.accounts}
 				thresholds={forecastQuery.data.thresholds}
 			/>
 
-			<AccountToggleList
-				accounts={forecastQuery.data.accounts}
-				selectedIds={selectedAccountIds}
-				onToggle={toggleAccount}
-				summaries={summaries}
-			/>
-
 			{groupedTransactions.length > 0 && (
 				<section className="rounded-2xl border border-white/10 bg-black/30 p-4">
-					<header className="mb-3">
-						<p className="text-sm font-semibold text-white">Transactions in this period</p>
+					<header className="mb-3 flex items-center justify-between gap-2">
+						<p className="text-sm font-semibold text-white">{t('FORECAST.TRANSACTIONS.TITLE')}</p>
+						<p className="text-xs text-slate-400">{t('FORECAST.TRANSACTIONS.HINT')}</p>
 					</header>
 					<div className="max-h-60 space-y-2 overflow-auto pr-1 text-sm">
 						{groupedTransactions.map((group) => {

@@ -18,7 +18,12 @@
 				"DESCRIPTION": "Vite, Vitest, RTL, Storybook, Husky, and GitHub Actions baked in."
 			}
 		},
+		"TRANSACTIONS": {
+			"TITLE": "Transactions impacting this period",
+			"HINT": "Grouped by account and schedule type for the selected range."
+		},
 		"FOOTER": {
+			"MADE_WITH": "Made with",
 			"STATUS": "MVP foundations ready • Mock data hooked via TanStack Query",
 			"NEXT_MILESTONE": "Next: optimized balance engine + interactive chart UI"
 		}
@@ -30,6 +35,10 @@
 			"START": "From",
 			"END": "To",
 			"NEXT_MONTHS": "Next {{count}} months"
+		},
+		"ACCOUNTS": {
+			"TITLE": "Accounts",
+			"HINT": "Toggle which accounts are included in the forecast."
 		},
 		"HERO": {
 			"PILL": "Forecast MVP",

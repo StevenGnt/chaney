@@ -11,15 +11,14 @@ export function App() {
 					<p className="text-sm font-semibold uppercase tracking-[0.3em] text-emerald-400">{t('APP.TAGLINE')}</p>
 					<div className="space-y-3">
 						<h1 className="text-3xl font-semibold text-white sm:text-4xl lg:text-5xl">{t('APP.TITLE')}</h1>
-						<p className="text-base text-slate-300 sm:text-lg lg:w-4/5">{t('APP.SUBTITLE')}</p>
 					</div>
 				</header>
 
 				<ForecastWorkspace />
 
 				<footer className="border-t border-white/5 pt-6 text-xs text-slate-400 sm:flex sm:items-center sm:justify-between">
+					<p>{t('APP.FOOTER.MADE_WITH')} React · TypeScript · Vite · TanStack Query · Recharts</p>
 					<p>{t('APP.FOOTER.STATUS')}</p>
-					<p>{t('APP.FOOTER.NEXT_MILESTONE')}</p>
 				</footer>
 			</div>
 		</div>
