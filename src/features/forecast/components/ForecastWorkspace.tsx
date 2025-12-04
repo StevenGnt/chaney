@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { addMonths, addWeeks, addYears, parseISO } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { createRangeFromMonths, type RangePreset } from '@/features/forecast/utils/range';
 import { buildChartDataset } from '@/features/forecast/utils/build-chart-dataset';
@@ -7,6 +8,7 @@ import { RangeSelector } from '@/features/forecast/components/RangeSelector';
 import { ForecastChart } from '@/features/forecast/components/ForecastChart';
 import { useForecastQuery } from '@/features/forecast/hooks/useForecastQuery';
 import type { ForecastRange } from '@/lib/finance/projection';
+import type { Transaction } from '@/features/forecast/types';
 import { formatDateVerbose } from '@/lib/format';
 
 const DEFAULT_RANGE_START = new Date().toISOString().slice(0, 10);
@@ -21,6 +23,22 @@ const BASE_PRESETS = [
 ] as const;
 
 const DEFAULT_RANGE: ForecastRange = createRangeFromMonths(DEFAULT_RANGE_START, DEFAULT_RANGE_MONTHS);
+
+type TransactionGroupType = 'monthly' | 'weekly' | 'single';
+
+interface VisibleTransaction {
+	id: string;
+	label: string;
+	type: Transaction['type'];
+	category: string;
+	amount: number;
+	firstOccurrence: Date;
+	groupType: TransactionGroupType;
+	accountId: string;
+	accountName: string;
+	accountColor?: string;
+	currency: string;
+}
 
 interface ForecastRangeSelectorProps {
 	range: ForecastRange;
@@ -141,6 +159,81 @@ export function ForecastWorkspace() {
 	const selectedAccounts =
 		forecastQuery.data?.accounts.filter((account) => selectedAccountIds.includes(account.id)) ?? [];
 
+	const visibleTransactions = useMemo<VisibleTransaction[]>(() => {
+		if (!forecastQuery.data) {
+			return [];
+		}
+
+		const accounts =
+			selectedAccountIds.length > 0
+				? forecastQuery.data.accounts.filter((account) => selectedAccountIds.includes(account.id))
+				: forecastQuery.data.accounts;
+
+		const collected: VisibleTransaction[] = [];
+
+		for (const account of accounts) {
+			for (const transaction of account.transactions) {
+				const firstOccurrence = getFirstTransactionOccurrenceInRange(transaction, account.initialDate, range);
+				if (!firstOccurrence) continue;
+
+				let groupType: TransactionGroupType = 'single';
+				if (transaction.schedule.kind === 'recurring') {
+					if (transaction.schedule.frequency === 'weekly') {
+						groupType = 'weekly';
+					} else {
+						groupType = 'monthly';
+					}
+				}
+
+				collected.push({
+					id: transaction.id,
+					label: transaction.label,
+					type: transaction.type,
+					category: transaction.category,
+					amount: transaction.amount,
+					firstOccurrence,
+					groupType,
+					accountId: account.id,
+					accountName: account.name,
+					accountColor: account.color,
+					currency: account.currency,
+				});
+			}
+		}
+
+		return collected;
+	}, [forecastQuery.data, selectedAccountIds, range]);
+
+	const groupedTransactions = useMemo(() => {
+		const groups: {
+			accountId: string;
+			accountName: string;
+			accountColor?: string;
+			currency: string;
+			items: VisibleTransaction[];
+		}[] = [];
+
+		const byId = new Map<string, (typeof groups)[number]>();
+
+		for (const tx of visibleTransactions) {
+			let group = byId.get(tx.accountId);
+			if (!group) {
+				group = {
+					accountId: tx.accountId,
+					accountName: tx.accountName,
+					accountColor: tx.accountColor,
+					currency: tx.currency,
+					items: [],
+				};
+				byId.set(tx.accountId, group);
+				groups.push(group);
+			}
+			group.items.push(tx);
+		}
+
+		return groups;
+	}, [visibleTransactions]);
+
 	const handlePresetChange = (preset: RangePreset) => {
 		setActivePresetId(preset.id);
 		const todayISO = new Date().toISOString().slice(0, 10);
@@ -200,6 +293,200 @@ export function ForecastWorkspace() {
 				onToggle={toggleAccount}
 				summaries={summaries}
 			/>
+
+			{groupedTransactions.length > 0 && (
+				<section className="rounded-2xl border border-white/10 bg-black/30 p-4">
+					<header className="mb-3">
+						<p className="text-sm font-semibold text-white">Transactions in this period</p>
+					</header>
+					<div className="max-h-60 space-y-2 overflow-auto pr-1 text-sm">
+						{groupedTransactions.map((group) => {
+							const monthlyItems = [...group.items]
+								.filter((item) => item.groupType === 'monthly')
+								.sort((left, right) => left.firstOccurrence.getTime() - right.firstOccurrence.getTime());
+							const weeklyItems = [...group.items]
+								.filter((item) => item.groupType === 'weekly')
+								.sort((left, right) => left.firstOccurrence.getTime() - right.firstOccurrence.getTime());
+							const singleItems = [...group.items]
+								.filter((item) => item.groupType === 'single')
+								.sort((left, right) => left.firstOccurrence.getTime() - right.firstOccurrence.getTime());
+
+							return (
+								<details key={group.accountId} className="rounded-xl border border-white/10 bg-white/5">
+									<summary className="flex cursor-pointer items-center justify-between gap-3 px-3 py-2">
+										<span className="flex items-center gap-2">
+											<span
+												className="h-2 w-2 rounded-full"
+												style={{ backgroundColor: group.accountColor ?? '#34d399' }}
+											/>
+											<span className="font-semibold text-white">
+												{group.accountName}{' '}
+												<span className="text-xs font-normal text-slate-400">
+													({group.items.length} transaction
+													{group.items.length > 1 ? 's' : ''})
+												</span>
+											</span>
+										</span>
+									</summary>
+									<div className="space-y-2 border-t border-white/10 px-3 py-2">
+										{monthlyItems.length > 0 && (
+											<div>
+												<p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-300">Monthly</p>
+												<ul className="space-y-1">
+													{monthlyItems.map((transaction) => (
+														<li key={transaction.id} className="flex items-center justify-between gap-3">
+															<div>
+																<p className="font-medium text-white">{transaction.label}</p>
+																<p className="text-xs text-slate-400">{transaction.category}</p>
+															</div>
+															<span
+																className={[
+																	'text-xs font-semibold',
+																	transaction.type === 'income' ? 'text-emerald-300' : 'text-rose-300',
+																].join(' ')}
+															>
+																{transaction.type === 'income' ? '+' : '-'}
+																{transaction.amount.toLocaleString(undefined, {
+																	style: 'currency',
+																	currency: transaction.currency,
+																})}
+															</span>
+														</li>
+													))}
+												</ul>
+											</div>
+										)}
+
+										{weeklyItems.length > 0 && (
+											<div>
+												<p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-300">Weekly</p>
+												<ul className="space-y-1">
+													{weeklyItems.map((transaction) => (
+														<li key={transaction.id} className="flex items-center justify-between gap-3">
+															<div>
+																<p className="font-medium text-white">{transaction.label}</p>
+																<p className="text-xs text-slate-400">{transaction.category}</p>
+															</div>
+															<span
+																className={[
+																	'text-xs font-semibold',
+																	transaction.type === 'income' ? 'text-emerald-300' : 'text-rose-300',
+																].join(' ')}
+															>
+																{transaction.type === 'income' ? '+' : '-'}
+																{transaction.amount.toLocaleString(undefined, {
+																	style: 'currency',
+																	currency: transaction.currency,
+																})}
+															</span>
+														</li>
+													))}
+												</ul>
+											</div>
+										)}
+
+										{singleItems.length > 0 && (
+											<div>
+												<p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-300">One-off</p>
+												<ul className="space-y-1">
+													{singleItems.map((transaction) => (
+														<li key={transaction.id} className="flex items-center justify-between gap-3">
+															<div>
+																<p className="font-medium text-white">{transaction.label}</p>
+																<p className="text-xs text-slate-400">{transaction.category}</p>
+															</div>
+															<span
+																className={[
+																	'text-xs font-semibold',
+																	transaction.type === 'income' ? 'text-emerald-300' : 'text-rose-300',
+																].join(' ')}
+															>
+																{transaction.type === 'income' ? '+' : '-'}
+																{transaction.amount.toLocaleString(undefined, {
+																	style: 'currency',
+																	currency: transaction.currency,
+																})}
+															</span>
+														</li>
+													))}
+												</ul>
+											</div>
+										)}
+									</div>
+								</details>
+							);
+						})}
+					</div>
+				</section>
+			)}
 		</section>
 	);
+}
+
+function getFirstTransactionOccurrenceInRange(transaction: Transaction, accountStartISO: string, range: ForecastRange) {
+	if (transaction.schedule.kind === 'single') {
+		const date = parseISO(transaction.schedule.date);
+		const rangeStart = parseISO(range.start);
+		const rangeEnd = parseISO(range.end);
+		const accountStart = parseISO(accountStartISO);
+
+		return date >= accountStart && date >= rangeStart && date <= rangeEnd ? date : null;
+	}
+
+	const schedule = transaction.schedule;
+	const every = schedule.every;
+	const accountStart = parseISO(accountStartISO);
+	const scheduleStart = parseISO(schedule.startDate);
+	const startDate = accountStart > scheduleStart ? accountStart : scheduleStart;
+	const windowStart = parseISO(range.start);
+	const windowEnd = parseISO(range.end);
+	const scheduleEnd = schedule.endDate ? parseISO(schedule.endDate) : windowEnd;
+	const maxEnd = scheduleEnd < windowEnd ? scheduleEnd : windowEnd;
+
+	if (startDate > maxEnd) {
+		return null;
+	}
+
+	const interruptions = schedule.interruptions.map((period) => ({
+		start: parseISO(period.start),
+		end: period.end ? parseISO(period.end) : windowEnd,
+	}));
+
+	let occurrences = 0;
+	let cursor = startDate;
+
+	while (cursor <= maxEnd) {
+		if (!isInterrupted(cursor, interruptions)) {
+			const inWindow = cursor >= windowStart && cursor <= windowEnd;
+			if (inWindow) {
+				return cursor;
+			}
+		}
+
+		occurrences += 1;
+		if (schedule.occurrences && occurrences >= schedule.occurrences) {
+			break;
+		}
+
+		cursor = advanceDate(cursor, schedule.frequency, every);
+	}
+
+	return null;
+}
+
+function advanceDate(date: Date, frequency: 'weekly' | 'monthly' | 'yearly', every: number) {
+	switch (frequency) {
+		case 'weekly':
+			return addWeeks(date, every);
+		case 'monthly':
+			return addMonths(date, every);
+		case 'yearly':
+			return addYears(date, every);
+		default:
+			return date;
+	}
+}
+
+function isInterrupted(date: Date, windows: { start: Date; end: Date }[]) {
+	return windows.some((window) => date >= window.start && date <= window.end);
 }
