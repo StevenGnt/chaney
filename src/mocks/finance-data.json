@@ -1,0 +1,153 @@
+{
+	"accounts": [
+		{
+			"id": "checking",
+			"name": "Main Checking",
+			"institution": "Shoreline Bank",
+			"currency": "EUR",
+			"color": "#34d399",
+			"initialBalance": 7350,
+			"initialDate": "2025-01-01",
+			"transactions": [
+				{
+					"id": "income-freelance",
+					"label": "Freelance retainers",
+					"category": "income",
+					"type": "income",
+					"amount": 5200,
+					"taxRate": 0.31,
+					"schedule": {
+						"kind": "recurring",
+						"frequency": "monthly",
+						"startDate": "2025-01-05"
+					},
+					"tags": ["primary-income"]
+				},
+				{
+					"id": "income-rent",
+					"label": "Apartment sublet",
+					"category": "income",
+					"type": "income",
+					"amount": 1200,
+					"schedule": {
+						"kind": "recurring",
+						"frequency": "monthly",
+						"startDate": "2025-01-10",
+						"occurrences": 10
+					}
+				},
+				{
+					"id": "expense-rent",
+					"label": "Rent",
+					"category": "housing",
+					"type": "expense",
+					"amount": 1850,
+					"schedule": {
+						"kind": "recurring",
+						"frequency": "monthly",
+						"startDate": "2025-01-01"
+					}
+				},
+				{
+					"id": "expense-groceries",
+					"label": "Groceries & markets",
+					"category": "food",
+					"type": "expense",
+					"amount": 180,
+					"schedule": {
+						"kind": "recurring",
+						"frequency": "weekly",
+						"startDate": "2025-01-03"
+					}
+				},
+				{
+					"id": "expense-gym",
+					"label": "Gym membership",
+					"category": "health",
+					"type": "expense",
+					"amount": 75,
+					"schedule": {
+						"kind": "recurring",
+						"frequency": "monthly",
+						"startDate": "2025-01-12",
+						"interruptions": [{ "start": "2025-07-01", "end": "2025-08-31" }]
+					}
+				},
+				{
+					"id": "expense-car-downpayment",
+					"label": "Car down payment",
+					"category": "mobility",
+					"type": "expense",
+					"amount": 12000,
+					"schedule": {
+						"kind": "single",
+						"date": "2025-03-15"
+					}
+				},
+				{
+					"id": "expense-car-loan",
+					"label": "Car loan",
+					"category": "mobility",
+					"type": "expense",
+					"amount": 640,
+					"schedule": {
+						"kind": "recurring",
+						"frequency": "monthly",
+						"startDate": "2025-04-01",
+						"occurrences": 36
+					}
+				}
+			]
+		},
+		{
+			"id": "savings",
+			"name": "Emergency Savings",
+			"institution": "Nova Fund",
+			"currency": "EUR",
+			"color": "#60a5fa",
+			"initialBalance": 12000,
+			"initialDate": "2025-01-01",
+			"transactions": [
+				{
+					"id": "income-safety-transfer",
+					"label": "Safety transfer",
+					"category": "savings",
+					"type": "income",
+					"amount": 800,
+					"schedule": {
+						"kind": "recurring",
+						"frequency": "monthly",
+						"startDate": "2025-01-12"
+					}
+				},
+				{
+					"id": "expense-laptop",
+					"label": "Laptop upgrade",
+					"category": "gear",
+					"type": "expense",
+					"amount": 2800,
+					"schedule": {
+						"kind": "single",
+						"date": "2025-05-20"
+					}
+				}
+			]
+		}
+	],
+	"thresholds": [
+		{
+			"id": "emergency-3m",
+			"label": "3 months runway",
+			"amount": 9000,
+			"currency": "EUR",
+			"color": "#f472b6"
+		},
+		{
+			"id": "dream-car",
+			"label": "Dream car budget",
+			"amount": 45000,
+			"currency": "EUR",
+			"color": "#facc15"
+		}
+	]
+}
