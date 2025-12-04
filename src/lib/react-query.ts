@@ -14,6 +14,11 @@ const defaultOptions = {
 	},
 } satisfies Parameters<typeof QueryClient>[0]['defaultOptions'];
 
+/**
+ * Creates a new `QueryClient` instance configured with the app defaults.
+ *
+ * @returns A fresh `QueryClient`.
+ */
 function createClient() {
 	return new QueryClient({
 		defaultOptions,
@@ -22,6 +27,14 @@ function createClient() {
 
 let queryClient: QueryClient | undefined;
 
+/**
+ * Returns a shared `QueryClient` instance on the client and a new one on the server.
+ *
+ * On the server this avoids sharing state between requests, while on the client it
+ * lazily initializes and memoizes a singleton instance.
+ *
+ * @returns A `QueryClient` ready to be used with React Query hooks and providers.
+ */
 export function getQueryClient() {
 	if (isServer) {
 		return createClient();

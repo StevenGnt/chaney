@@ -14,6 +14,13 @@ const resources = {
 
 let initialized = false;
 
+/**
+ * Initializes the i18next instance used by the app, wiring language detection and React bindings.
+ *
+ * This function is safe to call multiple times; initialization runs only once.
+ *
+ * @returns The configured i18next instance.
+ */
 export async function setupI18n() {
 	if (!initialized) {
 		initialized = true;

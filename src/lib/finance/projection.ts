@@ -23,6 +23,13 @@ interface TransactionEvent {
 
 const ISO_OPTIONS = { representation: 'date' } as const;
 
+/**
+ * Projects the balance evolution for a single account over a given forecast range.
+ *
+ * @param account - Source account including initial balance, start date and transactions.
+ * @param range - Inclusive date range (ISO dates) to compute the projection for.
+ * @returns A time series of dated balance points for the given account.
+ */
 export function projectAccountBalance(account: Account, range: ForecastRange): AccountProjection {
 	const accountStart = parseISO(account.initialDate);
 	const forecastStart = parseISO(range.start);
@@ -71,10 +78,24 @@ export function projectAccountBalance(account: Account, range: ForecastRange): A
 	};
 }
 
+/**
+ * Projects the balances for multiple accounts over a given forecast range.
+ *
+ * @param accounts - List of accounts to project.
+ * @param range - Inclusive date range (ISO dates) shared by all accounts.
+ * @returns An array of `AccountProjection`, one per account.
+ */
 export function projectAccounts(accounts: Account[], range: ForecastRange): AccountProjection[] {
 	return accounts.map((account) => projectAccountBalance(account, range));
 }
 
+/**
+ * Flattens all transactions of an account into dated events within the given window.
+ *
+ * @param account - Account whose transactions should be expanded.
+ * @param window - Forecast window limiting the generated events.
+ * @returns A chronologically sorted list of transaction events.
+ */
 function buildTransactionEvents(account: Account, window: ForecastRange): TransactionEvent[] {
 	const rangeStart = parseISO(window.start);
 	const rangeEnd = parseISO(window.end);
@@ -102,6 +123,12 @@ function buildTransactionEvents(account: Account, window: ForecastRange): Transa
 	return events.sort((left, right) => left.timestamp - right.timestamp);
 }
 
+/**
+ * Normalizes a transaction amount to a signed numeric value, applying tax if relevant.
+ *
+ * @param transaction - Transaction to normalize.
+ * @returns Signed amount (positive for income, negative for expense) with tax applied when configured.
+ */
 function normalizeAmount(transaction: Transaction) {
 	const base = transaction.type === 'income' ? transaction.amount : -1 * transaction.amount;
 
@@ -112,6 +139,13 @@ function normalizeAmount(transaction: Transaction) {
 	return base;
 }
 
+/**
+ * Creates a `TransactionEvent` object from a date and an amount.
+ *
+ * @param date - Occurrence date of the transaction.
+ * @param amount - Signed amount to apply on that date.
+ * @returns A `TransactionEvent` including timestamp, ISO date and amount.
+ */
 function createEvent(date: Date, amount: number): TransactionEvent {
 	return {
 		timestamp: date.getTime(),
@@ -120,6 +154,14 @@ function createEvent(date: Date, amount: number): TransactionEvent {
 	};
 }
 
+/**
+ * Expands a recurring transaction schedule into concrete occurrence dates within a window.
+ *
+ * @param transaction - Transaction with a recurring schedule.
+ * @param accountStartISO - ISO date at which the account becomes active.
+ * @param window - Forecast window limiting the occurrences to consider.
+ * @returns An array of occurrence dates for the schedule within the window.
+ */
 function expandRecurringSchedule(transaction: Transaction, accountStartISO: string, window: ForecastRange) {
 	const schedule = transaction.schedule;
 	if (schedule.kind !== 'recurring') {
@@ -167,6 +209,14 @@ function expandRecurringSchedule(transaction: Transaction, accountStartISO: stri
 	return dates;
 }
 
+/**
+ * Advances a date according to a recurrence frequency and interval.
+ *
+ * @param date - Current occurrence date.
+ * @param frequency - Recurrence frequency (weekly, monthly, yearly).
+ * @param every - Interval multiplier for the frequency.
+ * @returns The next occurrence date.
+ */
 function advanceDate(date: Date, frequency: 'weekly' | 'monthly' | 'yearly', every: number) {
 	switch (frequency) {
 		case 'weekly':
@@ -180,10 +230,24 @@ function advanceDate(date: Date, frequency: 'weekly' | 'monthly' | 'yearly', eve
 	}
 }
 
+/**
+ * Checks whether a date falls into any interruption window.
+ *
+ * @param date - Date to check.
+ * @param windows - List of interruption periods expressed as date ranges.
+ * @returns `true` if the date is within an interruption window, otherwise `false`.
+ */
 function isInterrupted(date: Date, windows: { start: Date; end: Date }[]) {
 	return windows.some((window) => date >= window.start && date <= window.end);
 }
 
+/**
+ * Inserts or updates a balance point for a given date in a time series.
+ *
+ * @param points - Existing list of balance points, assumed sorted by date.
+ * @param date - ISO date for the balance point.
+ * @param balance - Balance value to store for the date.
+ */
 function upsertPoint(points: BalancePoint[], date: string, balance: number) {
 	const last = points[points.length - 1];
 	if (last.date === date) {

@@ -7,6 +7,12 @@ export type ForecastQueryResult = FinanceMock & {
 	projections: AccountProjection[];
 };
 
+/**
+ * React Query hook that fetches mock finance data and computes account projections for a range.
+ *
+ * @param range - Inclusive forecast range used both for the query key and for computing projections.
+ * @returns A React Query result containing raw mock data and derived projections.
+ */
 export function useForecastQuery(range: ForecastRange) {
 	return useQuery<ForecastQueryResult>({
 		queryKey: ['forecast', range.start, range.end],
