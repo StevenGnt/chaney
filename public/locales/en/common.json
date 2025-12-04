@@ -1,0 +1,54 @@
+{
+	"APP": {
+		"TAGLINE": "Chart your money",
+		"TITLE": "Modern personal finance forecasts",
+		"SUBTITLE": "Project every account, simulate new projects, and stay audit-ready with clean dashboards powered by React, TanStack Query, and Recharts.",
+		"HIGHLIGHTS": {
+			"PILL": "Stack highlights",
+			"TIMELINE": {
+				"TITLE": "Forecast horizons",
+				"DESCRIPTION": "Switch between presets or custom ranges to stress-test cash."
+			},
+			"PLAYBOOKS": {
+				"TITLE": "Scenario playbooks",
+				"DESCRIPTION": "Model one-off purchases, recurring expenses, and tax buffers."
+			},
+			"QUALITY": {
+				"TITLE": "Quality toolchain",
+				"DESCRIPTION": "Vite, Vitest, RTL, Storybook, Husky, and GitHub Actions baked in."
+			}
+		},
+		"FOOTER": {
+			"STATUS": "MVP foundations ready • Mock data hooked via TanStack Query",
+			"NEXT_MILESTONE": "Next: optimized balance engine + interactive chart UI"
+		}
+	},
+	"FORECAST": {
+		"RANGE": {
+			"TITLE": "Timeline",
+			"HINT": "Pick a preset or define custom dates",
+			"START": "From",
+			"END": "To"
+		},
+		"HERO": {
+			"PILL": "Forecast MVP",
+			"TITLE": "Visualize balances, then iterate fast",
+			"SUBTITLE": "Define recurring or one-shot transactions in JSON mocks. The UI will chart balances with Recharts and keep client cache fresh via TanStack Query.",
+			"PREVIEW_LABEL": "Coming up next:",
+			"CHIPS": {
+				"ACCOUNTS": "Multi-account timelines",
+				"BUDGETS": "Monthly budget view",
+				"SIMULATIONS": "Project simulations"
+			},
+			"CTA": "Open forecast workspace"
+		},
+		"WORKSPACE": {
+			"PILL": "Live preview",
+			"TITLE": "Money evolution forecast",
+			"CAPTION": "From {{start}} to {{end}}"
+		},
+		"STATE": {
+			"ERROR": "Unable to load forecast data. Please try again."
+		}
+	}
+}

@@ -1,0 +1,54 @@
+{
+	"APP": {
+		"TAGLINE": "Pilote tes finances",
+		"TITLE": "Prévisionnel financier moderne",
+		"SUBTITLE": "Projette chaque compte, simule tes projets et rassure les recruteurs avec un dashboard clair propulsé par React, TanStack Query et Recharts.",
+		"HIGHLIGHTS": {
+			"PILL": "Atouts stack",
+			"TIMELINE": {
+				"TITLE": "Plages temporelles",
+				"DESCRIPTION": "Bascule rapidement entre presets ou intervalles custom."
+			},
+			"PLAYBOOKS": {
+				"TITLE": "Scénarios avancés",
+				"DESCRIPTION": "Achats ponctuels, dépenses récurrentes et provision taxes."
+			},
+			"QUALITY": {
+				"TITLE": "Qualité intégrée",
+				"DESCRIPTION": "Vite, Vitest, RTL, Storybook, Husky et GitHub Actions configurés."
+			}
+		},
+		"FOOTER": {
+			"STATUS": "Base MVP prête • Données mockées via TanStack Query",
+			"NEXT_MILESTONE": "Prochaine étape : moteur de calcul + graphes interactifs"
+		}
+	},
+	"FORECAST": {
+		"RANGE": {
+			"TITLE": "Axe temporel",
+			"HINT": "Choisis un preset ou des dates custom",
+			"START": "Du",
+			"END": "Au"
+		},
+		"HERO": {
+			"PILL": "MVP Prévision",
+			"TITLE": "Visualise tes soldes et itère vite",
+			"SUBTITLE": "Décris tes transactions récurrentes ou ponctuelles en JSON. L’UI Recharts affichera les courbes et TanStack Query gardera le cache frais.",
+			"PREVIEW_LABEL": "À livrer ensuite :",
+			"CHIPS": {
+				"ACCOUNTS": "Chroniques multi-comptes",
+				"BUDGETS": "Vue budget mensuel",
+				"SIMULATIONS": "Simulations de projets"
+			},
+			"CTA": "Ouvrir l’atelier de forecast"
+		},
+		"WORKSPACE": {
+			"PILL": "Live preview",
+			"TITLE": "Projection de trésorerie",
+			"CAPTION": "Du {{start}} au {{end}}"
+		},
+		"STATE": {
+			"ERROR": "Impossible de charger les données. Merci de réessayer."
+		}
+	}
+}
