@@ -1,8 +1,6 @@
 import { z } from 'zod';
 
-export const isoDateSchema = z
-	.string()
-	.regex(/^\d{4}-\d{2}-\d{2}$/, 'Use ISO date format YYYY-MM-DD');
+export const isoDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use ISO date format YYYY-MM-DD');
 
 export const currencySchema = z.enum(['EUR', 'USD', 'GBP', 'CAD']);
 
@@ -66,8 +64,6 @@ export type CurrencyCode = z.infer<typeof currencySchema>;
 export type Transaction = z.infer<typeof transactionSchema>;
 export type Account = z.infer<typeof accountSchema>;
 export type FinanceMock = z.infer<typeof financeMockSchema>;
-export type TransactionSchedule =
-	| z.infer<typeof singleScheduleSchema>
-	| z.infer<typeof recurringScheduleSchema>;
+export type TransactionSchedule = z.infer<typeof singleScheduleSchema> | z.infer<typeof recurringScheduleSchema>;
 export type DateRange = z.infer<typeof dateRangeSchema>;
 export type Threshold = z.infer<typeof thresholdSchema>;

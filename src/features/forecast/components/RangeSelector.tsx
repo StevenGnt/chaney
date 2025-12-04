@@ -10,35 +10,28 @@ interface RangeSelectorProps {
 	onRangeChange: (range: ForecastRange) => void;
 }
 
-export function RangeSelector({
-	range,
-	presets,
-	activePresetId,
-	onPresetChange,
-	onRangeChange,
-}: RangeSelectorProps) {
+export function RangeSelector({ range, presets, activePresetId, onPresetChange, onRangeChange }: RangeSelectorProps) {
 	const { t } = useTranslation();
 
-	const handleInputChange =
-		(field: 'start' | 'end') => (event: React.ChangeEvent<HTMLInputElement>) => {
-			const value = event.target.value;
-			if (!value) return;
+	const handleInputChange = (field: 'start' | 'end') => (event: React.ChangeEvent<HTMLInputElement>) => {
+		const value = event.target.value;
+		if (!value) return;
 
-			if (field === 'start' && value > range.end) {
-				onRangeChange({ start: value, end: value });
-				return;
-			}
+		if (field === 'start' && value > range.end) {
+			onRangeChange({ start: value, end: value });
+			return;
+		}
 
-			if (field === 'end' && value < range.start) {
-				onRangeChange({ start: value, end: value });
-				return;
-			}
+		if (field === 'end' && value < range.start) {
+			onRangeChange({ start: value, end: value });
+			return;
+		}
 
-			onRangeChange({
-				...range,
-				[field]: value,
-			});
-		};
+		onRangeChange({
+			...range,
+			[field]: value,
+		});
+	};
 
 	return (
 		<section className="rounded-2xl border border-white/10 bg-white/5 p-4">

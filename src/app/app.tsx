@@ -23,13 +23,9 @@ export function App() {
 		<div className="min-h-screen bg-slate-950 text-slate-100">
 			<div className="mx-auto flex min-h-screen max-w-6xl flex-col gap-12 px-4 py-10 sm:px-6 lg:px-8">
 				<header className="space-y-4">
-					<p className="text-sm font-semibold uppercase tracking-[0.3em] text-emerald-400">
-						{t('APP.TAGLINE')}
-					</p>
+					<p className="text-sm font-semibold uppercase tracking-[0.3em] text-emerald-400">{t('APP.TAGLINE')}</p>
 					<div className="space-y-3">
-						<h1 className="text-3xl font-semibold text-white sm:text-4xl lg:text-5xl">
-							{t('APP.TITLE')}
-						</h1>
+						<h1 className="text-3xl font-semibold text-white sm:text-4xl lg:text-5xl">{t('APP.TITLE')}</h1>
 						<p className="text-base text-slate-300 sm:text-lg lg:w-4/5">{t('APP.SUBTITLE')}</p>
 					</div>
 				</header>

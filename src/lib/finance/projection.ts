@@ -86,11 +86,7 @@ function buildTransactionEvents(account: Account, window: ForecastRange): Transa
 
 		if (transaction.schedule.kind === 'single') {
 			const occurrence = parseISO(transaction.schedule.date);
-			if (
-				occurrence >= rangeStart &&
-				occurrence <= rangeEnd &&
-				occurrence >= parseISO(account.initialDate)
-			) {
+			if (occurrence >= rangeStart && occurrence <= rangeEnd && occurrence >= parseISO(account.initialDate)) {
 				events.push(createEvent(occurrence, signedAmount));
 			}
 			continue;
@@ -124,11 +120,7 @@ function createEvent(date: Date, amount: number): TransactionEvent {
 	};
 }
 
-function expandRecurringSchedule(
-	transaction: Transaction,
-	accountStartISO: string,
-	window: ForecastRange,
-) {
+function expandRecurringSchedule(transaction: Transaction, accountStartISO: string, window: ForecastRange) {
 	const schedule = transaction.schedule;
 	if (schedule.kind !== 'recurring') {
 		return [];

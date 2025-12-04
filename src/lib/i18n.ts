@@ -5,46 +5,41 @@ import { initReactI18next } from 'react-i18next';
 import enCommon from '../../public/locales/en/common.json';
 import frCommon from '../../public/locales/fr/common.json';
 
+const LANGUAGE = { EN: 'en', FR: 'fr' } as const;
+
 const resources = {
-	en: {
-		common: enCommon,
-	},
-	fr: {
-		common: frCommon,
-	},
+	[LANGUAGE.EN]: { common: enCommon },
+	[LANGUAGE.FR]: { common: frCommon },
 } as const;
 
 let initialized = false;
 
 export async function setupI18n() {
-	if (initialized) {
-		return i18n;
+	if (!initialized) {
+		initialized = true;
+
+		await i18n
+			.use(LanguageDetector)
+			.use(initReactI18next)
+			.init({
+				resources,
+				fallbackLng: LANGUAGE.EN,
+				defaultNS: 'common',
+				interpolation: {
+					escapeValue: false,
+				},
+				detection: {
+					order: ['localStorage', 'navigator', 'htmlTag'],
+				},
+				supportedLngs: [LANGUAGE.EN, LANGUAGE.FR],
+			});
 	}
-
-	initialized = true;
-
-	await i18n
-		.use(LanguageDetector)
-		.use(initReactI18next)
-		.init({
-			resources,
-			fallbackLng: 'en',
-			defaultNS: 'common',
-			interpolation: {
-				escapeValue: false,
-			},
-			detection: {
-				order: ['localStorage', 'navigator', 'htmlTag'],
-			},
-			supportedLngs: ['en', 'fr'],
-		});
 
 	return i18n;
 }
 
 export type AppLanguage = keyof typeof resources;
 export type AppNamespace = keyof (typeof resources)['en'];
-export type AppNamespaceKeys<Namespace extends AppNamespace> =
-	Namespace extends keyof (typeof resources)['en']
-		? keyof (typeof resources)['en'][Namespace]
-		: never;
+export type AppNamespaceKeys<Namespace extends AppNamespace> = Namespace extends keyof (typeof resources)['en']
+	? keyof (typeof resources)['en'][Namespace]
+	: never;

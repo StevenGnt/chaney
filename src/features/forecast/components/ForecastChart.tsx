@@ -67,10 +67,7 @@ export function ForecastChart({ data, accounts, thresholds }: ForecastChartProps
 							stroke={threshold.color ?? DEFAULT_THRESHOLD_COLOR}
 							strokeDasharray="4 4"
 							label={{
-								value: `${threshold.label} (${formatCurrency(
-									threshold.amount,
-									threshold.currency,
-								)})`,
+								value: `${threshold.label} (${formatCurrency(threshold.amount, threshold.currency)})`,
 								fill: threshold.color ?? DEFAULT_THRESHOLD_COLOR,
 							}}
 						/>
@@ -117,10 +114,7 @@ function CustomTooltip({ active, payload, label, accounts, currency }: CustomToo
 					return (
 						<li key={entry.name} className="flex items-center justify-between gap-3">
 							<span className="flex items-center gap-2">
-								<span
-									className="h-2 w-2 rounded-full"
-									style={{ backgroundColor: entry.color ?? account?.color }}
-								/>
+								<span className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.color ?? account?.color }} />
 								{entry.name}
 							</span>
 							<span className="text-xs text-slate-200">

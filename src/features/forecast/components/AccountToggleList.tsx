@@ -13,12 +13,7 @@ interface AccountToggleListProps {
 	summaries: Partial<Record<string, AccountSummary>>;
 }
 
-export function AccountToggleList({
-	accounts,
-	selectedIds,
-	onToggle,
-	summaries,
-}: AccountToggleListProps) {
+export function AccountToggleList({ accounts, selectedIds, onToggle, summaries }: AccountToggleListProps) {
 	return (
 		<div className="space-y-3 rounded-2xl border border-white/10 bg-white/5 p-4">
 			{accounts.map((account) => {
@@ -45,10 +40,7 @@ export function AccountToggleList({
 						}}
 					>
 						<span className="flex items-center gap-3">
-							<span
-								className="h-3 w-3 rounded-full"
-								style={{ backgroundColor: account.color ?? '#34d399' }}
-							/>
+							<span className="h-3 w-3 rounded-full" style={{ backgroundColor: account.color ?? '#34d399' }} />
 							<span className="text-sm font-semibold text-white">{account.name}</span>
 						</span>
 						<span className="text-xs text-slate-300">{deltaLabel}</span>

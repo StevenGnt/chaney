@@ -79,9 +79,7 @@ describe('projectAccountBalance', () => {
 		const lastPoint = projection.points.at(-1);
 		expect(lastPoint?.date).toBe('2025-03-31');
 		expect(lastPoint?.balance).toBeGreaterThan(1000);
-		expect(
-			projection.points.filter((point) => point.date.startsWith('2025-02')).length,
-		).toBeGreaterThan(0);
+		expect(projection.points.filter((point) => point.date.startsWith('2025-02')).length).toBeGreaterThan(0);
 	});
 
 	it('stops recurring schedules after reaching the occurrence limit', () => {

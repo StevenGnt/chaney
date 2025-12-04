@@ -5,10 +5,7 @@ export interface ChartDatum {
 	[accountId: string]: string | number | null;
 }
 
-export function buildChartDataset(
-	projections: AccountProjection[],
-	selectedAccountIds?: string[],
-): ChartDatum[] {
+export function buildChartDataset(projections: AccountProjection[], selectedAccountIds?: string[]): ChartDatum[] {
 	const activeIds =
 		selectedAccountIds && selectedAccountIds.length > 0
 			? selectedAccountIds

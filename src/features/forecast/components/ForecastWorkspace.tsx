@@ -20,10 +20,7 @@ const PRESETS: RangePreset[] = [
 	{ id: '24m', label: '24 months', months: 24 },
 ];
 
-const DEFAULT_RANGE: ForecastRange = createRangeFromMonths(
-	DEFAULT_RANGE_START,
-	DEFAULT_RANGE_MONTHS,
-);
+const DEFAULT_RANGE: ForecastRange = createRangeFromMonths(DEFAULT_RANGE_START, DEFAULT_RANGE_MONTHS);
 
 export function ForecastWorkspace() {
 	const { t } = useTranslation();
@@ -111,9 +108,7 @@ export function ForecastWorkspace() {
 
 	const toggleAccount = (accountId: string) => {
 		setSelectedAccountIds((current) =>
-			current.includes(accountId)
-				? current.filter((id) => id !== accountId)
-				: [...current, accountId],
+			current.includes(accountId) ? current.filter((id) => id !== accountId) : [...current, accountId],
 		);
 	};
 
@@ -138,9 +133,7 @@ export function ForecastWorkspace() {
 		<section className="space-y-6 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur">
 			<div className="flex flex-wrap items-center justify-between gap-3">
 				<div>
-					<p className="text-xs uppercase tracking-[0.3em] text-emerald-300">
-						{t('FORECAST.WORKSPACE.PILL')}
-					</p>
+					<p className="text-xs uppercase tracking-[0.3em] text-emerald-300">{t('FORECAST.WORKSPACE.PILL')}</p>
 					<h2 className="text-2xl font-semibold text-white">{t('FORECAST.WORKSPACE.TITLE')}</h2>
 					<p className="text-sm text-slate-300">
 						{t('FORECAST.WORKSPACE.CAPTION', {
@@ -178,11 +171,7 @@ export function ForecastWorkspace() {
 								<p className="text-2xl font-semibold text-white">
 									{formatCurrency(summary.endBalance, account.currency)}
 								</p>
-								<p
-									className={['text-xs', delta >= 0 ? 'text-emerald-300' : 'text-rose-300'].join(
-										' ',
-									)}
-								>
+								<p className={['text-xs', delta >= 0 ? 'text-emerald-300' : 'text-rose-300'].join(' ')}>
 									{deltaLabel}
 									{formatCurrency(delta, account.currency)} vs start
 								</p>
