@@ -5,22 +5,67 @@ import { buildChartDataset } from '@/features/forecast/utils/build-chart-dataset
 import { AccountToggleList } from '@/features/forecast/components/AccountToggleList';
 import { RangeSelector } from '@/features/forecast/components/RangeSelector';
 import { ForecastChart } from '@/features/forecast/components/ForecastChart';
-import { useForecastQuery } from '@/features/forecast/hooks/use-forecast-query';
+import { useForecastQuery } from '@/features/forecast/hooks/useForecastQuery';
 import type { ForecastRange } from '@/lib/finance/projection';
 import { formatCurrency, formatDateVerbose } from '@/lib/format';
 
-const DEFAULT_RANGE_START = '2025-01-01';
+const DEFAULT_RANGE_START = new Date().toISOString().slice(0, 10);
 const DEFAULT_RANGE_MONTHS = 12;
 const DEFAULT_PRESET_ID = '12m';
 
-const PRESETS: RangePreset[] = [
-	{ id: '3m', label: '3 months', months: 3 },
-	{ id: '6m', label: '6 months', months: 6 },
-	{ id: '12m', label: '12 months', months: 12 },
-	{ id: '24m', label: '24 months', months: 24 },
-];
+const BASE_PRESETS = [
+	{ id: '3m', months: 3 },
+	{ id: '6m', months: 6 },
+	{ id: '12m', months: 12 },
+	{ id: '24m', months: 24 },
+] as const;
 
 const DEFAULT_RANGE: ForecastRange = createRangeFromMonths(DEFAULT_RANGE_START, DEFAULT_RANGE_MONTHS);
+
+interface ForecastRangeSelectorProps {
+	range: ForecastRange;
+	activePresetId: string;
+	onPresetChange: (preset: RangePreset) => void;
+	onRangeChange: (range: ForecastRange) => void;
+}
+
+function ForecastRangeSelector({ range, activePresetId, onPresetChange, onRangeChange }: ForecastRangeSelectorProps) {
+	const { t } = useTranslation();
+
+	const presets: RangePreset[] = BASE_PRESETS.map((preset) => ({
+		...preset,
+		label: t('FORECAST.RANGE.NEXT_MONTHS', { count: preset.months }),
+	}));
+
+	return (
+		<RangeSelector
+			range={range}
+			presets={presets}
+			activePresetId={activePresetId}
+			onPresetChange={onPresetChange}
+			onRangeChange={onRangeChange}
+		/>
+	);
+}
+
+function ForecastWorkspaceLoadingState() {
+	return (
+		<div className="space-y-4 rounded-3xl border border-white/10 bg-white/5 p-6">
+			<div className="h-6 w-48 animate-pulse rounded bg-white/10" />
+			<div className="h-80 animate-pulse rounded-2xl bg-white/5" />
+		</div>
+	);
+}
+
+function ForecastWorkspaceErrorState() {
+	const { t } = useTranslation();
+
+	return (
+		<div className="rounded-3xl border border-red-400/40 bg-red-500/10 p-6 text-sm text-red-200">
+			{t('FORECAST.STATE.ERROR')}
+		</div>
+	);
+}
 
 export function ForecastWorkspace() {
 	const { t } = useTranslation();
@@ -54,7 +99,7 @@ export function ForecastWorkspace() {
 				return previousRange;
 			}
 
-			const preset = PRESETS.find((item) => item.id === activePresetId) ?? PRESETS[2];
+			const preset = BASE_PRESETS.find((item) => item.id === activePresetId) ?? BASE_PRESETS[2];
 			return createRangeFromMonths(earliest, preset.months);
 		});
 
@@ -98,7 +143,8 @@ export function ForecastWorkspace() {
 
 	const handlePresetChange = (preset: RangePreset) => {
 		setActivePresetId(preset.id);
-		setRange((previousRange) => createRangeFromMonths(previousRange.start, preset.months));
+		const todayISO = new Date().toISOString().slice(0, 10);
+		setRange(createRangeFromMonths(todayISO, preset.months));
 	};
 
 	const handleRangeChange = (updated: ForecastRange) => {
@@ -113,20 +159,11 @@ export function ForecastWorkspace() {
 	};
 
 	if (forecastQuery.isPending) {
-		return (
-			<div className="space-y-4 rounded-3xl border border-white/10 bg-white/5 p-6">
-				<div className="h-6 w-48 animate-pulse rounded bg-white/10" />
-				<div className="h-80 animate-pulse rounded-2xl bg-white/5" />
-			</div>
-		);
+		return <ForecastWorkspaceLoadingState />;
 	}
 
 	if (forecastQuery.isError) {
-		return (
-			<div className="rounded-3xl border border-red-400/40 bg-red-500/10 p-6 text-sm text-red-200">
-				{t('FORECAST.STATE.ERROR')}
-			</div>
-		);
+		return <ForecastWorkspaceErrorState />;
 	}
 
 	return (
@@ -144,9 +181,8 @@ export function ForecastWorkspace() {
 				</div>
 			</div>
 
-			<RangeSelector
+			<ForecastRangeSelector
 				range={range}
-				presets={PRESETS}
 				activePresetId={activePresetId}
 				onPresetChange={handlePresetChange}
 				onRangeChange={handleRangeChange}

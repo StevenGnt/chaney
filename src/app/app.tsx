@@ -1,21 +1,6 @@
 import { ForecastWorkspace } from '@/features/forecast/components/ForecastWorkspace';
 import { useTranslation } from 'react-i18next';
 
-const HIGHLIGHTS = [
-	{
-		titleKey: 'APP.HIGHLIGHTS.TIMELINE.TITLE',
-		descriptionKey: 'APP.HIGHLIGHTS.TIMELINE.DESCRIPTION',
-	},
-	{
-		titleKey: 'APP.HIGHLIGHTS.PLAYBOOKS.TITLE',
-		descriptionKey: 'APP.HIGHLIGHTS.PLAYBOOKS.DESCRIPTION',
-	},
-	{
-		titleKey: 'APP.HIGHLIGHTS.QUALITY.TITLE',
-		descriptionKey: 'APP.HIGHLIGHTS.QUALITY.DESCRIPTION',
-	},
-] as const;
-
 export function App() {
 	const { t } = useTranslation();
 
@@ -30,23 +15,7 @@ export function App() {
 					</div>
 				</header>
 
-				<main className="grid gap-6 lg:grid-cols-[3fr_2fr]">
-					<ForecastWorkspace />
-
-					<aside className="space-y-4 rounded-2xl border border-white/5 bg-white/5 p-6 shadow-2xl shadow-emerald-500/10 backdrop-blur">
-						<p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300">
-							{t('APP.HIGHLIGHTS.PILL')}
-						</p>
-						<ul className="space-y-4">
-							{HIGHLIGHTS.map(({ titleKey, descriptionKey }) => (
-								<li key={titleKey} className="space-y-1">
-									<p className="text-base font-semibold text-white">{t(titleKey)}</p>
-									<p className="text-sm text-slate-300">{t(descriptionKey)}</p>
-								</li>
-							))}
-						</ul>
-					</aside>
-				</main>
+				<ForecastWorkspace />
 
 				<footer className="border-t border-white/5 pt-6 text-xs text-slate-400 sm:flex sm:items-center sm:justify-between">
 					<p>{t('APP.FOOTER.STATUS')}</p>

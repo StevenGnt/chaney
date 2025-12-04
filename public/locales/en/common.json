@@ -28,7 +28,8 @@
 			"TITLE": "Timeline",
 			"HINT": "Pick a preset or define custom dates",
 			"START": "From",
-			"END": "To"
+			"END": "To",
+			"NEXT_MONTHS": "Next {{count}} months"
 		},
 		"HERO": {
 			"PILL": "Forecast MVP",
