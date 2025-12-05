@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { createRangeFromMonths, type RangePreset } from '@/features/ForecastWorkspace/utils/range';
 import { buildChartDataset } from '@/features/ForecastWorkspace/utils/build-chart-dataset';
-import { AccountSection } from '@/features/ForecastWorkspace/components/AccountSection';
+import { AccountSelector } from '@/features/ForecastWorkspace/components/AccountSelector';
 import { RangeSelector } from '@/features/ForecastWorkspace/components/RangeSelector';
 import { ForecastChart } from '@/features/ForecastWorkspace/components/ForecastChart';
 import { useForecastQuery } from '@/features/ForecastWorkspace/hooks/useForecastQuery';
@@ -116,33 +116,6 @@ export function ForecastWorkspace() {
 		return buildChartDataset(forecastQuery.data.projections, selectedAccountIds);
 	}, [forecastQuery.data, selectedAccountIds]);
 
-	// Compute balance summaries (end balance and delta) for each selected account
-	const summaries = useMemo(() => {
-		if (!forecastQuery.data) {
-			return {};
-		}
-
-		const summary: Record<string, { endBalance: number; delta: number }> = {};
-
-		for (const projection of forecastQuery.data.projections) {
-			// Skip if account filtering is active and this account is not selected
-			if (selectedAccountIds.length > 0 && !selectedAccountIds.includes(projection.accountId)) {
-				continue;
-			}
-
-			// Calculate balance change over the forecast period
-			const first = projection.points[0]?.balance ?? 0;
-			const last = projection.points.at(-1)?.balance ?? first;
-
-			summary[projection.accountId] = {
-				endBalance: last,
-				delta: last - first,
-			};
-		}
-
-		return summary;
-	}, [forecastQuery.data, selectedAccountIds]);
-
 	const selectedAccounts =
 		forecastQuery.data?.accounts.filter((account) => selectedAccountIds.includes(account.id)) ?? [];
 
@@ -176,7 +149,7 @@ export function ForecastWorkspace() {
 				onRangeChange={setRange}
 			/>
 
-			<AccountSection
+			<AccountSelector
 				accounts={forecastQuery.data.accounts}
 				selectedAccountIds={selectedAccountIds}
 				onToggleAccount={(accountId) => {
@@ -184,7 +157,6 @@ export function ForecastWorkspace() {
 						current.includes(accountId) ? current.filter((id) => id !== accountId) : [...current, accountId],
 					);
 				}}
-				summaries={summaries}
 			/>
 
 			<ForecastChart
