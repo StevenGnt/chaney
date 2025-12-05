@@ -24,7 +24,7 @@ function RangeSelectorDateInput({ label, value, onChange }: RangeSelectorDateInp
 		<label className="flex flex-col text-xs text-slate-300">
 			{label}
 			<input
-				className="mt-1 rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-white focus:border-emerald-400 focus:outline-none"
+				className="mt-1 rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-white focus:border-emerald-400 focus:outline-none"
 				type="date"
 				value={value}
 				onChange={onChange}
@@ -36,15 +36,6 @@ function RangeSelectorDateInput({ label, value, onChange }: RangeSelectorDateInp
 export function RangeSelector({ range, presets, activePresetId, onPresetChange, onRangeChange }: RangeSelectorProps) {
 	const { t } = useTranslation();
 
-	/**
-	 * Creates a change handler for date inputs that validates and updates the range.
-	 *
-	 * If the new date would create an invalid range (start > end or end < start),
-	 * it adjusts both dates to the new value to maintain validity.
-	 *
-	 * @param field - Which date field is being changed ('start' or 'end').
-	 * @returns An event handler function for the date input.
-	 */
 	const handleInputChange = (field: 'start' | 'end') => (event: React.ChangeEvent<HTMLInputElement>) => {
 		const value = event.target.value;
 

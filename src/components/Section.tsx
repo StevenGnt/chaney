@@ -1,3 +1,5 @@
+import { Hint } from './Hint';
+
 interface SectionProps {
 	title: string;
 	hint: string;
@@ -6,11 +8,11 @@ interface SectionProps {
 
 export function Section({ title, hint, children }: SectionProps) {
 	return (
-		<section className="rounded-2xl border border-white/10 bg-white/5 p-4">
+		<section className="rounded-lg border border-white/10 bg-white/5 p-4">
 			<header className="mb-3 flex items-center justify-between">
 				<p className="text-sm font-semibold text-white">{title}</p>
 
-				{hint && <span className="text-xs text-slate-400">{hint}</span>}
+				{hint && <Hint>{hint}</Hint>}
 			</header>
 			{children}
 		</section>

@@ -7,8 +7,8 @@ import { RangeSelector } from '@/features/ForecastWorkspace/components/RangeSele
 import { ForecastChart } from '@/features/ForecastWorkspace/components/ForecastChart';
 import { useForecastQuery } from '@/features/ForecastWorkspace/hooks/useForecastQuery';
 import type { ForecastRange } from '@/lib/finance/projection';
-import { formatDateVerbose } from '@/lib/format';
 import { TransactionsPanel } from '@/features/ForecastWorkspace/components/TransactionsPanel';
+import clsx from 'clsx';
 
 const DEFAULT_RANGE_START = new Date().toISOString().slice(0, 10);
 const DEFAULT_RANGE_MONTHS = 12;
@@ -49,23 +49,35 @@ function ForecastRangeSelector({ range, activePresetId, onPresetChange, onRangeC
 	);
 }
 
+function ForecastWorkspaceWrapper({ children, error }: { children: React.ReactNode; error?: boolean }) {
+	return (
+		<section
+			className={clsx(
+				'rounded-xl',
+				'space-y-4',
+				'p-6',
+				'border',
+				!error ? ['border-white/10', 'bg-white/5'] : ['border-red-400/40', 'bg-red-500/10', 'text-red-200'],
+			)}
+		>
+			{children}
+		</section>
+	);
+}
+
 function ForecastWorkspaceLoadingState() {
 	return (
-		<div className="space-y-4 rounded-3xl border border-white/10 bg-white/5 p-6">
+		<ForecastWorkspaceWrapper>
 			<div className="h-6 w-48 animate-pulse rounded bg-white/10" />
-			<div className="h-80 animate-pulse rounded-2xl bg-white/5" />
-		</div>
+			<div className="h-80 animate-pulse rounded-xl bg-white/5" />
+		</ForecastWorkspaceWrapper>
 	);
 }
 
 function ForecastWorkspaceErrorState() {
 	const { t } = useTranslation();
 
-	return (
-		<div className="rounded-3xl border border-red-400/40 bg-red-500/10 p-6 text-sm text-red-200">
-			{t('FORECAST.STATE.ERROR')}
-		</div>
-	);
+	return <ForecastWorkspaceWrapper error>{t('FORECAST.STATE.ERROR')}</ForecastWorkspaceWrapper>;
 }
 
 export function ForecastWorkspace() {
@@ -128,26 +140,8 @@ export function ForecastWorkspace() {
 	}
 
 	return (
-		<section className="space-y-6 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur">
-			<div className="flex flex-wrap items-center justify-between gap-3">
-				<div>
-					<p className="text-xs uppercase tracking-[0.3em] text-emerald-300">{t('FORECAST.WORKSPACE.PILL')}</p>
-					<h2 className="text-2xl font-semibold text-white">{t('FORECAST.WORKSPACE.TITLE')}</h2>
-					<p className="text-sm text-slate-300">
-						{t('FORECAST.WORKSPACE.CAPTION', {
-							start: formatDateVerbose(range.start),
-							end: formatDateVerbose(range.end),
-						})}
-					</p>
-				</div>
-			</div>
-
-			<ForecastRangeSelector
-				range={range}
-				activePresetId={activePresetId}
-				onPresetChange={setActivePresetId}
-				onRangeChange={setRange}
-			/>
+		<ForecastWorkspaceWrapper>
+			<p className="text-sm text-slate-300">{t('FORECAST.WORKSPACE.DESCRIPTION')}</p>
 
 			<AccountSelector
 				accounts={forecastQuery.data.accounts}
@@ -159,6 +153,15 @@ export function ForecastWorkspace() {
 				}}
 			/>
 
+			<ForecastRangeSelector
+				range={range}
+				activePresetId={activePresetId}
+				onPresetChange={(preset) => {
+					setActivePresetId(preset.id);
+				}}
+				onRangeChange={setRange}
+			/>
+
 			<ForecastChart
 				data={dataset}
 				accounts={selectedAccounts.length > 0 ? selectedAccounts : forecastQuery.data.accounts}
@@ -166,7 +169,7 @@ export function ForecastWorkspace() {
 			/>
 
 			<TransactionsPanel accounts={forecastQuery.data.accounts} selectedAccountIds={selectedAccountIds} range={range} />
-		</section>
+		</ForecastWorkspaceWrapper>
 	);
 }
 

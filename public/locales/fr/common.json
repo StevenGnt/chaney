@@ -1,27 +1,8 @@
 {
 	"APP": {
-		"TAGLINE": "Pilote tes finances",
-		"TITLE": "Prévisionnel financier moderne",
+		"TITLE": "Chaney",
+		"TAGLINE": "Visualise tes finances",
 		"SUBTITLE": "Projette chaque compte, simule tes projets et rassure les recruteurs avec un dashboard clair propulsé par React, TanStack Query et Recharts.",
-		"HIGHLIGHTS": {
-			"PILL": "Atouts stack",
-			"TIMELINE": {
-				"TITLE": "Plages temporelles",
-				"DESCRIPTION": "Bascule rapidement entre presets ou intervalles custom."
-			},
-			"PLAYBOOKS": {
-				"TITLE": "Scénarios avancés",
-				"DESCRIPTION": "Achats ponctuels, dépenses récurrentes et provision taxes."
-			},
-			"QUALITY": {
-				"TITLE": "Qualité intégrée",
-				"DESCRIPTION": "Vite, Vitest, RTL, Storybook, Husky et GitHub Actions configurés."
-			}
-		},
-		"TRANSACTIONS": {
-			"TITLE": "Transactions incluses sur cette période",
-			"HINT": "Groupées par compte et type de récurrence pour l’intervalle sélectionné."
-		},
 		"FOOTER": {
 			"MADE_WITH": "Réalisé avec",
 			"STATUS": "Base MVP prête • Données mockées via TanStack Query",
@@ -40,29 +21,16 @@
 			"TITLE": "Comptes",
 			"HINT": "Active les comptes pris en compte dans la prévision."
 		},
-		"HERO": {
-			"PILL": "MVP Prévision",
-			"TITLE": "Visualise tes soldes et itère vite",
-			"SUBTITLE": "Décris tes transactions récurrentes ou ponctuelles en JSON. L’UI Recharts affichera les courbes et TanStack Query gardera le cache frais.",
-			"PREVIEW_LABEL": "À livrer ensuite :",
-			"CHIPS": {
-				"ACCOUNTS": "Chroniques multi-comptes",
-				"BUDGETS": "Vue budget mensuel",
-				"SIMULATIONS": "Simulations de projets"
-			},
-			"CTA": "Ouvrir l’atelier de forecast"
-		},
 		"WORKSPACE": {
-			"PILL": "Live preview",
-			"TITLE": "Projection de trésorerie",
-			"CAPTION": "Du {{start}} au {{end}}"
+			"DESCRIPTION": "Projette l'évolution de tes comptes dans le temps avec des transactions récurrentes, des dépenses ponctuelles et des plages de dates personnalisées."
 		},
 		"STATE": {
-			"ERROR": "Impossible de charger les données. Merci de réessayer."
+			"ERROR": "Impossible de charger les données. Merci de réessayer.",
+			"NO_DATA": "Aucune donnée disponible pour le moment."
 		},
 		"TRANSACTIONS": {
 			"TITLE": "Transactions incluses sur cette période",
-			"HINT": "Groupées par compte et type de récurrence pour l’intervalle sélectionné.",
+			"HINT": "Groupées par compte et type de récurrence pour l'intervalle sélectionné.",
 			"COUNT": "{{count}} transaction",
 			"COUNT_plural": "{{count}} transactions",
 			"MONTHLY": "Mensuelles",

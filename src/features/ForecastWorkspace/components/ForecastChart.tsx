@@ -12,6 +12,7 @@ import {
 import type { Account, Threshold } from '@/features/ForecastWorkspace/types';
 import type { ChartDatum } from '@/features/ForecastWorkspace/utils/build-chart-dataset';
 import { formatCurrency, formatDateLabel, formatDateVerbose } from '@/lib/format';
+import { useTranslation } from 'react-i18next';
 
 const DEFAULT_CURRENCY = 'EUR';
 const CHART_HEIGHT = 400;
@@ -29,10 +30,12 @@ interface ForecastChartProps {
 }
 
 export function ForecastChart({ data, accounts, thresholds }: ForecastChartProps) {
+	const { t } = useTranslation();
+
 	if (data.length === 0 || accounts.length === 0) {
 		return (
-			<div className="flex h-80 items-center justify-center rounded-2xl border border-dashed border-white/10 bg-black/20 text-sm text-slate-400">
-				No data available yet.
+			<div className="flex h-80 items-center justify-center rounded-xl border border-dashed border-white/10 bg-black/20 text-sm text-slate-400">
+				{t('FORECAST.STATE.NO_DATA')}
 			</div>
 		);
 	}

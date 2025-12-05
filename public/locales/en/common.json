@@ -1,27 +1,8 @@
 {
 	"APP": {
+		"TITLE": "Chaney",
 		"TAGLINE": "Chart your money",
-		"TITLE": "Modern personal finance forecasts",
 		"SUBTITLE": "Project every account, simulate new projects, and stay audit-ready with clean dashboards powered by React, TanStack Query, and Recharts.",
-		"HIGHLIGHTS": {
-			"PILL": "Stack highlights",
-			"TIMELINE": {
-				"TITLE": "Forecast horizons",
-				"DESCRIPTION": "Switch between presets or custom ranges to stress-test cash."
-			},
-			"PLAYBOOKS": {
-				"TITLE": "Scenario playbooks",
-				"DESCRIPTION": "Model one-off purchases, recurring expenses, and tax buffers."
-			},
-			"QUALITY": {
-				"TITLE": "Quality toolchain",
-				"DESCRIPTION": "Vite, Vitest, RTL, Storybook, Husky, and GitHub Actions baked in."
-			}
-		},
-		"TRANSACTIONS": {
-			"TITLE": "Transactions impacting this period",
-			"HINT": "Grouped by account and schedule type for the selected range."
-		},
 		"FOOTER": {
 			"MADE_WITH": "Made with",
 			"STATUS": "MVP foundations ready • Mock data hooked via TanStack Query",
@@ -40,25 +21,12 @@
 			"TITLE": "Accounts",
 			"HINT": "Toggle which accounts are included in the forecast."
 		},
-		"HERO": {
-			"PILL": "Forecast MVP",
-			"TITLE": "Visualize balances, then iterate fast",
-			"SUBTITLE": "Define recurring or one-shot transactions in JSON mocks. The UI will chart balances with Recharts and keep client cache fresh via TanStack Query.",
-			"PREVIEW_LABEL": "Coming up next:",
-			"CHIPS": {
-				"ACCOUNTS": "Multi-account timelines",
-				"BUDGETS": "Monthly budget view",
-				"SIMULATIONS": "Project simulations"
-			},
-			"CTA": "Open forecast workspace"
-		},
 		"WORKSPACE": {
-			"PILL": "Live preview",
-			"TITLE": "Money evolution forecast",
-			"CAPTION": "From {{start}} to {{end}}"
+			"DESCRIPTION": "Project your account balances over time with recurring transactions, one-off expenses, and custom date ranges."
 		},
 		"STATE": {
-			"ERROR": "Unable to load forecast data. Please try again."
+			"ERROR": "Unable to load forecast data. Please try again.",
+			"NO_DATA": "No data available yet."
 		},
 		"TRANSACTIONS": {
 			"TITLE": "Transactions impacting this period",
