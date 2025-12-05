@@ -25,10 +25,10 @@ interface VisibleTransaction {
 interface TransactionsPanelProps {
 	accounts: Account[];
 	selectedAccountIds: string[];
-	range: ForecastRange;
+	dateRange: ForecastRange;
 }
 
-export function TransactionsPanel({ accounts, selectedAccountIds, range }: TransactionsPanelProps) {
+export function TransactionsPanel({ accounts, selectedAccountIds, dateRange }: TransactionsPanelProps) {
 	const { t } = useTranslation();
 
 	// Filter transactions that have at least one occurrence in the selected date range,
@@ -41,8 +41,8 @@ export function TransactionsPanel({ accounts, selectedAccountIds, range }: Trans
 
 		for (const account of filteredAccounts) {
 			for (const transaction of account.transactions) {
-				// Check if transaction has any occurrence in the forecast range
-				const firstOccurrence = getFirstTransactionOccurrenceInRange(transaction, account.initialDate, range);
+				// Check if transaction has any occurrence in the forecast date range
+				const firstOccurrence = getFirstTransactionOccurrenceInRange(transaction, account.initialDate, dateRange);
 				if (!firstOccurrence) continue;
 
 				// Determine transaction group type based on schedule frequency
@@ -72,7 +72,7 @@ export function TransactionsPanel({ accounts, selectedAccountIds, range }: Trans
 		}
 
 		return collected;
-	}, [accounts, selectedAccountIds, range]);
+	}, [accounts, selectedAccountIds, dateRange]);
 
 	// Group transactions by account ID for collapsible account sections
 	const groupedTransactions = useMemo(() => {
@@ -122,26 +122,30 @@ export function TransactionsPanel({ accounts, selectedAccountIds, range }: Trans
 }
 
 /**
- * Finds the first occurrence date of a transaction within the given forecast range.
+ * Finds the first occurrence date of a transaction within the given forecast date range.
  *
- * For single transactions, checks if the date falls within the range.
+ * For single transactions, checks if the date falls within the date range.
  * For recurring transactions, iterates through occurrences until finding one
- * within the range, respecting interruptions and occurrence limits.
+ * within the date range, respecting interruptions and occurrence limits.
  *
  * @param transaction - Transaction to check for occurrences.
  * @param accountStartISO - ISO date when the account becomes active.
- * @param range - Forecast range to search within.
- * @returns The first occurrence date within the range, or null if none exists.
+ * @param dateRange - Forecast date range to search within.
+ * @returns The first occurrence date within the date range, or null if none exists.
  */
-function getFirstTransactionOccurrenceInRange(transaction: Transaction, accountStartISO: string, range: ForecastRange) {
+function getFirstTransactionOccurrenceInRange(
+	transaction: Transaction,
+	accountStartISO: string,
+	dateRange: ForecastRange,
+) {
 	// Handle single-occurrence transactions
 	if (transaction.schedule.kind === 'single') {
 		const date = parseISO(transaction.schedule.date);
-		const rangeStart = parseISO(range.start);
-		const rangeEnd = parseISO(range.end);
+		const rangeStart = parseISO(dateRange.start);
+		const rangeEnd = parseISO(dateRange.end);
 		const accountStart = parseISO(accountStartISO);
 
-		// Must be after account start and within the forecast range
+		// Must be after account start and within the forecast date range
 		return date >= accountStart && date >= rangeStart && date <= rangeEnd ? date : null;
 	}
 
@@ -152,8 +156,8 @@ function getFirstTransactionOccurrenceInRange(transaction: Transaction, accountS
 	const scheduleStart = parseISO(schedule.startDate);
 	// Use the later of account start or schedule start
 	const startDate = accountStart > scheduleStart ? accountStart : scheduleStart;
-	const windowStart = parseISO(range.start);
-	const windowEnd = parseISO(range.end);
+	const windowStart = parseISO(dateRange.start);
+	const windowEnd = parseISO(dateRange.end);
 	const scheduleEnd = schedule.endDate ? parseISO(schedule.endDate) : windowEnd;
 	// Use the earlier of schedule end or forecast window end
 	const maxEnd = scheduleEnd < windowEnd ? scheduleEnd : windowEnd;

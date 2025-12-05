@@ -1,25 +1,25 @@
 import { useTranslation } from 'react-i18next';
 import type { ForecastRange } from '@/lib/finance/projection';
-import type { RangePreset } from '@/features/ForecastWorkspace/utils/range';
+import type { DateRangePreset } from '@/features/ForecastWorkspace/utils/range';
 import { Section } from '@/components/Section';
 import { Button } from '@/components/Button';
 import { ButtonsGroup } from '@/components/ButtonsGroup';
 
-interface RangeSelectorProps {
-	range: ForecastRange;
-	presets: RangePreset[];
+interface DateRangeSelectorProps {
+	dateRange: ForecastRange;
+	presets: DateRangePreset[];
 	activePresetId: string;
-	onPresetChange: (preset: RangePreset) => void;
-	onRangeChange: (range: ForecastRange) => void;
+	onPresetChange: (preset: DateRangePreset) => void;
+	onDateRangeChange: (dateRange: ForecastRange) => void;
 }
 
-interface RangeSelectorDateInputProps {
+interface DateRangeSelectorDateInputProps {
 	label: string;
 	value: string;
 	onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-function RangeSelectorDateInput({ label, value, onChange }: RangeSelectorDateInputProps) {
+function DateRangeSelectorDateInput({ label, value, onChange }: DateRangeSelectorDateInputProps) {
 	return (
 		<label className="flex flex-col text-xs text-slate-300">
 			{label}
@@ -33,7 +33,13 @@ function RangeSelectorDateInput({ label, value, onChange }: RangeSelectorDateInp
 	);
 }
 
-export function RangeSelector({ range, presets, activePresetId, onPresetChange, onRangeChange }: RangeSelectorProps) {
+export function DateRangeSelector({
+	dateRange,
+	presets,
+	activePresetId,
+	onPresetChange,
+	onDateRangeChange,
+}: DateRangeSelectorProps) {
 	const { t } = useTranslation();
 
 	const handleInputChange = (field: 'start' | 'end') => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,16 +47,16 @@ export function RangeSelector({ range, presets, activePresetId, onPresetChange, 
 
 		if (value) {
 			// If new start date is after end date, set both to the new start date
-			if (field === 'start' && value > range.end) {
-				onRangeChange({ start: value, end: value });
+			if (field === 'start' && value > dateRange.end) {
+				onDateRangeChange({ start: value, end: value });
 			}
 			// If new end date is before start date, set both to the new end date
-			else if (field === 'end' && value < range.start) {
-				onRangeChange({ start: value, end: value });
+			else if (field === 'end' && value < dateRange.start) {
+				onDateRangeChange({ start: value, end: value });
 			}
 			// Otherwise, update only the changed field
 			else {
-				onRangeChange({ ...range, [field]: value });
+				onDateRangeChange({ ...dateRange, [field]: value });
 			}
 		}
 	};
@@ -72,12 +78,16 @@ export function RangeSelector({ range, presets, activePresetId, onPresetChange, 
 			</ButtonsGroup>
 
 			<div className="mt-4 grid gap-4 sm:grid-cols-2">
-				<RangeSelectorDateInput
+				<DateRangeSelectorDateInput
 					label={t('FORECAST.RANGE.START')}
-					value={range.start}
+					value={dateRange.start}
 					onChange={handleInputChange('start')}
 				/>
-				<RangeSelectorDateInput label={t('FORECAST.RANGE.END')} value={range.end} onChange={handleInputChange('end')} />
+				<DateRangeSelectorDateInput
+					label={t('FORECAST.RANGE.END')}
+					value={dateRange.end}
+					onChange={handleInputChange('end')}
+				/>
 			</div>
 		</Section>
 	);

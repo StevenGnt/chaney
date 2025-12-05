@@ -1,7 +1,7 @@
 import { addMonths, differenceInMonths, formatISO, parseISO } from 'date-fns';
 import type { ForecastRange } from '@/lib/finance/projection';
 
-export interface RangePreset {
+export interface DateRangePreset {
 	id: string;
 	label: string;
 	months: number;
