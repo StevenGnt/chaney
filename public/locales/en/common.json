@@ -59,6 +59,15 @@
 		},
 		"STATE": {
 			"ERROR": "Unable to load forecast data. Please try again."
+		},
+		"TRANSACTIONS": {
+			"TITLE": "Transactions impacting this period",
+			"HINT": "Grouped by account and schedule type for the selected range.",
+			"COUNT": "{{count}} transaction",
+			"COUNT_plural": "{{count}} transactions",
+			"MONTHLY": "Monthly",
+			"WEEKLY": "Weekly",
+			"SINGLE": "One-off"
 		}
 	}
 }

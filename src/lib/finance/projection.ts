@@ -1,5 +1,5 @@
 import { addMonths, addWeeks, addYears, formatISO, parseISO } from 'date-fns';
-import type { Account, DateRange, Transaction } from '@/features/forecast/types';
+import type { Account, DateRange, Transaction } from '@/features/ForecastWorkspace/types';
 
 export interface ForecastRange extends DateRange {
 	end: string;

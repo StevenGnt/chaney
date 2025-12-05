@@ -1,4 +1,6 @@
-import type { Account } from '@/features/forecast/types';
+import { Button } from '@/components/Button';
+import { ButtonsGroup } from '@/components/ButtonsGroup';
+import type { Account } from '@/features/ForecastWorkspace/types';
 import { formatCurrency } from '@/lib/format';
 
 interface AccountSummary {
@@ -16,7 +18,7 @@ interface AccountToggleListProps {
 export function AccountToggleList({ accounts, selectedIds, onToggle, summaries }: AccountToggleListProps) {
 	return (
 		<div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-			<div className="flex flex-wrap gap-2">
+			<ButtonsGroup>
 				{accounts.map((account) => {
 					const isActive = selectedIds.includes(account.id);
 					const summary = summaries[account.id];
@@ -27,15 +29,10 @@ export function AccountToggleList({ accounts, selectedIds, onToggle, summaries }
 						: formatCurrency(summary ? summary.endBalance : account.initialBalance, account.currency);
 
 					return (
-						<button
+						<Button
 							key={account.id}
-							type="button"
-							className={[
-								'inline-flex items-center gap-3 rounded-full border px-4 py-2 text-sm transition',
-								isActive
-									? 'border-emerald-400/60 bg-emerald-400/10 text-white'
-									: 'border-white/10 bg-black/20 text-slate-200 hover:border-white/20',
-							].join(' ')}
+							hint={deltaLabel}
+							active={isActive}
 							onClick={() => {
 								onToggle(account.id);
 							}}
@@ -44,11 +41,10 @@ export function AccountToggleList({ accounts, selectedIds, onToggle, summaries }
 								<span className="h-3 w-3 rounded-full" style={{ backgroundColor: account.color ?? '#34d399' }} />
 								<span className="font-semibold">{account.name}</span>
 							</span>
-							<span className="text-xs text-slate-300">{deltaLabel}</span>
-						</button>
+						</Button>
 					);
 				})}
-			</div>
+			</ButtonsGroup>
 		</div>
 	);
 }

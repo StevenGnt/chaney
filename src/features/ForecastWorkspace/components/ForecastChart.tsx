@@ -9,8 +9,8 @@ import {
 	XAxis,
 	YAxis,
 } from 'recharts';
-import type { Account, Threshold } from '@/features/forecast/types';
-import type { ChartDatum } from '@/features/forecast/utils/build-chart-dataset';
+import type { Account, Threshold } from '@/features/ForecastWorkspace/types';
+import type { ChartDatum } from '@/features/ForecastWorkspace/utils/build-chart-dataset';
 import { formatCurrency, formatDateLabel, formatDateVerbose } from '@/lib/format';
 
 const DEFAULT_CURRENCY = 'EUR';

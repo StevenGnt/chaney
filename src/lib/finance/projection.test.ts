@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { Account } from '@/features/forecast/types';
+import type { Account } from '@/features/ForecastWorkspace/types';
 import { projectAccountBalance } from './projection';
 
 const baseAccount: Account = {

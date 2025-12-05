@@ -59,6 +59,15 @@
 		},
 		"STATE": {
 			"ERROR": "Impossible de charger les données. Merci de réessayer."
+		},
+		"TRANSACTIONS": {
+			"TITLE": "Transactions incluses sur cette période",
+			"HINT": "Groupées par compte et type de récurrence pour l’intervalle sélectionné.",
+			"COUNT": "{{count}} transaction",
+			"COUNT_plural": "{{count}} transactions",
+			"MONTHLY": "Mensuelles",
+			"WEEKLY": "Hebdomadaires",
+			"SINGLE": "Ponctuelles"
 		}
 	}
 }
