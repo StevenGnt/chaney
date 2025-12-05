@@ -1,4 +1,6 @@
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { addMonths, differenceInMonths, formatISO, parseISO } from 'date-fns';
 import type { ForecastRange } from '@/lib/finance/projection';
 import type { DateRangePreset } from '@/features/ForecastWorkspace/utils/range';
 import { Section } from '@/components/Section';
@@ -8,8 +10,6 @@ import { ButtonsGroup } from '@/components/ButtonsGroup';
 interface DateRangeSelectorProps {
 	dateRange: ForecastRange;
 	presets: DateRangePreset[];
-	activePresetId: string;
-	onPresetChange: (preset: DateRangePreset) => void;
 	onDateRangeChange: (dateRange: ForecastRange) => void;
 }
 
@@ -33,31 +33,47 @@ function DateRangeSelectorDateInput({ label, value, onChange }: DateRangeSelecto
 	);
 }
 
-export function DateRangeSelector({
-	dateRange,
-	presets,
-	activePresetId,
-	onPresetChange,
-	onDateRangeChange,
-}: DateRangeSelectorProps) {
+export function DateRangeSelector({ dateRange, presets, onDateRangeChange }: DateRangeSelectorProps) {
 	const { t } = useTranslation();
+
+	// Calculate the active preset ID based on the current date range
+	const activePresetId = useMemo(() => {
+		const startDate = parseISO(dateRange.start);
+		const endDate = parseISO(dateRange.end);
+		const monthsInRange = Math.max(1, differenceInMonths(endDate, startDate));
+		const matchingPreset = presets.find((preset) => preset.months === monthsInRange);
+
+		if (matchingPreset) {
+			// Check if the date range matches the preset (same start date and months)
+			const expectedEnd = formatISO(addMonths(startDate, matchingPreset.months), { representation: 'date' });
+			if (expectedEnd === dateRange.end) {
+				return matchingPreset.id;
+			}
+		}
+
+		return null;
+	}, [dateRange, presets]);
+
+	const handlePresetClick = (preset: DateRangePreset) => {
+		const startDate = parseISO(dateRange.start);
+		const endDate = addMonths(startDate, preset.months);
+		onDateRangeChange({
+			start: dateRange.start,
+			end: formatISO(endDate, { representation: 'date' }),
+		});
+	};
 
 	const handleInputChange = (field: 'start' | 'end') => (event: React.ChangeEvent<HTMLInputElement>) => {
 		const value = event.target.value;
 
 		if (value) {
-			// If new start date is after end date, set both to the new start date
-			if (field === 'start' && value > dateRange.end) {
-				onDateRangeChange({ start: value, end: value });
-			}
-			// If new end date is before start date, set both to the new end date
-			else if (field === 'end' && value < dateRange.start) {
-				onDateRangeChange({ start: value, end: value });
-			}
-			// Otherwise, update only the changed field
-			else {
-				onDateRangeChange({ ...dateRange, [field]: value });
-			}
+			const newRange =
+				// If start date is after end date, set both to the new
+				(field === 'start' && value > dateRange.end) || (field === 'end' && value < dateRange.start)
+					? { start: value, end: value }
+					: { ...dateRange, [field]: value };
+
+			onDateRangeChange(newRange);
 		}
 	};
 
@@ -69,7 +85,7 @@ export function DateRangeSelector({
 						key={preset.id}
 						active={activePresetId === preset.id}
 						onClick={() => {
-							onPresetChange(preset);
+							handlePresetClick(preset);
 						}}
 					>
 						{preset.label}

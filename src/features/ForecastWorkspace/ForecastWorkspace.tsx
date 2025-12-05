@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { createRangeFromMonths, type DateRangePreset } from '@/features/ForecastWorkspace/utils/range';
+import { addMonths, differenceInMonths, formatISO, parseISO } from 'date-fns';
+import type { DateRangePreset } from '@/features/ForecastWorkspace/utils/range';
 import { buildChartDataset } from '@/features/ForecastWorkspace/utils/build-chart-dataset';
 import { AccountSelector } from '@/features/ForecastWorkspace/components/AccountSelector';
 import { DateRangeSelector } from '@/features/ForecastWorkspace/components/DateRangeSelector';
@@ -12,7 +13,6 @@ import clsx from 'clsx';
 
 const DEFAULT_DATE_RANGE_START = new Date().toISOString().slice(0, 10);
 const DEFAULT_DATE_RANGE_MONTHS = 12;
-const DEFAULT_PRESET_ID = '12m';
 
 const BASE_DATE_RANGE_PRESETS = [
 	{ id: '3m', months: 3 },
@@ -21,37 +21,31 @@ const BASE_DATE_RANGE_PRESETS = [
 	{ id: '24m', months: 24 },
 ] as const;
 
-const DEFAULT_DATE_RANGE: ForecastRange = createRangeFromMonths(DEFAULT_DATE_RANGE_START, DEFAULT_DATE_RANGE_MONTHS);
+const DEFAULT_DATE_RANGE: ForecastRange = (() => {
+	const start = parseISO(DEFAULT_DATE_RANGE_START);
+	const end = addMonths(start, DEFAULT_DATE_RANGE_MONTHS);
+	return {
+		start: DEFAULT_DATE_RANGE_START,
+		end: formatISO(end, { representation: 'date' }),
+	};
+})();
 
 interface ForecastDateRangeSelectorProps {
 	dateRange: ForecastRange;
-	activePresetId: string;
-	onPresetChange: (preset: DateRangePreset) => void;
 	onDateRangeChange: (dateRange: ForecastRange) => void;
 }
 
-function ForecastDateRangeSelector({
-	dateRange,
-	activePresetId,
-	onPresetChange,
-	onDateRangeChange,
-}: ForecastDateRangeSelectorProps) {
+function ForecastDateRangeSelector(props: ForecastDateRangeSelectorProps) {
 	const { t } = useTranslation();
+
+	const { dateRange, onDateRangeChange } = props;
 
 	const presets: DateRangePreset[] = BASE_DATE_RANGE_PRESETS.map((preset) => ({
 		...preset,
 		label: t('FORECAST.RANGE.NEXT_MONTHS', { count: preset.months }),
 	}));
 
-	return (
-		<DateRangeSelector
-			dateRange={dateRange}
-			presets={presets}
-			activePresetId={activePresetId}
-			onPresetChange={onPresetChange}
-			onDateRangeChange={onDateRangeChange}
-		/>
-	);
+	return <DateRangeSelector dateRange={dateRange} presets={presets} onDateRangeChange={onDateRangeChange} />;
 }
 
 function ForecastWorkspaceWrapper({ children, error }: { children: React.ReactNode; error?: boolean }) {
@@ -88,41 +82,48 @@ function ForecastWorkspaceErrorState() {
 export function ForecastWorkspace() {
 	const { t } = useTranslation();
 	const [dateRange, setDateRange] = useState<ForecastRange>(DEFAULT_DATE_RANGE);
-	const [activePresetId, setActivePresetId] = useState(DEFAULT_PRESET_ID);
 	const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>([]);
 	const autoAlignedDateRange = useRef(false);
 	const forecastQuery = useForecastQuery(dateRange);
 
+	// Initialize UI values once data is loaded
 	useEffect(() => {
-		if (!forecastQuery.data || selectedAccountIds.length > 0) {
+		if (!forecastQuery.data) {
 			return;
 		}
 
-		// eslint-disable-next-line react-hooks/set-state-in-effect
-		setSelectedAccountIds(forecastQuery.data.accounts.map((account) => account.id));
-	}, [forecastQuery.data, selectedAccountIds.length]);
-
-	useEffect(() => {
-		if (!forecastQuery.data || autoAlignedDateRange.current) {
-			return;
+		// Select all accounts by default if none are selected
+		if (selectedAccountIds.length === 0) {
+			// eslint-disable-next-line react-hooks/set-state-in-effect
+			setSelectedAccountIds(forecastQuery.data.accounts.map((account) => account.id));
 		}
 
-		const earliest = forecastQuery.data.accounts.reduce((current, account) => {
-			return account.initialDate < current ? account.initialDate : current;
-		}, forecastQuery.data.accounts[0]?.initialDate ?? dateRange.start);
+		// Align date range to earliest account date (only once)
+		if (!autoAlignedDateRange.current) {
+			const earliest = forecastQuery.data.accounts.reduce((current, account) => {
+				return account.initialDate < current ? account.initialDate : current;
+			}, forecastQuery.data.accounts[0]?.initialDate ?? dateRange.start);
 
-		// eslint-disable-next-line react-hooks/set-state-in-effect
-		setDateRange((previousDateRange) => {
-			if (previousDateRange.start === earliest) {
-				return previousDateRange;
-			}
+			setDateRange((previousDateRange) => {
+				if (previousDateRange.start === earliest) {
+					return previousDateRange;
+				}
 
-			const preset = BASE_DATE_RANGE_PRESETS.find((item) => item.id === activePresetId) ?? BASE_DATE_RANGE_PRESETS[2];
-			return createRangeFromMonths(earliest, preset.months);
-		});
+				// Use the current range's duration (months) when auto-aligning
+				const startDate = parseISO(previousDateRange.start);
+				const endDate = parseISO(previousDateRange.end);
+				const currentMonths = Math.max(1, differenceInMonths(endDate, startDate));
+				const newStart = parseISO(earliest);
+				const newEnd = addMonths(newStart, currentMonths);
+				return {
+					start: earliest,
+					end: formatISO(newEnd, { representation: 'date' }),
+				};
+			});
 
-		autoAlignedDateRange.current = true;
-	}, [forecastQuery.data, activePresetId, dateRange.start]);
+			autoAlignedDateRange.current = true;
+		}
+	}, [forecastQuery.data, selectedAccountIds.length, dateRange.start]);
 
 	// Build chart dataset from projections, filtering by selected accounts
 	const dataset = useMemo(() => {
@@ -158,14 +159,7 @@ export function ForecastWorkspace() {
 				}}
 			/>
 
-			<ForecastDateRangeSelector
-				dateRange={dateRange}
-				activePresetId={activePresetId}
-				onPresetChange={(preset: DateRangePreset) => {
-					setActivePresetId(preset.id);
-				}}
-				onDateRangeChange={setDateRange}
-			/>
+			<ForecastDateRangeSelector dateRange={dateRange} onDateRangeChange={setDateRange} />
 
 			<ForecastChart
 				data={dataset}
