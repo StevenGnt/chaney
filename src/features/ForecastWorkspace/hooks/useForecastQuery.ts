@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchMockFinance } from '@/mocks/mock-service';
-import { projectAccounts, type AccountProjection, type ForecastRange } from '@/lib/finance/projection';
+
 import type { FinanceMock } from '@/features/ForecastWorkspace/types';
+import { projectAccounts, type AccountProjection, type ForecastRange } from '@/lib/finance/projection';
+import { fetchMockFinance } from '@/mocks/mock-service';
 
 export type ForecastQueryResult = FinanceMock & {
 	projections: AccountProjection[];

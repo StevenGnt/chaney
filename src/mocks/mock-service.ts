@@ -1,5 +1,5 @@
-import rawData from '@/mocks/finance-data.json';
 import { financeMockSchema, type FinanceMock } from '@/features/ForecastWorkspace/types';
+import rawData from '@/mocks/finance-data.json';
 
 /**
  * Simulates network latency by delaying execution for a specified duration.

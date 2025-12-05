@@ -1,15 +1,16 @@
+import clsx from 'clsx';
+import { addMonths, differenceInMonths, formatISO, parseISO } from 'date-fns';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { addMonths, differenceInMonths, formatISO, parseISO } from 'date-fns';
-import type { DateRangePreset } from '@/features/ForecastWorkspace/utils/range';
-import { buildChartDataset } from '@/features/ForecastWorkspace/utils/build-chart-dataset';
+
 import { AccountSelector } from '@/features/ForecastWorkspace/components/AccountSelector';
 import { DateRangeSelector } from '@/features/ForecastWorkspace/components/DateRangeSelector';
 import { ForecastChart } from '@/features/ForecastWorkspace/components/ForecastChart';
-import { useForecastQuery } from '@/features/ForecastWorkspace/hooks/useForecastQuery';
-import type { ForecastRange } from '@/lib/finance/projection';
 import { TransactionsPanel } from '@/features/ForecastWorkspace/components/TransactionsPanel';
-import clsx from 'clsx';
+import { useForecastQuery } from '@/features/ForecastWorkspace/hooks/useForecastQuery';
+import { buildChartDataset } from '@/features/ForecastWorkspace/utils/build-chart-dataset';
+import type { DateRangePreset } from '@/features/ForecastWorkspace/utils/range';
+import type { ForecastRange } from '@/lib/finance/projection';
 
 const DEFAULT_DATE_RANGE_START = new Date().toISOString().slice(0, 10);
 const DEFAULT_DATE_RANGE_MONTHS = 12;

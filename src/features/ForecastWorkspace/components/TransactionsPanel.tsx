@@ -1,10 +1,12 @@
-import { useMemo } from 'react';
 import { addMonths, addWeeks, addYears, parseISO } from 'date-fns';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ForecastRange } from '@/lib/finance/projection';
-import type { Account, Transaction } from '@/features/ForecastWorkspace/types';
-import { Section } from '@/components/Section';
+
 import { Hint } from '@/components/Hint';
+import { Section } from '@/components/Section';
+import type { Account, Transaction } from '@/features/ForecastWorkspace/types';
+import { DEFAULT_COLOR } from '@/lib/constants';
+import type { ForecastRange } from '@/lib/finance/projection';
 
 type TransactionGroupType = 'monthly' | 'weekly' | 'single';
 
@@ -262,7 +264,7 @@ function AccountTransactionsGroup({ group }: AccountTransactionsGroupProps) {
 		<details className="rounded-s border border-white/10 bg-white/5">
 			<summary className="flex cursor-pointer items-center justify-between gap-3 px-3 py-2">
 				<span className="flex items-center gap-2">
-					<span className="h-2 w-2 rounded-full" style={{ backgroundColor: group.accountColor ?? '#34d399' }} />
+					<span className="h-2 w-2 rounded-full" style={{ backgroundColor: group.accountColor ?? DEFAULT_COLOR }} />
 					<span className="font-semibold text-white">
 						{group.accountName} <Hint>({t('FORECAST.TRANSACTIONS.COUNT', { count: group.items.length })})</Hint>
 					</span>

@@ -1,5 +1,6 @@
-import { ForecastWorkspace } from '@/features/ForecastWorkspace/ForecastWorkspace';
 import { useTranslation } from 'react-i18next';
+
+import { ForecastWorkspace } from '@/features/ForecastWorkspace/ForecastWorkspace';
 
 export function App() {
 	const { t } = useTranslation();

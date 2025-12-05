@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import {
 	CartesianGrid,
 	Legend,
@@ -9,10 +10,11 @@ import {
 	XAxis,
 	YAxis,
 } from 'recharts';
+
 import type { Account, Threshold } from '@/features/ForecastWorkspace/types';
 import type { ChartDatum } from '@/features/ForecastWorkspace/utils/build-chart-dataset';
+import { DEFAULT_COLOR } from '@/lib/constants';
 import { formatCurrency, formatDateLabel, formatDateVerbose } from '@/lib/format';
-import { useTranslation } from 'react-i18next';
 
 const DEFAULT_CURRENCY = 'EUR';
 const CHART_HEIGHT = 400;
@@ -20,8 +22,9 @@ const GRID_STROKE = 'rgba(255,255,255,0.08)';
 const GRID_DASH = '3 3';
 const CURSOR_STROKE = '#f8fafc';
 const CURSOR_DASH = '3 3';
-const DEFAULT_ACCOUNT_COLOR = '#34d399';
+const DEFAULT_ACCOUNT_COLOR = DEFAULT_COLOR;
 const DEFAULT_THRESHOLD_COLOR = '#f472b6';
+const DEFAULT_AXIS_COLOR = '#94a3b8';
 
 interface ForecastChartProps {
 	data: ChartDatum[];
@@ -49,12 +52,12 @@ export function ForecastChart({ data, accounts, thresholds }: ForecastChartProps
 					<CartesianGrid stroke={GRID_STROKE} strokeDasharray={GRID_DASH} />
 					<XAxis
 						dataKey="date"
-						stroke="#94a3b8"
+						stroke={DEFAULT_AXIS_COLOR}
 						tickFormatter={(value) => formatDateLabel(String(value))}
 						tick={{ fontSize: 12 }}
 					/>
 					<YAxis
-						stroke="#94a3b8"
+						stroke={DEFAULT_AXIS_COLOR}
 						tickFormatter={(value) => formatCurrency(Number(value), currency)}
 						tick={{ fontSize: 12 }}
 					/>

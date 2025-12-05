@@ -1,11 +1,12 @@
+import { addMonths, differenceInMonths, formatISO, parseISO } from 'date-fns';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { addMonths, differenceInMonths, formatISO, parseISO } from 'date-fns';
-import type { ForecastRange } from '@/lib/finance/projection';
-import type { DateRangePreset } from '@/features/ForecastWorkspace/utils/range';
-import { Section } from '@/components/Section';
+
 import { Button } from '@/components/Button';
 import { ButtonsGroup } from '@/components/ButtonsGroup';
+import { Section } from '@/components/Section';
+import type { DateRangePreset } from '@/features/ForecastWorkspace/utils/range';
+import type { ForecastRange } from '@/lib/finance/projection';
 
 interface DateRangeSelectorProps {
 	dateRange: ForecastRange;
