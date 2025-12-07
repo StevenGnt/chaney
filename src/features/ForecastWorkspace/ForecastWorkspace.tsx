@@ -81,52 +81,56 @@ export function ForecastWorkspace() {
 			end: formatISO(end, { representation: 'date' }),
 		};
 	});
-	const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>([]);
+	const [selectedAccountIds, setSelectedAccountIds] = useState<string[] | null>(null);
 	const autoAlignedDateRange = useRef(false);
 	const forecastQuery = useForecastQuery(dateRange);
+
 	const forecastData = useForecastData({
 		queryResult: forecastQuery.data,
-		selectedAccountIds,
+		selectedAccountIds: selectedAccountIds ?? [],
 	});
 
-	// Initialize UI values once data is loaded
+	// Initialize selectedAccountIds to all accounts once data is loaded
 	useEffect(() => {
-		if (!forecastQuery.data) {
+		if (!forecastQuery.data || selectedAccountIds !== null) {
 			return;
 		}
 
-		// Select all accounts by default if none are selected
-		if (selectedAccountIds.length === 0) {
-			// eslint-disable-next-line react-hooks/set-state-in-effect
-			setSelectedAccountIds(forecastQuery.data.accounts.map((account) => account.id));
+		// Select all accounts by default on first data load
+		// eslint-disable-next-line react-hooks/set-state-in-effect
+		setSelectedAccountIds(forecastQuery.data.accounts.map((account) => account.id));
+	}, [forecastQuery.data, selectedAccountIds]);
+
+	// Align date range to earliest account date (only once)
+	useEffect(() => {
+		if (!forecastQuery.data || autoAlignedDateRange.current) {
+			return;
 		}
 
-		// Align date range to earliest account date (only once)
-		if (!autoAlignedDateRange.current) {
-			const earliest = forecastQuery.data.accounts.reduce((current, account) => {
-				return account.initialDate < current ? account.initialDate : current;
-			}, forecastQuery.data.accounts[0]?.initialDate ?? dateRange.start);
+		const earliest = forecastQuery.data.accounts.reduce((current, account) => {
+			return account.initialDate < current ? account.initialDate : current;
+		}, forecastQuery.data.accounts[0]?.initialDate ?? dateRange.start);
 
-			setDateRange((previousDateRange) => {
-				if (previousDateRange.start === earliest) {
-					return previousDateRange;
-				}
+		// eslint-disable-next-line react-hooks/set-state-in-effect
+		setDateRange((previousDateRange) => {
+			if (previousDateRange.start === earliest) {
+				return previousDateRange;
+			}
 
-				// Use the current range's duration (months) when auto-aligning
-				const startDate = parseISO(previousDateRange.start);
-				const endDate = parseISO(previousDateRange.end);
-				const currentMonths = Math.max(1, differenceInMonths(endDate, startDate));
-				const newStart = parseISO(earliest);
-				const newEnd = addMonths(newStart, currentMonths);
-				return {
-					start: earliest,
-					end: formatISO(newEnd, { representation: 'date' }),
-				};
-			});
+			// Use the current range's duration (months) when auto-aligning
+			const startDate = parseISO(previousDateRange.start);
+			const endDate = parseISO(previousDateRange.end);
+			const currentMonths = Math.max(1, differenceInMonths(endDate, startDate));
+			const newStart = parseISO(earliest);
+			const newEnd = addMonths(newStart, currentMonths);
+			return {
+				start: earliest,
+				end: formatISO(newEnd, { representation: 'date' }),
+			};
+		});
 
-			autoAlignedDateRange.current = true;
-		}
-	}, [forecastQuery.data, selectedAccountIds.length, dateRange.start]);
+		autoAlignedDateRange.current = true;
+	}, [forecastQuery.data, dateRange.start]);
 
 	if (forecastQuery.isPending) {
 		return <ForecastWorkspaceLoadingState />;
@@ -142,27 +146,26 @@ export function ForecastWorkspace() {
 
 			<AccountSelector
 				accounts={forecastData.allAccounts}
-				selectedAccountIds={selectedAccountIds}
+				selectedAccountIds={selectedAccountIds ?? []}
 				onToggleAccount={(accountId) => {
-					setSelectedAccountIds((current) =>
-						current.includes(accountId) ? current.filter((id) => id !== accountId) : [...current, accountId],
-					);
+					setSelectedAccountIds((current) => {
+						const currentIds = current ?? [];
+						return currentIds.includes(accountId)
+							? currentIds.filter((id) => id !== accountId)
+							: [...currentIds, accountId];
+					});
 				}}
 			/>
 
 			<ForecastDateRangeSelector dateRange={dateRange} onDateRangeChange={setDateRange} />
 
 			<ForecastChart
-				projections={forecastData.filteredProjections}
 				accounts={forecastData.selectedAccounts}
+				projections={forecastData.filteredProjections}
 				thresholds={forecastData.thresholds}
 			/>
 
-			<TransactionsPanel
-				accounts={forecastData.allAccounts}
-				selectedAccountIds={selectedAccountIds}
-				dateRange={dateRange}
-			/>
+			<TransactionsPanel accounts={forecastData.filteredAccounts} dateRange={dateRange} />
 		</ForecastWorkspaceWrapper>
 	);
 }

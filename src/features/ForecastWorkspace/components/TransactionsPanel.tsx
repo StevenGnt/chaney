@@ -8,19 +8,21 @@ import { filterTransactions, type VisibleTransaction } from '@/features/Forecast
 import { DEFAULT_COLOR } from '@/lib/constants';
 import type { ForecastRange } from '@/lib/finance/projection';
 
+import { Message } from '../../../components/Message';
+
 interface TransactionsPanelProps {
 	accounts: Account[];
-	selectedAccountIds: string[];
 	dateRange: ForecastRange;
 }
 
-export function TransactionsPanel({ accounts, selectedAccountIds, dateRange }: TransactionsPanelProps) {
+export function TransactionsPanel({ accounts, dateRange }: TransactionsPanelProps) {
 	const { t } = useTranslation();
 
 	// Filter transactions using the centralized utility
+	// accounts are already filtered by selectedAccountIds via forecastData.filteredAccounts
 	const visibleTransactions = useMemo<VisibleTransaction[]>(() => {
-		return filterTransactions(accounts, selectedAccountIds, dateRange);
-	}, [accounts, selectedAccountIds, dateRange]);
+		return filterTransactions(accounts, dateRange);
+	}, [accounts, dateRange]);
 
 	// Group transactions by account ID for collapsible account sections
 	const groupedTransactions = useMemo(() => {
@@ -54,17 +56,17 @@ export function TransactionsPanel({ accounts, selectedAccountIds, dateRange }: T
 		return groups;
 	}, [visibleTransactions]);
 
-	if (groupedTransactions.length === 0) {
-		return null;
-	}
-
 	return (
 		<Section title={t('FORECAST.TRANSACTIONS.TITLE')} hint={t('FORECAST.TRANSACTIONS.HINT')}>
-			<div className="max-h-60 space-y-2 overflow-auto pr-1 text-sm">
-				{groupedTransactions.map((group) => (
-					<AccountTransactionsGroup key={group.accountId} group={group} />
-				))}
-			</div>
+			{groupedTransactions.length === 0 ? (
+				<Message>{t('FORECAST.STATE.NO_DATA')}</Message>
+			) : (
+				<div className="max-h-100 space-y-2 overflow-auto pr-1 text-sm">
+					{groupedTransactions.map((group) => (
+						<AccountTransactionsGroup key={group.accountId} group={group} />
+					))}
+				</div>
+			)}
 		</Section>
 	);
 }

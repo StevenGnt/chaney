@@ -23,22 +23,14 @@ export interface VisibleTransaction {
  * Filters transactions that have at least one occurrence in the selected date range,
  * determines their group type (monthly/weekly/single), and enriches with account metadata.
  *
- * @param accounts - All accounts to filter from.
- * @param selectedAccountIds - Array of account IDs to include. Empty array means all accounts.
+ * @param accounts - Accounts to filter from (already filtered by selection).
  * @param dateRange - Forecast date range to filter transactions by.
  * @returns Array of visible transactions with enriched metadata.
  */
-export function filterTransactions(
-	accounts: Account[],
-	selectedAccountIds: string[],
-	dateRange: ForecastRange,
-): VisibleTransaction[] {
-	const filteredAccounts =
-		selectedAccountIds.length > 0 ? accounts.filter((account) => selectedAccountIds.includes(account.id)) : accounts;
-
+export function filterTransactions(accounts: Account[], dateRange: ForecastRange): VisibleTransaction[] {
 	const collected: VisibleTransaction[] = [];
 
-	for (const account of filteredAccounts) {
+	for (const account of accounts) {
 		for (const transaction of account.transactions) {
 			// Check if transaction has any occurrence in the forecast date range
 			const firstOccurrence = getFirstTransactionOccurrenceInRange(transaction, account.initialDate, dateRange);

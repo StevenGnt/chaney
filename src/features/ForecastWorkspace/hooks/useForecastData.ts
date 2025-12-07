@@ -24,7 +24,7 @@ interface UseForecastDataReturn {
  * Returns filtered domain models ready for transformation to UI-specific formats.
  *
  * @param queryResult - The forecast query result containing accounts, projections, and thresholds.
- * @param selectedAccountIds - Array of account IDs to filter by. Empty array means all accounts.
+ * @param selectedAccountIds - Array of account IDs to filter by. Empty array means no accounts selected (empty results).
  * @returns Filtered accounts, projections, and related data.
  */
 export function useForecastData({ queryResult, selectedAccountIds }: UseForecastDataParams): UseForecastDataReturn {
@@ -40,31 +40,26 @@ export function useForecastData({ queryResult, selectedAccountIds }: UseForecast
 		}
 
 		const allAccounts = queryResult.accounts;
+		const hasSelection = selectedAccountIds.length > 0;
 
-		// Filter accounts based on selection
-		const filteredAccounts =
-			selectedAccountIds.length > 0
-				? allAccounts.filter((account) => selectedAccountIds.includes(account.id))
-				: allAccounts;
-
-		// Filter projections based on selected accounts
-		const filteredProjections =
-			selectedAccountIds.length > 0
-				? queryResult.projections.filter((projection) => selectedAccountIds.includes(projection.accountId))
-				: queryResult.projections;
-
-		// Get selected accounts (for display purposes)
-		const selectedAccounts =
-			selectedAccountIds.length > 0
-				? allAccounts.filter((account) => selectedAccountIds.includes(account.id))
-				: allAccounts;
-
-		return {
-			filteredAccounts,
-			filteredProjections,
-			selectedAccounts,
+		// Initialize return value
+		const result: UseForecastDataReturn = {
+			filteredAccounts: [],
+			filteredProjections: [],
+			selectedAccounts: [],
 			allAccounts,
 			thresholds: queryResult.thresholds,
 		};
+
+		// Filter based on selection (only if accounts are selected)
+		if (hasSelection) {
+			result.filteredAccounts = allAccounts.filter((account) => selectedAccountIds.includes(account.id));
+			result.filteredProjections = queryResult.projections.filter((projection) =>
+				selectedAccountIds.includes(projection.accountId),
+			);
+			result.selectedAccounts = allAccounts.filter((account) => selectedAccountIds.includes(account.id));
+		}
+
+		return result;
 	}, [queryResult, selectedAccountIds]);
 }

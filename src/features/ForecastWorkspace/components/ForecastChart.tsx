@@ -12,6 +12,7 @@ import {
 	YAxis,
 } from 'recharts';
 
+import { Message } from '@/components/Message';
 import { Section } from '@/components/Section';
 import type { Account, Threshold } from '@/features/ForecastWorkspace/types';
 import { DEFAULT_COLOR } from '@/lib/constants';
@@ -83,9 +84,9 @@ export function ForecastChart({ projections, accounts, thresholds }: ForecastCha
 
 	if (data.length === 0 || accounts.length === 0) {
 		return (
-			<div className="flex h-80 items-center justify-center rounded-xl border border-dashed border-white/10 bg-black/20 text-sm text-slate-400">
-				{t('FORECAST.STATE.NO_DATA')}
-			</div>
+			<Section>
+				<Message>{t('FORECAST.STATE.NO_DATA')}</Message>
+			</Section>
 		);
 	}
 

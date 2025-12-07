@@ -26,7 +26,7 @@
 		},
 		"STATE": {
 			"ERROR": "Unable to load forecast data. Please try again.",
-			"NO_DATA": "No data available yet."
+			"NO_DATA": "Nothing to show."
 		},
 		"TRANSACTIONS": {
 			"TITLE": "Transactions impacting this period",
