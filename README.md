@@ -29,8 +29,8 @@ Chaney is a financial forecasting application that helps you visualize and proje
 
 ### Internationalization
 
-- **i18next 25** - Internationalization framework
-- **react-i18next 16** - React bindings for i18next
+- **i18next** - Internationalization framework
+- **react-i18next** - React bindings for i18next
 - **i18next-browser-languagedetector** - Language detection
 - **i18next-scanner** - Automatic translation key extraction
 
@@ -44,24 +44,24 @@ Chaney is a financial forecasting application that helps you visualize and proje
 - **Vitest 4** - Unit testing framework
 - **Testing Library** - React component testing utilities
 - **ESLint 9** - Code linting with TypeScript support
-- **Prettier 3** - Code formatting
-- **Husky 9** - Git hooks
+- **Prettier** - Code formatting
+- **Husky** - Git hooks
 - **lint-staged** - Pre-commit linting
-- **Storybook 8** - Component development environment
+- **Storybook** - Component development environment
 
 ## Features
 
-- **Multi-Account Forecasting**: Project balances across multiple accounts simultaneously
-- **Recurring Transactions**: Support for weekly, monthly, and yearly recurring income/expenses
-- **One-Off Transactions**: Handle single-date transactions
-- **Custom Date Ranges**: Select forecast periods (3, 6, 12, or 24 months)
-- **Interactive Charts**: Visualize account balance projections with Recharts
-- **Transaction Filtering**: View transactions grouped by account and schedule type
-- **Account Selection**: Toggle accounts in/out of forecasts
-- **Threshold Lines**: Visual thresholds on charts for goal tracking
+- **Multi-account forecasting**: Project balances across multiple accounts simultaneously
+- **Recurring transactions**: Support for weekly, monthly, and yearly recurring income/expenses
+- **One-off transactions**: Handle single-date transactions
+- **Custom date ranges**: Select forecast periods (3, 6, 12, or 24 months)
+- **Interactive charts**: Visualize account balance projections with Recharts
+- **Transaction filtering**: View transactions grouped by account and schedule type
+- **Account selection**: Toggle accounts in/out of forecasts
+- **Threshold lines**: Visual thresholds on charts for goal tracking
 - **Internationalization**: English and French language support
-- **Tax Calculations**: Support for tax rates on income transactions
-- **Transaction Interruptions**: Handle date ranges where recurring transactions pause
+- **Tax calculations**: Support for tax rates on income transactions
+- **Transaction interruptions**: Handle date ranges where recurring transactions pause
 
 ## Getting Started
 
@@ -75,8 +75,8 @@ Chaney is a financial forecasting application that helps you visualize and proje
 1. Clone the repository:
 
 ```bash
-git clone <repository-url>
-cd chaney-refacto
+git clone git@github.com:StevenGnt/chaney.git
+cd chaney
 ```
 
 2. Install dependencies:
