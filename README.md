@@ -1,73 +1,243 @@
-# React + TypeScript + Vite
+# Chaney
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Chart your money**
 
-Currently, two official plugins are available:
+Project every account, simulate new projects, and stay audit-ready with clean dashboards powered by React, TanStack Query, and Recharts.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Overview
 
-## React Compiler
+Chaney is a financial forecasting application that helps you visualize and project account balances over time. It supports multiple accounts, recurring transactions, one-off expenses, and custom date ranges to provide comprehensive financial projections.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech Stack
 
-## Expanding the ESLint configuration
+### Core Framework
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **React 19** - UI library
+- **TypeScript 5** - Type safety
+- **Vite 6** - Build tool and dev server
 
-```js
-export default defineConfig([
-	globalIgnores(['dist']),
-	{
-		files: ['**/*.{ts,tsx}'],
-		extends: [
-			// Other configs...
+### Data & State Management
 
-			// Remove tseslint.configs.recommended and replace with this
-			tseslint.configs.recommendedTypeChecked,
-			// Alternatively, use this for stricter rules
-			tseslint.configs.strictTypeChecked,
-			// Optionally, add this for stylistic rules
-			tseslint.configs.stylisticTypeChecked,
+- **TanStack Query 5** - Server state management and data fetching
+- **TanStack Query DevTools** - Development debugging tools
 
-			// Other configs...
-		],
-		languageOptions: {
-			parserOptions: {
-				project: ['./tsconfig.node.json', './tsconfig.app.json'],
-				tsconfigRootDir: import.meta.dirname,
-			},
-			// other options...
-		},
-	},
-]);
+### UI & Styling
+
+- **Tailwind CSS 4** - Utility-first CSS framework
+- **Recharts 3** - Charting library for financial visualizations
+- **clsx** - Conditional class names
+
+### Internationalization
+
+- **i18next 25** - Internationalization framework
+- **react-i18next 16** - React bindings for i18next
+- **i18next-browser-languagedetector** - Language detection
+- **i18next-scanner** - Automatic translation key extraction
+
+### Utilities
+
+- **date-fns 4** - Date manipulation and formatting
+- **zod 4** - Schema validation
+
+### Development Tools
+
+- **Vitest 4** - Unit testing framework
+- **Testing Library** - React component testing utilities
+- **ESLint 9** - Code linting with TypeScript support
+- **Prettier 3** - Code formatting
+- **Husky 9** - Git hooks
+- **lint-staged** - Pre-commit linting
+- **Storybook 8** - Component development environment
+
+## Features
+
+- **Multi-Account Forecasting**: Project balances across multiple accounts simultaneously
+- **Recurring Transactions**: Support for weekly, monthly, and yearly recurring income/expenses
+- **One-Off Transactions**: Handle single-date transactions
+- **Custom Date Ranges**: Select forecast periods (3, 6, 12, or 24 months)
+- **Interactive Charts**: Visualize account balance projections with Recharts
+- **Transaction Filtering**: View transactions grouped by account and schedule type
+- **Account Selection**: Toggle accounts in/out of forecasts
+- **Threshold Lines**: Visual thresholds on charts for goal tracking
+- **Internationalization**: English and French language support
+- **Tax Calculations**: Support for tax rates on income transactions
+- **Transaction Interruptions**: Handle date ranges where recurring transactions pause
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v18 or higher recommended)
+- npm, yarn, or pnpm
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git clone <repository-url>
+cd chaney-refacto
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2. Install dependencies:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x';
-import reactDom from 'eslint-plugin-react-dom';
-
-export default defineConfig([
-	globalIgnores(['dist']),
-	{
-		files: ['**/*.{ts,tsx}'],
-		extends: [
-			// Other configs...
-			// Enable lint rules for React
-			reactX.configs['recommended-typescript'],
-			// Enable lint rules for React DOM
-			reactDom.configs.recommended,
-		],
-		languageOptions: {
-			parserOptions: {
-				project: ['./tsconfig.node.json', './tsconfig.app.json'],
-				tsconfigRootDir: import.meta.dirname,
-			},
-			// other options...
-		},
-	},
-]);
+```bash
+npm install
 ```
+
+3. Start the development server:
+
+```bash
+npm run dev
+```
+
+4. Open your browser and navigate to the URL shown in the terminal (typically `http://localhost:5173`)
+
+## Available Scripts
+
+### Development
+
+- `npm run dev` - Start the Vite development server
+- `npm run preview` - Preview the production build locally
+
+### Building
+
+- `npm run build` - Build the application for production
+- `npm run typecheck` - Run TypeScript type checking without emitting files
+
+### Code Quality
+
+- `npm run lint` - Run ESLint to check for code issues
+- `npm run lint:fix` - Run ESLint and automatically fix issues
+- `npm run format` - Check code formatting with Prettier
+- `npm run format:write` - Format code with Prettier
+
+### Testing
+
+- `npm run test` - Run tests once
+- `npm run test:watch` - Run tests in watch mode
+- `npm run coverage` - Generate test coverage report
+
+### Internationalization
+
+- `npm run i18n:extract` - Extract translation keys from source files
+
+### Storybook
+
+- `npm run storybook` - Start Storybook development server
+- `npm run storybook:build` - Build Storybook for production
+
+## Project Structure
+
+```
+src/
+├── app/                    # Application root component
+├── assets/                 # Static assets
+├── components/             # Shared UI components
+├── features/               # Feature-based modules
+│   └── ForecastWorkspace/  # Main forecasting feature
+├── lib/                    # Shared libraries and utilities
+├── mocks/                  # Mock data and services
+├── providers/              # React context providers
+└── test/                   # Test setup files
+
+public/
+└── locales/                # Translation files
+```
+
+## Testing
+
+The project uses **Vitest** as the testing framework with **Testing Library** for React component testing.
+
+### Test Setup
+
+- Test configuration is in `vite.config.ts`
+- Test setup file: `src/test/setup.ts`
+- Tests use `jsdom` environment for browser simulation
+
+### Running Tests
+
+```bash
+npm run test          # Run tests once
+npm run test:watch    # Run tests in watch mode
+npm run coverage      # Generate coverage report
+```
+
+### Current Test Coverage
+
+- Financial projection logic (`src/lib/finance/projection.test.ts`)
+
+## Internationalization
+
+The application supports multiple languages using i18next. Currently supported languages:
+
+- English (en)
+- French (fr)
+
+### Translation Files
+
+Translation files are located in `public/locales/{lang}/common.json`.
+
+### Extracting Translation Keys
+
+Run the i18next scanner to automatically extract translation keys from source files:
+
+```bash
+npm run i18n:extract
+```
+
+## Code Quality
+
+### ESLint
+
+The project uses ESLint with strict TypeScript rules:
+
+- Type-aware linting enabled
+- React Hooks rules
+- Import ordering and organization
+- Custom rules for code style
+
+### Prettier
+
+Code formatting is handled by Prettier with Tailwind CSS plugin for class sorting.
+
+### Git Hooks
+
+Husky is configured to run lint-staged on pre-commit:
+
+- ESLint checks on staged TypeScript/JavaScript files
+- Prettier formatting on staged files
+- Zero warnings policy enforced
+
+## TODO
+
+### High Priority
+
+- [ ] **Expand Test Coverage**
+  - Add tests for React components
+  - Add tests for custom hooks
+  - Add tests for utility functions
+  - Add integration tests for the forecast workflow
+
+- [ ] **Set Up CI/CD Pipeline**
+  - Create GitHub Actions workflow for automated testing
+  - Add linting and type checking to CI pipeline
+  - Set up automated builds and deployments
+  - Add test coverage reporting to CI
+
+- [ ] **Initialize Storybook**
+  - Create Storybook configuration files
+  - Add stories for shared components
+  - Add stories for feature components
+
+### Medium Priority
+
+- [ ] **Accessibility**
+  - Ensure proper ARIA labels
+  - Test with screen readers
+
+### Low Priority
+
+- [ ] **Additional Features**
+  - CRUD operations on accounts and transactions within the UI
+  - Simulation of new projects and financial scenarios
