@@ -1,6 +1,6 @@
 import clsx from 'clsx';
-import { addMonths, differenceInMonths, formatISO, parseISO } from 'date-fns';
-import { useEffect, useRef, useState } from 'react';
+import { addMonths, formatISO, parseISO } from 'date-fns';
+import { useMemo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AccountSelector } from '@/features/ForecastWorkspace/components/AccountSelector';
@@ -12,8 +12,7 @@ import { useForecastQuery } from '@/features/ForecastWorkspace/hooks/useForecast
 import type { DateRangePreset } from '@/features/ForecastWorkspace/utils/range';
 import type { ForecastRange } from '@/lib/finance/projection';
 
-const DEFAULT_DATE_RANGE_START = new Date().toISOString().slice(0, 10);
-const DEFAULT_DATE_RANGE_MONTHS = 12;
+const DEFAULT_DURATION_MONTHS = 12;
 
 const BASE_DATE_RANGE_PRESETS = [
 	{ id: '3m', months: 3 },
@@ -23,21 +22,21 @@ const BASE_DATE_RANGE_PRESETS = [
 ] as const;
 
 interface ForecastDateRangeSelectorProps {
-	dateRange: ForecastRange;
-	onDateRangeChange: (dateRange: ForecastRange) => void;
+	duration: number;
+	onDurationChange: (duration: number) => void;
 }
 
 function ForecastDateRangeSelector(props: ForecastDateRangeSelectorProps) {
 	const { t } = useTranslation();
 
-	const { dateRange, onDateRangeChange } = props;
+	const { duration, onDurationChange } = props;
 
 	const presets: DateRangePreset[] = BASE_DATE_RANGE_PRESETS.map((preset) => ({
 		...preset,
 		label: t('FORECAST.RANGE.NEXT_MONTHS', { count: preset.months }),
 	}));
 
-	return <DateRangeSelector dateRange={dateRange} presets={presets} onDateRangeChange={onDateRangeChange} />;
+	return <DateRangeSelector duration={duration} presets={presets} onDurationChange={onDurationChange} />;
 }
 
 function ForecastWorkspaceWrapper({ children, error }: { children: React.ReactNode; error?: boolean }) {
@@ -73,22 +72,47 @@ function ForecastWorkspaceErrorState() {
 
 export function ForecastWorkspace() {
 	const { t } = useTranslation();
-	const [dateRange, setDateRange] = useState<ForecastRange>(() => {
-		const start = parseISO(DEFAULT_DATE_RANGE_START);
-		const end = addMonths(start, DEFAULT_DATE_RANGE_MONTHS);
-		return {
-			start: DEFAULT_DATE_RANGE_START,
-			end: formatISO(end, { representation: 'date' }),
-		};
-	});
+	const [duration, setDuration] = useState<number>(DEFAULT_DURATION_MONTHS);
 	const [selectedAccountIds, setSelectedAccountIds] = useState<string[] | null>(null);
-	const autoAlignedDateRange = useRef(false);
+	const [effectiveStartDate, setEffectiveStartDate] = useState<string>(() => {
+		return new Date().toISOString().slice(0, 10);
+	});
+
+	// Compute the full date range from duration and effective start date
+	const dateRange = useMemo<ForecastRange>(() => {
+		const startDate = parseISO(effectiveStartDate);
+		const endDate = addMonths(startDate, duration);
+		return {
+			start: effectiveStartDate,
+			end: formatISO(endDate, { representation: 'date' }),
+		};
+	}, [effectiveStartDate, duration]);
+
 	const forecastQuery = useForecastQuery(dateRange);
 
 	const forecastData = useForecastData({
 		queryResult: forecastQuery.data,
 		selectedAccountIds: selectedAccountIds ?? [],
 	});
+
+	// Compute and update effective start date when data loads: max(today, earliest data date)
+	useEffect(() => {
+		if (!forecastQuery.data) {
+			return;
+		}
+
+		const today = new Date().toISOString().slice(0, 10);
+		const earliest = forecastQuery.data.accounts.reduce((current, account) => {
+			return account.initialDate < current ? account.initialDate : current;
+		}, forecastQuery.data.accounts[0]?.initialDate ?? today);
+
+		const newEffectiveStart = earliest > today ? earliest : today;
+		// eslint-disable-next-line react-hooks/set-state-in-effect -- Needed to update start date when data loads
+		setEffectiveStartDate((current) => {
+			// Only update if the computed value is different
+			return newEffectiveStart !== current ? newEffectiveStart : current;
+		});
+	}, [forecastQuery.data]);
 
 	// Initialize selectedAccountIds to all accounts once data is loaded
 	useEffect(() => {
@@ -100,37 +124,6 @@ export function ForecastWorkspace() {
 		// eslint-disable-next-line react-hooks/set-state-in-effect
 		setSelectedAccountIds(forecastQuery.data.accounts.map((account) => account.id));
 	}, [forecastQuery.data, selectedAccountIds]);
-
-	// Align date range to earliest account date (only once)
-	useEffect(() => {
-		if (!forecastQuery.data || autoAlignedDateRange.current) {
-			return;
-		}
-
-		const earliest = forecastQuery.data.accounts.reduce((current, account) => {
-			return account.initialDate < current ? account.initialDate : current;
-		}, forecastQuery.data.accounts[0]?.initialDate ?? dateRange.start);
-
-		// eslint-disable-next-line react-hooks/set-state-in-effect
-		setDateRange((previousDateRange) => {
-			if (previousDateRange.start === earliest) {
-				return previousDateRange;
-			}
-
-			// Use the current range's duration (months) when auto-aligning
-			const startDate = parseISO(previousDateRange.start);
-			const endDate = parseISO(previousDateRange.end);
-			const currentMonths = Math.max(1, differenceInMonths(endDate, startDate));
-			const newStart = parseISO(earliest);
-			const newEnd = addMonths(newStart, currentMonths);
-			return {
-				start: earliest,
-				end: formatISO(newEnd, { representation: 'date' }),
-			};
-		});
-
-		autoAlignedDateRange.current = true;
-	}, [forecastQuery.data, dateRange.start]);
 
 	if (forecastQuery.isPending) {
 		return <ForecastWorkspaceLoadingState />;
@@ -157,7 +150,7 @@ export function ForecastWorkspace() {
 				}}
 			/>
 
-			<ForecastDateRangeSelector dateRange={dateRange} onDateRangeChange={setDateRange} />
+			<ForecastDateRangeSelector duration={duration} onDurationChange={setDuration} />
 
 			<ForecastChart
 				accounts={forecastData.selectedAccounts}

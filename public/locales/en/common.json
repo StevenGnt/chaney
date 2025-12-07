@@ -12,9 +12,7 @@
 	"FORECAST": {
 		"RANGE": {
 			"TITLE": "Timeline",
-			"HINT": "Pick a preset or define custom dates",
-			"START": "From",
-			"END": "To",
+			"HINT": "Select how far ahead to forecast",
 			"NEXT_MONTHS": "Next {{count}} months"
 		},
 		"ACCOUNTS": {

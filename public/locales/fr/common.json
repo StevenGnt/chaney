@@ -12,9 +12,7 @@
 	"FORECAST": {
 		"RANGE": {
 			"TITLE": "Axe temporel",
-			"HINT": "Choisis un preset ou des dates custom",
-			"START": "Du",
-			"END": "Au",
+			"HINT": "Sélectionne la durée de la prévision",
 			"NEXT_MONTHS": "Prochains {{count}} mois"
 		},
 		"ACCOUNTS": {
