@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
 	CartesianGrid,
@@ -11,9 +12,10 @@ import {
 	YAxis,
 } from 'recharts';
 
+import { Section } from '@/components/Section';
 import type { Account, Threshold } from '@/features/ForecastWorkspace/types';
-import type { ChartDatum } from '@/features/ForecastWorkspace/utils/build-chart-dataset';
 import { DEFAULT_COLOR } from '@/lib/constants';
+import type { AccountProjection } from '@/lib/finance/projection';
 import { formatCurrency, formatDateLabel, formatDateVerbose } from '@/lib/format';
 
 const DEFAULT_CURRENCY = 'EUR';
@@ -26,14 +28,58 @@ const DEFAULT_ACCOUNT_COLOR = DEFAULT_COLOR;
 const DEFAULT_THRESHOLD_COLOR = '#f472b6';
 const DEFAULT_AXIS_COLOR = '#94a3b8';
 
+interface ChartDatum {
+	date: string;
+	[accountId: string]: string | number | null;
+}
+
 interface ForecastChartProps {
-	data: ChartDatum[];
+	projections: AccountProjection[];
 	accounts: Account[];
 	thresholds: Threshold[];
 }
 
-export function ForecastChart({ data, accounts, thresholds }: ForecastChartProps) {
+/**
+ * Builds a chart-friendly dataset from account projections.
+ *
+ * Each row corresponds to a date and contains a column per account id. Missing values for
+ * active accounts are forward-filled so chart lines remain continuous.
+ */
+function buildChartDataset(projections: AccountProjection[]): ChartDatum[] {
+	const rows = new Map<string, ChartDatum>();
+
+	for (const projection of projections) {
+		for (const point of projection.points) {
+			const existing = rows.get(point.date) ?? { date: point.date };
+			existing[projection.accountId] = point.balance;
+			rows.set(point.date, existing);
+		}
+	}
+
+	const sortedRows = [...rows.values()].sort((a, b) => a.date.localeCompare(b.date));
+
+	// Forward-fill missing values for each account
+	const accountIds = projections.map((p) => p.accountId);
+	for (const accountId of accountIds) {
+		let lastValue: number | null = null;
+		for (const row of sortedRows) {
+			const rawValue = row[accountId];
+			const numericValue = typeof rawValue === 'number' ? rawValue : null;
+			if (numericValue !== null) {
+				lastValue = numericValue;
+			} else {
+				row[accountId] = lastValue;
+			}
+		}
+	}
+
+	return sortedRows;
+}
+
+export function ForecastChart({ projections, accounts, thresholds }: ForecastChartProps) {
 	const { t } = useTranslation();
+
+	const data = useMemo(() => buildChartDataset(projections), [projections]);
 
 	if (data.length === 0 || accounts.length === 0) {
 		return (
@@ -46,7 +92,7 @@ export function ForecastChart({ data, accounts, thresholds }: ForecastChartProps
 	const currency = accounts[0]?.currency ?? DEFAULT_CURRENCY;
 
 	return (
-		<div className="rounded-3xl border border-white/10 bg-black/30 p-4">
+		<Section>
 			<ResponsiveContainer width="100%" height={CHART_HEIGHT}>
 				<LineChart data={data}>
 					<CartesianGrid stroke={GRID_STROKE} strokeDasharray={GRID_DASH} />
@@ -78,13 +124,13 @@ export function ForecastChart({ data, accounts, thresholds }: ForecastChartProps
 							}}
 						/>
 					))}
-					{accounts.map((account) => (
+					{accounts.map(({ id, name, color }) => (
 						<Line
-							key={account.id}
+							key={id}
 							type="monotone"
-							dataKey={account.id}
-							name={account.name}
-							stroke={account.color ?? DEFAULT_ACCOUNT_COLOR}
+							dataKey={id}
+							name={name}
+							stroke={color ?? DEFAULT_ACCOUNT_COLOR}
 							strokeWidth={2}
 							dot={false}
 							isAnimationActive={false}
@@ -92,7 +138,7 @@ export function ForecastChart({ data, accounts, thresholds }: ForecastChartProps
 					))}
 				</LineChart>
 			</ResponsiveContainer>
-		</div>
+		</Section>
 	);
 }
 

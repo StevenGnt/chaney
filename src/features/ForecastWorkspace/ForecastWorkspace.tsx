@@ -1,14 +1,14 @@
 import clsx from 'clsx';
 import { addMonths, differenceInMonths, formatISO, parseISO } from 'date-fns';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AccountSelector } from '@/features/ForecastWorkspace/components/AccountSelector';
 import { DateRangeSelector } from '@/features/ForecastWorkspace/components/DateRangeSelector';
 import { ForecastChart } from '@/features/ForecastWorkspace/components/ForecastChart';
 import { TransactionsPanel } from '@/features/ForecastWorkspace/components/TransactionsPanel';
+import { useForecastData } from '@/features/ForecastWorkspace/hooks/useForecastData';
 import { useForecastQuery } from '@/features/ForecastWorkspace/hooks/useForecastQuery';
-import { buildChartDataset } from '@/features/ForecastWorkspace/utils/build-chart-dataset';
 import type { DateRangePreset } from '@/features/ForecastWorkspace/utils/range';
 import type { ForecastRange } from '@/lib/finance/projection';
 
@@ -21,15 +21,6 @@ const BASE_DATE_RANGE_PRESETS = [
 	{ id: '12m', months: 12 },
 	{ id: '24m', months: 24 },
 ] as const;
-
-const DEFAULT_DATE_RANGE: ForecastRange = (() => {
-	const start = parseISO(DEFAULT_DATE_RANGE_START);
-	const end = addMonths(start, DEFAULT_DATE_RANGE_MONTHS);
-	return {
-		start: DEFAULT_DATE_RANGE_START,
-		end: formatISO(end, { representation: 'date' }),
-	};
-})();
 
 interface ForecastDateRangeSelectorProps {
 	dateRange: ForecastRange;
@@ -82,10 +73,21 @@ function ForecastWorkspaceErrorState() {
 
 export function ForecastWorkspace() {
 	const { t } = useTranslation();
-	const [dateRange, setDateRange] = useState<ForecastRange>(DEFAULT_DATE_RANGE);
+	const [dateRange, setDateRange] = useState<ForecastRange>(() => {
+		const start = parseISO(DEFAULT_DATE_RANGE_START);
+		const end = addMonths(start, DEFAULT_DATE_RANGE_MONTHS);
+		return {
+			start: DEFAULT_DATE_RANGE_START,
+			end: formatISO(end, { representation: 'date' }),
+		};
+	});
 	const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>([]);
 	const autoAlignedDateRange = useRef(false);
 	const forecastQuery = useForecastQuery(dateRange);
+	const forecastData = useForecastData({
+		queryResult: forecastQuery.data,
+		selectedAccountIds,
+	});
 
 	// Initialize UI values once data is loaded
 	useEffect(() => {
@@ -126,18 +128,6 @@ export function ForecastWorkspace() {
 		}
 	}, [forecastQuery.data, selectedAccountIds.length, dateRange.start]);
 
-	// Build chart dataset from projections, filtering by selected accounts
-	const dataset = useMemo(() => {
-		if (!forecastQuery.data) {
-			return [];
-		}
-
-		return buildChartDataset(forecastQuery.data.projections, selectedAccountIds);
-	}, [forecastQuery.data, selectedAccountIds]);
-
-	const selectedAccounts =
-		forecastQuery.data?.accounts.filter((account) => selectedAccountIds.includes(account.id)) ?? [];
-
 	if (forecastQuery.isPending) {
 		return <ForecastWorkspaceLoadingState />;
 	}
@@ -151,7 +141,7 @@ export function ForecastWorkspace() {
 			<p className="text-sm text-slate-300">{t('FORECAST.WORKSPACE.DESCRIPTION')}</p>
 
 			<AccountSelector
-				accounts={forecastQuery.data.accounts}
+				accounts={forecastData.allAccounts}
 				selectedAccountIds={selectedAccountIds}
 				onToggleAccount={(accountId) => {
 					setSelectedAccountIds((current) =>
@@ -163,13 +153,13 @@ export function ForecastWorkspace() {
 			<ForecastDateRangeSelector dateRange={dateRange} onDateRangeChange={setDateRange} />
 
 			<ForecastChart
-				data={dataset}
-				accounts={selectedAccounts.length > 0 ? selectedAccounts : forecastQuery.data.accounts}
-				thresholds={forecastQuery.data.thresholds}
+				projections={forecastData.filteredProjections}
+				accounts={forecastData.selectedAccounts}
+				thresholds={forecastData.thresholds}
 			/>
 
 			<TransactionsPanel
-				accounts={forecastQuery.data.accounts}
+				accounts={forecastData.allAccounts}
 				selectedAccountIds={selectedAccountIds}
 				dateRange={dateRange}
 			/>

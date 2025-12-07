@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 
 import App from '@/app/app';
 import { setupI18n } from '@/lib/i18n';
-import { AppProvider } from '@/providers/app-provider';
+import { AppProvider } from '@/providers/appProvider';
 import './index.css';
 
 const rootElement = document.getElementById('root');
