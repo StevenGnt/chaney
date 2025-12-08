@@ -4,6 +4,8 @@ export const isoDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use ISO da
 
 export const currencySchema = z.enum(['EUR', 'USD', 'GBP', 'CAD']);
 
+export const recurrenceFrequencySchema = z.enum(['weekly', 'monthly', 'yearly']);
+
 export const dateRangeSchema = z.object({
 	start: isoDateSchema,
 	end: isoDateSchema.optional(),
@@ -16,7 +18,7 @@ export const singleScheduleSchema = z.object({
 
 export const recurringScheduleSchema = z.object({
 	kind: z.literal('recurring'),
-	frequency: z.enum(['weekly', 'monthly', 'yearly']),
+	frequency: recurrenceFrequencySchema,
 	every: z.number().int().positive().default(1),
 	startDate: isoDateSchema,
 	endDate: isoDateSchema.optional(),
@@ -27,13 +29,11 @@ export const recurringScheduleSchema = z.object({
 export const transactionSchema = z.object({
 	id: z.string(),
 	label: z.string(),
-	type: z.enum(['income', 'expense']),
 	category: z.string(),
-	amount: z.number().nonnegative(),
+	amount: z.number(),
 	schedule: z.union([singleScheduleSchema, recurringScheduleSchema]),
 	taxRate: z.number().min(0).max(1).optional(),
 	notes: z.string().optional(),
-	tags: z.array(z.string()).default([]),
 });
 
 export const accountSchema = z.object({
@@ -60,7 +60,9 @@ export const financeMockSchema = z.object({
 	thresholds: z.array(thresholdSchema).default([]),
 });
 
+// Infer types
 export type CurrencyCode = z.infer<typeof currencySchema>;
+export type RecurrenceFrequency = z.infer<typeof recurrenceFrequencySchema>;
 export type Transaction = z.infer<typeof transactionSchema>;
 export type Account = z.infer<typeof accountSchema>;
 export type FinanceMock = z.infer<typeof financeMockSchema>;

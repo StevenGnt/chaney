@@ -1,6 +1,6 @@
 import { addMonths, addWeeks, addYears, parseISO } from 'date-fns';
 
-import type { Account, Transaction } from '@/features/ForecastWorkspace/types';
+import type { Account, RecurrenceFrequency, Transaction } from '@/features/ForecastWorkspace/types';
 import type { ForecastRange } from '@/lib/finance/projection';
 
 export type TransactionGroupType = 'monthly' | 'weekly' | 'single';
@@ -8,7 +8,6 @@ export type TransactionGroupType = 'monthly' | 'weekly' | 'single';
 export interface VisibleTransaction {
 	id: string;
 	label: string;
-	type: Transaction['type'];
 	category: string;
 	amount: number;
 	firstOccurrence: Date;
@@ -49,7 +48,6 @@ export function filterTransactions(accounts: Account[], dateRange: ForecastRange
 			collected.push({
 				id: transaction.id,
 				label: transaction.label,
-				type: transaction.type,
 				category: transaction.category,
 				amount: transaction.amount,
 				firstOccurrence,
@@ -151,7 +149,7 @@ function getFirstTransactionOccurrenceInRange(
  * @param every - Number of frequency units to advance (e.g., every 2 weeks).
  * @returns The advanced date.
  */
-function advanceDate(date: Date, frequency: 'weekly' | 'monthly' | 'yearly', every: number): Date {
+function advanceDate(date: Date, frequency: RecurrenceFrequency, every: number): Date {
 	switch (frequency) {
 		case 'weekly':
 			return addWeeks(date, every);

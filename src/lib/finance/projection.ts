@@ -1,6 +1,6 @@
 import { addMonths, addWeeks, addYears, formatISO, parseISO } from 'date-fns';
 
-import type { Account, DateRange, Transaction } from '@/features/ForecastWorkspace/types';
+import type { Account, DateRange, RecurrenceFrequency, Transaction } from '@/features/ForecastWorkspace/types';
 
 export interface ForecastRange extends DateRange {
 	end: string;
@@ -45,6 +45,7 @@ export function projectAccountBalance(account: Account, range: ForecastRange): A
 	let cursor = 0;
 	let balance = account.initialBalance;
 
+	// Compute balance at the start of the forecast if account initial date is before forecast start
 	while (cursor < events.length && events[cursor].timestamp < effectiveStart.getTime()) {
 		balance += events[cursor].amount;
 		cursor += 1;
@@ -93,7 +94,10 @@ function buildTransactionEvents(account: Account, window: ForecastRange): Transa
 
 	for (const transaction of account.transactions) {
 		const signedAmount = normalizeAmount(transaction);
-		if (signedAmount === 0) continue;
+
+		if (signedAmount === 0) {
+			continue;
+		}
 
 		if (transaction.schedule.kind === 'single') {
 			const occurrence = parseISO(transaction.schedule.date);
@@ -114,15 +118,16 @@ function buildTransactionEvents(account: Account, window: ForecastRange): Transa
 }
 
 /**
- * Normalizes a transaction amount to a signed numeric value, applying tax if relevant.
+ * Normalizes a transaction amount, applying tax if relevant.
  *
  * @param transaction - Transaction to normalize.
- * @returns Signed amount (positive for income, negative for expense) with tax applied when configured.
+ * @returns Amount with tax applied when configured (only for positive amounts/income).
  */
 function normalizeAmount(transaction: Transaction) {
-	const base = transaction.type === 'income' ? transaction.amount : -1 * transaction.amount;
+	const base = transaction.amount;
 
-	if (transaction.type === 'income' && transaction.taxRate) {
+	// Only apply tax to positive amounts (income)
+	if (base > 0 && transaction.taxRate) {
 		return +(base * (1 - transaction.taxRate)).toFixed(2);
 	}
 
@@ -207,7 +212,7 @@ function expandRecurringSchedule(transaction: Transaction, accountStartISO: stri
  * @param every - Interval multiplier for the frequency.
  * @returns The next occurrence date.
  */
-function advanceDate(date: Date, frequency: 'weekly' | 'monthly' | 'yearly', every: number) {
+function advanceDate(date: Date, frequency: RecurrenceFrequency, every: number) {
 	switch (frequency) {
 		case 'weekly':
 			return addWeeks(date, every);

@@ -153,11 +153,9 @@ function TransactionItem({ transaction }: TransactionItemProps) {
 				<p className="text-xs text-slate-400">{transaction.category}</p>
 			</div>
 			<span
-				className={['text-xs font-semibold', transaction.type === 'income' ? 'text-emerald-300' : 'text-rose-300'].join(
-					' ',
-				)}
+				className={['text-xs font-semibold', transaction.amount >= 0 ? 'text-emerald-300' : 'text-rose-300'].join(' ')}
 			>
-				{transaction.type === 'income' ? '+' : '-'}
+				{transaction.amount >= 0 ? '+' : ''}
 				{transaction.amount.toLocaleString(undefined, {
 					style: 'currency',
 					currency: transaction.currency,

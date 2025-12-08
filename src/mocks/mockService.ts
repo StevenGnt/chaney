@@ -13,18 +13,17 @@ function simulateLatency(duration = 150) {
 	});
 }
 
-// Parse and validate the raw JSON data once at module load time
-const parsedData = financeMockSchema.parse(rawData);
-
 /**
  * Fetches mock finance data with simulated latency.
  *
- * The data is pre-parsed and validated at module load time, so this function
- * only simulates an async fetch operation.
+ * Validates the data against the schema before returning, matching the pattern
+ * of a real API service where responses would be validated.
  *
  * @returns A promise resolving to validated finance mock data.
  */
 export async function fetchMockFinance(): Promise<FinanceMock> {
 	await simulateLatency();
-	return parsedData;
+
+	// Validate the data (matches real API pattern)
+	return financeMockSchema.parse(rawData);
 }

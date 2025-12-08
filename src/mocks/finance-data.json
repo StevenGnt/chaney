@@ -13,21 +13,18 @@
 					"id": "income-freelance",
 					"label": "Freelance retainers",
 					"category": "income",
-					"type": "income",
 					"amount": 5200,
 					"taxRate": 0.31,
 					"schedule": {
 						"kind": "recurring",
 						"frequency": "monthly",
 						"startDate": "2025-01-05"
-					},
-					"tags": ["primary-income"]
+					}
 				},
 				{
 					"id": "income-rent",
 					"label": "Apartment sublet",
 					"category": "income",
-					"type": "income",
 					"amount": 1200,
 					"schedule": {
 						"kind": "recurring",
@@ -40,8 +37,7 @@
 					"id": "expense-rent",
 					"label": "Rent",
 					"category": "housing",
-					"type": "expense",
-					"amount": 1850,
+					"amount": -1850,
 					"schedule": {
 						"kind": "recurring",
 						"frequency": "monthly",
@@ -52,8 +48,7 @@
 					"id": "expense-groceries",
 					"label": "Groceries & markets",
 					"category": "food",
-					"type": "expense",
-					"amount": 180,
+					"amount": -180,
 					"schedule": {
 						"kind": "recurring",
 						"frequency": "weekly",
@@ -64,8 +59,7 @@
 					"id": "expense-gym",
 					"label": "Gym membership",
 					"category": "health",
-					"type": "expense",
-					"amount": 75,
+					"amount": -75,
 					"schedule": {
 						"kind": "recurring",
 						"frequency": "monthly",
@@ -77,8 +71,7 @@
 					"id": "expense-car-downpayment",
 					"label": "Car down payment",
 					"category": "mobility",
-					"type": "expense",
-					"amount": 12000,
+					"amount": -12000,
 					"schedule": {
 						"kind": "single",
 						"date": "2025-03-15"
@@ -88,8 +81,7 @@
 					"id": "expense-car-loan",
 					"label": "Car loan",
 					"category": "mobility",
-					"type": "expense",
-					"amount": 640,
+					"amount": -640,
 					"schedule": {
 						"kind": "recurring",
 						"frequency": "monthly",
@@ -112,7 +104,6 @@
 					"id": "income-safety-transfer",
 					"label": "Safety transfer",
 					"category": "savings",
-					"type": "income",
 					"amount": 800,
 					"schedule": {
 						"kind": "recurring",
@@ -124,8 +115,7 @@
 					"id": "expense-laptop",
 					"label": "Laptop upgrade",
 					"category": "gear",
-					"type": "expense",
-					"amount": 2800,
+					"amount": -2800,
 					"schedule": {
 						"kind": "single",
 						"date": "2025-05-20"
