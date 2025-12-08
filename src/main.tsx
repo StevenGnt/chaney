@@ -1,4 +1,3 @@
-import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import App from '@/app/app';
@@ -15,11 +14,9 @@ if (!rootElement) {
 setupI18n()
 	.then(() => {
 		createRoot(rootElement).render(
-			<StrictMode>
-				<AppProvider>
-					<App />
-				</AppProvider>
-			</StrictMode>,
+			<AppProvider>
+				<App />
+			</AppProvider>,
 		);
 	})
 	.catch((error: unknown) => {
