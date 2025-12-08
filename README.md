@@ -93,6 +93,15 @@ npm run dev
 
 4. Open your browser and navigate to the URL shown in the terminal (typically `http://localhost:5173`)
 
+## Finance Data Configuration
+
+To use your personal finance data instead of the example data:
+
+1. Copy the example file: `cp public/finance-data.example.json public/finance-data.json`
+2. Edit `public/finance-data.json` with your own accounts, transactions, and thresholds
+
+The app automatically uses your personal file if it exists (falling back to the example otherwise). Your personal data is git-ignored and never committed.
+
 ## Available Scripts
 
 ### Development
