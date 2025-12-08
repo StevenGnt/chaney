@@ -90,40 +90,45 @@ export function ForecastWorkspace() {
 
 	const forecastQuery = useForecastQuery(dateRange);
 
+	// Compute effective start date from data: max(today, earliest account date)
+	const computedEffectiveStartDate = useMemo(() => {
+		if (!forecastQuery.data) {
+			return effectiveStartDate;
+		}
+
+		const today = new Date().toISOString().slice(0, 10);
+		const earliest = forecastQuery.data.accounts.reduce(
+			(current, account) => (account.initialDate < current ? account.initialDate : current),
+			forecastQuery.data.accounts[0]?.initialDate ?? today,
+		);
+
+		return earliest > today ? earliest : today;
+	}, [forecastQuery.data, effectiveStartDate]);
+
+	// Update effective start date when computed value changes
+	useEffect(() => {
+		if (computedEffectiveStartDate !== effectiveStartDate) {
+			// eslint-disable-next-line react-hooks/set-state-in-effect
+			setEffectiveStartDate(computedEffectiveStartDate);
+		}
+	}, [computedEffectiveStartDate, effectiveStartDate]);
+
+	// Initialize selectedAccountIds to all accounts once data is loaded
+	const initialAccountIds = useMemo(() => {
+		return forecastQuery.data?.accounts.map((account) => account.id) ?? null;
+	}, [forecastQuery.data]);
+
+	useEffect(() => {
+		if (initialAccountIds !== null && selectedAccountIds === null) {
+			// eslint-disable-next-line react-hooks/set-state-in-effect
+			setSelectedAccountIds(initialAccountIds);
+		}
+	}, [initialAccountIds, selectedAccountIds]);
+
 	const forecastData = useForecastData({
 		queryResult: forecastQuery.data,
 		selectedAccountIds: selectedAccountIds ?? [],
 	});
-
-	// Compute and update effective start date when data loads: max(today, earliest data date)
-	useEffect(() => {
-		if (!forecastQuery.data) {
-			return;
-		}
-
-		const today = new Date().toISOString().slice(0, 10);
-		const earliest = forecastQuery.data.accounts.reduce((current, account) => {
-			return account.initialDate < current ? account.initialDate : current;
-		}, forecastQuery.data.accounts[0]?.initialDate ?? today);
-
-		const newEffectiveStart = earliest > today ? earliest : today;
-		// eslint-disable-next-line react-hooks/set-state-in-effect -- Needed to update start date when data loads
-		setEffectiveStartDate((current) => {
-			// Only update if the computed value is different
-			return newEffectiveStart !== current ? newEffectiveStart : current;
-		});
-	}, [forecastQuery.data]);
-
-	// Initialize selectedAccountIds to all accounts once data is loaded
-	useEffect(() => {
-		if (!forecastQuery.data || selectedAccountIds !== null) {
-			return;
-		}
-
-		// Select all accounts by default on first data load
-		// eslint-disable-next-line react-hooks/set-state-in-effect
-		setSelectedAccountIds(forecastQuery.data.accounts.map((account) => account.id));
-	}, [forecastQuery.data, selectedAccountIds]);
 
 	if (forecastQuery.isPending) {
 		return <ForecastWorkspaceLoadingState />;
@@ -153,7 +158,7 @@ export function ForecastWorkspace() {
 			<ForecastDateRangeSelector duration={duration} onDurationChange={setDuration} />
 
 			<ForecastChart
-				accounts={forecastData.selectedAccounts}
+				accounts={forecastData.filteredAccounts}
 				projections={forecastData.filteredProjections}
 				thresholds={forecastData.thresholds}
 			/>

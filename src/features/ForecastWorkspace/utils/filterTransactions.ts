@@ -1,7 +1,8 @@
-import { addMonths, addWeeks, addYears, parseISO } from 'date-fns';
+import { parseISO } from 'date-fns';
 
-import type { Account, RecurrenceFrequency, Transaction } from '@/features/ForecastWorkspace/types';
+import type { Account, Transaction } from '@/features/ForecastWorkspace/types';
 import type { ForecastRange } from '@/lib/finance/projection';
+import { generateRecurringOccurrences } from '@/lib/finance/recurringSchedule';
 
 export type TransactionGroupType = 'monthly' | 'weekly' | 'single';
 
@@ -92,83 +93,16 @@ function getFirstTransactionOccurrenceInRange(
 	}
 
 	// Handle recurring transactions
-	const schedule = transaction.schedule;
-	const every = schedule.every;
 	const accountStart = parseISO(accountStartISO);
-	const scheduleStart = parseISO(schedule.startDate);
-	// Use the later of account start or schedule start
-	const startDate = accountStart > scheduleStart ? accountStart : scheduleStart;
 	const windowStart = parseISO(dateRange.start);
 	const windowEnd = parseISO(dateRange.end);
-	const scheduleEnd = schedule.endDate ? parseISO(schedule.endDate) : windowEnd;
-	// Use the earlier of schedule end or forecast window end
-	const maxEnd = scheduleEnd < windowEnd ? scheduleEnd : windowEnd;
 
-	// No valid range if start is after max end
-	if (startDate > maxEnd) {
-		return null;
-	}
+	const occurrences = generateRecurringOccurrences(transaction, {
+		accountStart,
+		windowStart,
+		windowEnd,
+	});
 
-	// Convert interruption periods to Date objects for comparison
-	const interruptions = schedule.interruptions.map((period) => ({
-		start: parseISO(period.start),
-		end: period.end ? parseISO(period.end) : windowEnd,
-	}));
-
-	let occurrences = 0;
-	let cursor = startDate;
-
-	// Iterate through potential occurrence dates
-	while (cursor <= maxEnd) {
-		// Skip dates within interruption windows
-		if (!isInterrupted(cursor, interruptions)) {
-			const inWindow = cursor >= windowStart && cursor <= windowEnd;
-			if (inWindow) {
-				return cursor;
-			}
-		}
-
-		occurrences += 1;
-		// Stop if we've reached the maximum number of occurrences
-		if (schedule.occurrences && occurrences >= schedule.occurrences) {
-			break;
-		}
-
-		// Advance to the next occurrence date
-		cursor = advanceDate(cursor, schedule.frequency, every);
-	}
-
-	return null;
-}
-
-/**
- * Advances a date by the specified frequency and interval multiplier.
- *
- * @param date - Current date to advance from.
- * @param frequency - Recurrence frequency (weekly, monthly, or yearly).
- * @param every - Number of frequency units to advance (e.g., every 2 weeks).
- * @returns The advanced date.
- */
-function advanceDate(date: Date, frequency: RecurrenceFrequency, every: number): Date {
-	switch (frequency) {
-		case 'weekly':
-			return addWeeks(date, every);
-		case 'monthly':
-			return addMonths(date, every);
-		case 'yearly':
-			return addYears(date, every);
-		default:
-			return date;
-	}
-}
-
-/**
- * Checks if a date falls within any of the provided interruption windows.
- *
- * @param date - Date to check.
- * @param windows - Array of interruption periods, each with start and end dates.
- * @returns True if the date is within any interruption window, false otherwise.
- */
-function isInterrupted(date: Date, windows: { start: Date; end: Date }[]): boolean {
-	return windows.some((window) => date >= window.start && date <= window.end);
+	// Return the first occurrence, if any
+	return occurrences.length > 0 ? occurrences[0] : null;
 }

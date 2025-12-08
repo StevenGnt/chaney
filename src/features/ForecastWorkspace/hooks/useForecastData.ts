@@ -12,7 +12,6 @@ interface UseForecastDataParams {
 interface UseForecastDataReturn {
 	filteredAccounts: Account[];
 	filteredProjections: AccountProjection[];
-	selectedAccounts: Account[];
 	allAccounts: Account[];
 	thresholds: ForecastQueryResult['thresholds'];
 }
@@ -33,7 +32,6 @@ export function useForecastData({ queryResult, selectedAccountIds }: UseForecast
 			return {
 				filteredAccounts: [],
 				filteredProjections: [],
-				selectedAccounts: [],
 				allAccounts: [],
 				thresholds: [],
 			};
@@ -42,24 +40,19 @@ export function useForecastData({ queryResult, selectedAccountIds }: UseForecast
 		const allAccounts = queryResult.accounts;
 		const hasSelection = selectedAccountIds.length > 0;
 
-		// Initialize return value
-		const result: UseForecastDataReturn = {
-			filteredAccounts: [],
-			filteredProjections: [],
-			selectedAccounts: [],
+		// Filter based on selection (only if accounts are selected)
+		const filteredAccounts = hasSelection
+			? allAccounts.filter((account) => selectedAccountIds.includes(account.id))
+			: [];
+		const filteredProjections = hasSelection
+			? queryResult.projections.filter((projection) => selectedAccountIds.includes(projection.accountId))
+			: [];
+
+		return {
+			filteredAccounts,
+			filteredProjections,
 			allAccounts,
 			thresholds: queryResult.thresholds,
 		};
-
-		// Filter based on selection (only if accounts are selected)
-		if (hasSelection) {
-			result.filteredAccounts = allAccounts.filter((account) => selectedAccountIds.includes(account.id));
-			result.filteredProjections = queryResult.projections.filter((projection) =>
-				selectedAccountIds.includes(projection.accountId),
-			);
-			result.selectedAccounts = allAccounts.filter((account) => selectedAccountIds.includes(account.id));
-		}
-
-		return result;
 	}, [queryResult, selectedAccountIds]);
 }

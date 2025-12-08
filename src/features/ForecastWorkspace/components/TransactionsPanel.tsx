@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -152,9 +153,7 @@ function TransactionItem({ transaction }: TransactionItemProps) {
 				<p className="font-medium text-white">{transaction.label}</p>
 				<p className="text-xs text-slate-400">{transaction.category}</p>
 			</div>
-			<span
-				className={['text-xs font-semibold', transaction.amount >= 0 ? 'text-emerald-300' : 'text-rose-300'].join(' ')}
-			>
+			<span className={clsx('text-xs font-semibold', transaction.amount >= 0 ? 'text-emerald-300' : 'text-rose-300')}>
 				{transaction.amount >= 0 ? '+' : ''}
 				{transaction.amount.toLocaleString(undefined, {
 					style: 'currency',

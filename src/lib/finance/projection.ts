@@ -1,6 +1,8 @@
-import { addMonths, addWeeks, addYears, formatISO, parseISO } from 'date-fns';
+import { formatISO, parseISO } from 'date-fns';
 
-import type { Account, DateRange, Transaction } from '@/features/ForecastWorkspace/types';
+import type { Account, DateRange } from '@/features/ForecastWorkspace/types';
+
+import { generateRecurringOccurrences } from './recurringSchedule';
 
 export interface ForecastRange extends DateRange {
 	end: string;
@@ -141,7 +143,11 @@ function buildTransactionsEvents(account: Account, window: ForecastRange): Map<s
 				break;
 			}
 			case 'recurring': {
-				const occurrences = expandRecurringSchedule(transaction, accountStart, rangeStart, rangeEnd);
+				const occurrences = generateRecurringOccurrences(transaction, {
+					accountStart,
+					windowStart: rangeStart,
+					windowEnd: rangeEnd,
+				});
 				for (const occurrence of occurrences) {
 					dateKeys.push(toDateKey(occurrence));
 				}
@@ -161,64 +167,4 @@ function buildTransactionsEvents(account: Account, window: ForecastRange): Map<s
 	}
 
 	return eventsByDate;
-}
-
-/**
- * Expands a recurring transaction schedule into concrete occurrence dates within a window.
- *
- * @param transaction - Transaction with a recurring schedule.
- * @param accountStart - Date at which the account becomes active.
- * @param windowStart - Start of the forecast window.
- * @param windowEnd - End of the forecast window.
- * @returns An array of occurrence dates for the schedule within the window.
- */
-function expandRecurringSchedule(transaction: Transaction, accountStart: Date, windowStart: Date, windowEnd: Date) {
-	// This function is only called for recurring schedules
-	const schedule = transaction.schedule as Extract<typeof transaction.schedule, { kind: 'recurring' }>;
-	const scheduleStart = parseISO(schedule.startDate);
-	const scheduleEnd = schedule.endDate ? parseISO(schedule.endDate) : windowEnd;
-	const maxEnd = Math.min(scheduleEnd.getTime(), windowEnd.getTime());
-	const startDate = Math.max(accountStart.getTime(), scheduleStart.getTime());
-
-	const interruptions = schedule.interruptions.map((period) => ({
-		start: parseISO(period.start),
-		end: period.end ? parseISO(period.end) : windowEnd,
-	}));
-
-	const dates: Date[] = [];
-	let occurrences = 0;
-	let cursor = new Date(startDate);
-
-	while (cursor.getTime() <= maxEnd) {
-		const isInterruptedDate = interruptions.some(
-			(interruption) => cursor >= interruption.start && cursor <= interruption.end,
-		);
-
-		if (!isInterruptedDate) {
-			const inWindow = cursor >= windowStart && cursor <= windowEnd;
-			if (inWindow) {
-				dates.push(new Date(cursor));
-			}
-			occurrences += 1;
-		}
-
-		if (schedule.occurrences && occurrences >= schedule.occurrences) {
-			break;
-		}
-
-		// Advance date according to frequency
-		switch (schedule.frequency) {
-			case 'weekly':
-				cursor = addWeeks(cursor, schedule.every);
-				break;
-			case 'monthly':
-				cursor = addMonths(cursor, schedule.every);
-				break;
-			case 'yearly':
-				cursor = addYears(cursor, schedule.every);
-				break;
-		}
-	}
-
-	return dates;
 }
