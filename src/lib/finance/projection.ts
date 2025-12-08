@@ -80,17 +80,6 @@ export function projectAccountBalance(account: Account, range: ForecastRange): A
 }
 
 /**
- * Projects the balances for multiple accounts over a given forecast range.
- *
- * @param accounts - List of accounts to project.
- * @param range - Inclusive date range (ISO dates) shared by all accounts.
- * @returns An array of `AccountProjection`, one per account.
- */
-export function projectAccounts(accounts: Account[], range: ForecastRange): AccountProjection[] {
-	return accounts.map((account) => projectAccountBalance(account, range));
-}
-
-/**
  * Flattens all transactions of an account into dated events within the given window.
  *
  * @param account - Account whose transactions should be expanded.

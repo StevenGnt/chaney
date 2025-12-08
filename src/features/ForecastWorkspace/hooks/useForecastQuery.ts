@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import type { FinanceMock } from '@/features/ForecastWorkspace/types';
-import { projectAccounts, type AccountProjection, type ForecastRange } from '@/lib/finance/projection';
+import { projectAccountBalance, type AccountProjection, type ForecastRange } from '@/lib/finance/projection';
 import { fetchMockFinance } from '@/mocks/mockService';
 
 export type ForecastQueryResult = FinanceMock & {
@@ -19,7 +19,7 @@ export function useForecastQuery(range: ForecastRange) {
 		queryKey: ['forecast', range.start, range.end],
 		queryFn: async () => {
 			const data = await fetchMockFinance();
-			const projections = projectAccounts(data.accounts, range);
+			const projections = data.accounts.map((account) => projectAccountBalance(account, range));
 			return { ...data, projections };
 		},
 		staleTime: 1000 * 60 * 5,
