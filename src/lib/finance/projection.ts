@@ -1,6 +1,6 @@
 import { addMonths, addWeeks, addYears, formatISO, parseISO } from 'date-fns';
 
-import type { Account, DateRange, RecurrenceFrequency, Transaction } from '@/features/ForecastWorkspace/types';
+import type { Account, DateRange, Transaction } from '@/features/ForecastWorkspace/types';
 
 export interface ForecastRange extends DateRange {
 	end: string;
@@ -16,16 +16,17 @@ export interface AccountProjection {
 	points: BalancePoint[];
 }
 
-interface TransactionEvent {
-	timestamp: number;
-	date: string;
-	amount: number;
-}
-
 const ISO_OPTIONS = { representation: 'date' } as const;
 
-// Inline function to build date key from a Date object
-const toDateKey = (date: Date) => formatISO(date, ISO_OPTIONS);
+/**
+ * Create a date key from a date.
+ *
+ * @param date - Date to convert.
+ * @returns A ISO date string.
+ */
+function toDateKey(date: Date): string {
+	return formatISO(date, ISO_OPTIONS);
+}
 
 /**
  * Projects the balance evolution for a single account over a given forecast range.
@@ -38,43 +39,65 @@ export function projectAccountBalance(account: Account, range: ForecastRange): A
 	const accountStart = parseISO(account.initialDate);
 	const forecastStart = parseISO(range.start);
 	const forecastEnd = parseISO(range.end);
-	const effectiveStart = accountStart > forecastStart ? accountStart : forecastStart;
 
-	const events = buildTransactionsEvents(account, {
+	// Build events from account start date, keyed by ISO date
+	const eventsByDate = buildTransactionsEvents(account, {
 		start: account.initialDate,
 		end: range.end,
 	});
 
-	let cursor = 0;
-	let balance = account.initialBalance;
+	// Get all dates, sorted chronologically
+	const dates = Array.from(eventsByDate.keys()).sort();
 
-	// Compute balance at the start of the forecast if account initial date is before forecast start
-	while (cursor < events.length && events[cursor].timestamp < effectiveStart.getTime()) {
-		balance += events[cursor].amount;
-		cursor += 1;
+	// Compute balance from account start to forecast start
+	let balanceAtForecastStart = account.initialBalance;
+
+	// If account starts in the future, use initial balance
+	if (accountStart > forecastStart) {
+		balanceAtForecastStart = account.initialBalance;
+	} else {
+		// Process events from account start to forecast start
+		for (const date of dates) {
+			const dateObj = parseISO(date);
+			if (dateObj >= forecastStart) {
+				break;
+			}
+			const amounts = eventsByDate.get(date) ?? [];
+			for (const amount of amounts) {
+				balanceAtForecastStart += amount;
+			}
+		}
 	}
 
-	const points: BalancePoint[] = [
-		{
-			date: toDateKey(effectiveStart),
-			balance,
-		},
-	];
+	// Generate points for every day in the forecast range
+	const points: BalancePoint[] = [];
+	let currentBalance = balanceAtForecastStart;
 
-	for (; cursor < events.length; cursor += 1) {
-		const event = events[cursor];
-		if (event.timestamp > forecastEnd.getTime()) {
-			break;
+	// Track which dates have events
+	const eventDates = new Set(dates);
+
+	// Create a point for every day in the forecast range
+	const currentDate = new Date(forecastStart);
+	const endDate = new Date(forecastEnd);
+
+	while (currentDate <= endDate) {
+		const dateKey = toDateKey(currentDate);
+
+		// Apply events for this date if any
+		if (eventDates.has(dateKey)) {
+			const amounts = eventsByDate.get(dateKey) ?? [];
+			for (const amount of amounts) {
+				currentBalance += amount;
+			}
 		}
 
-		balance += event.amount;
+		points.push({
+			date: dateKey,
+			balance: currentBalance,
+		});
 
-		upsertPoint(points, event.date, balance);
-	}
-
-	const finalDate = toDateKey(forecastEnd);
-	if (points[points.length - 1]?.date !== finalDate) {
-		points.push({ date: finalDate, balance });
+		// Move to next day
+		currentDate.setDate(currentDate.getDate() + 1);
 	}
 
 	return {
@@ -88,12 +111,13 @@ export function projectAccountBalance(account: Account, range: ForecastRange): A
  *
  * @param account - Account whose transactions should be expanded.
  * @param window - Forecast window limiting the generated events.
- * @returns A chronologically sorted list of transaction events.
+ * @returns A map of ISO dates to arrays of amounts for that date.
  */
-function buildTransactionsEvents(account: Account, window: ForecastRange): TransactionEvent[] {
+function buildTransactionsEvents(account: Account, window: ForecastRange): Map<string, number[]> {
 	const rangeStart = parseISO(window.start);
 	const rangeEnd = parseISO(window.end);
-	const events: TransactionEvent[] = [];
+	const accountStart = parseISO(account.initialDate);
+	const eventsByDate = new Map<string, number[]>();
 
 	for (const transaction of account.transactions) {
 		const base = transaction.amount;
@@ -105,74 +129,56 @@ function buildTransactionsEvents(account: Account, window: ForecastRange): Trans
 		// Only apply tax to positive amounts (income)
 		const amount = base > 0 && transaction.taxRate ? +(base * (1 - transaction.taxRate)).toFixed(2) : base;
 
-		// Collect events for this transaction
-		const transactionEvents: TransactionEvent[] = [];
+		// Collect date keys for this transaction
+		const dateKeys: string[] = [];
 
 		switch (transaction.schedule.kind) {
 			case 'single': {
 				const occurrence = parseISO(transaction.schedule.date);
-				if (occurrence >= rangeStart && occurrence <= rangeEnd && occurrence >= parseISO(account.initialDate)) {
-					transactionEvents.push(createEvent(occurrence, amount));
+				if (occurrence >= rangeStart && occurrence <= rangeEnd && occurrence >= accountStart) {
+					dateKeys.push(toDateKey(occurrence));
 				}
 				break;
 			}
 			case 'recurring': {
-				const occurrences = expandRecurringSchedule(transaction, account.initialDate, window);
+				const occurrences = expandRecurringSchedule(transaction, accountStart, rangeStart, rangeEnd);
 				for (const occurrence of occurrences) {
-					transactionEvents.push(createEvent(occurrence, amount));
+					dateKeys.push(toDateKey(occurrence));
 				}
 				break;
 			}
 		}
 
-		// Push all events for this transaction at once
-		events.push(...transactionEvents);
+		// Add all events for this transaction at once
+		for (const dateKey of dateKeys) {
+			const existing = eventsByDate.get(dateKey);
+			if (existing) {
+				existing.push(amount);
+			} else {
+				eventsByDate.set(dateKey, [amount]);
+			}
+		}
 	}
 
-	return events.sort((left, right) => left.timestamp - right.timestamp);
-}
-
-/**
- * Creates a `TransactionEvent` object from a date and an amount.
- *
- * @param date - Occurrence date of the transaction.
- * @param amount - Signed amount to apply on that date.
- * @returns A `TransactionEvent` including timestamp, ISO date and amount.
- */
-function createEvent(date: Date, amount: number): TransactionEvent {
-	return {
-		timestamp: date.getTime(),
-		date: toDateKey(date),
-		amount,
-	};
+	return eventsByDate;
 }
 
 /**
  * Expands a recurring transaction schedule into concrete occurrence dates within a window.
  *
  * @param transaction - Transaction with a recurring schedule.
- * @param accountStartISO - ISO date at which the account becomes active.
- * @param window - Forecast window limiting the occurrences to consider.
+ * @param accountStart - Date at which the account becomes active.
+ * @param windowStart - Start of the forecast window.
+ * @param windowEnd - End of the forecast window.
  * @returns An array of occurrence dates for the schedule within the window.
  */
-function expandRecurringSchedule(transaction: Transaction, accountStartISO: string, window: ForecastRange) {
-	const schedule = transaction.schedule;
-	if (schedule.kind !== 'recurring') {
-		return [];
-	}
-
-	const every = schedule.every;
-	const accountStart = parseISO(accountStartISO);
+function expandRecurringSchedule(transaction: Transaction, accountStart: Date, windowStart: Date, windowEnd: Date) {
+	// This function is only called for recurring schedules
+	const schedule = transaction.schedule as Extract<typeof transaction.schedule, { kind: 'recurring' }>;
 	const scheduleStart = parseISO(schedule.startDate);
-	const startDate = accountStart > scheduleStart ? accountStart : scheduleStart;
-	const windowStart = parseISO(window.start);
-	const windowEnd = parseISO(window.end);
 	const scheduleEnd = schedule.endDate ? parseISO(schedule.endDate) : windowEnd;
-	const maxEnd = scheduleEnd < windowEnd ? scheduleEnd : windowEnd;
-
-	if (startDate > maxEnd) {
-		return [];
-	}
+	const maxEnd = Math.min(scheduleEnd.getTime(), windowEnd.getTime());
+	const startDate = Math.max(accountStart.getTime(), scheduleStart.getTime());
 
 	const interruptions = schedule.interruptions.map((period) => ({
 		start: parseISO(period.start),
@@ -181,72 +187,38 @@ function expandRecurringSchedule(transaction: Transaction, accountStartISO: stri
 
 	const dates: Date[] = [];
 	let occurrences = 0;
-	let cursor = startDate;
+	let cursor = new Date(startDate);
 
-	while (cursor <= maxEnd) {
-		if (!isInterrupted(cursor, interruptions)) {
+	while (cursor.getTime() <= maxEnd) {
+		const isInterruptedDate = interruptions.some(
+			(interruption) => cursor >= interruption.start && cursor <= interruption.end,
+		);
+
+		if (!isInterruptedDate) {
 			const inWindow = cursor >= windowStart && cursor <= windowEnd;
 			if (inWindow) {
 				dates.push(new Date(cursor));
 			}
+			occurrences += 1;
 		}
 
-		occurrences += 1;
 		if (schedule.occurrences && occurrences >= schedule.occurrences) {
 			break;
 		}
 
-		cursor = advanceDate(cursor, schedule.frequency, every);
+		// Advance date according to frequency
+		switch (schedule.frequency) {
+			case 'weekly':
+				cursor = addWeeks(cursor, schedule.every);
+				break;
+			case 'monthly':
+				cursor = addMonths(cursor, schedule.every);
+				break;
+			case 'yearly':
+				cursor = addYears(cursor, schedule.every);
+				break;
+		}
 	}
 
 	return dates;
-}
-
-/**
- * Advances a date according to a recurrence frequency and interval.
- *
- * @param date - Current occurrence date.
- * @param frequency - Recurrence frequency (weekly, monthly, yearly).
- * @param every - Interval multiplier for the frequency.
- * @returns The next occurrence date.
- */
-function advanceDate(date: Date, frequency: RecurrenceFrequency, every: number) {
-	switch (frequency) {
-		case 'weekly':
-			return addWeeks(date, every);
-		case 'monthly':
-			return addMonths(date, every);
-		case 'yearly':
-			return addYears(date, every);
-		default:
-			return date;
-	}
-}
-
-/**
- * Checks whether a date falls into any interruption window.
- *
- * @param date - Date to check.
- * @param windows - List of interruption periods expressed as date ranges.
- * @returns `true` if the date is within an interruption window, otherwise `false`.
- */
-function isInterrupted(date: Date, windows: { start: Date; end: Date }[]) {
-	return windows.some((window) => date >= window.start && date <= window.end);
-}
-
-/**
- * Inserts or updates a balance point for a given date in a time series.
- *
- * @param points - Existing list of balance points, assumed sorted by date.
- * @param date - ISO date for the balance point.
- * @param balance - Balance value to store for the date.
- */
-function upsertPoint(points: BalancePoint[], date: string, balance: number) {
-	const last = points[points.length - 1];
-	if (last.date === date) {
-		last.balance = balance;
-		return;
-	}
-
-	points.push({ date, balance });
 }
