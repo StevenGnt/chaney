@@ -37,7 +37,7 @@ export function projectAccountBalance(account: Account, range: ForecastRange): A
 	const forecastEnd = parseISO(range.end);
 	const effectiveStart = accountStart > forecastStart ? accountStart : forecastStart;
 
-	const events = buildTransactionEvents(account, {
+	const events = buildTransactionsEvents(account, {
 		start: account.initialDate,
 		end: range.end,
 	});
@@ -87,51 +87,40 @@ export function projectAccountBalance(account: Account, range: ForecastRange): A
  * @param window - Forecast window limiting the generated events.
  * @returns A chronologically sorted list of transaction events.
  */
-function buildTransactionEvents(account: Account, window: ForecastRange): TransactionEvent[] {
+function buildTransactionsEvents(account: Account, window: ForecastRange): TransactionEvent[] {
 	const rangeStart = parseISO(window.start);
 	const rangeEnd = parseISO(window.end);
 	const events: TransactionEvent[] = [];
 
 	for (const transaction of account.transactions) {
-		const signedAmount = normalizeAmount(transaction);
+		const base = transaction.amount;
 
-		if (signedAmount === 0) {
+		if (base === 0) {
 			continue;
 		}
 
-		if (transaction.schedule.kind === 'single') {
-			const occurrence = parseISO(transaction.schedule.date);
-			if (occurrence >= rangeStart && occurrence <= rangeEnd && occurrence >= parseISO(account.initialDate)) {
-				events.push(createEvent(occurrence, signedAmount));
+		// Only apply tax to positive amounts (income)
+		const amount = base > 0 && transaction.taxRate ? +(base * (1 - transaction.taxRate)).toFixed(2) : base;
+
+		switch (transaction.schedule.kind) {
+			case 'single': {
+				const occurrence = parseISO(transaction.schedule.date);
+				if (occurrence >= rangeStart && occurrence <= rangeEnd && occurrence >= parseISO(account.initialDate)) {
+					events.push(createEvent(occurrence, amount));
+				}
+				break;
 			}
-			continue;
-		}
-
-		const occurrences = expandRecurringSchedule(transaction, account.initialDate, window);
-
-		for (const occurrence of occurrences) {
-			events.push(createEvent(occurrence, signedAmount));
+			case 'recurring': {
+				const occurrences = expandRecurringSchedule(transaction, account.initialDate, window);
+				for (const occurrence of occurrences) {
+					events.push(createEvent(occurrence, amount));
+				}
+				break;
+			}
 		}
 	}
 
 	return events.sort((left, right) => left.timestamp - right.timestamp);
-}
-
-/**
- * Normalizes a transaction amount, applying tax if relevant.
- *
- * @param transaction - Transaction to normalize.
- * @returns Amount with tax applied when configured (only for positive amounts/income).
- */
-function normalizeAmount(transaction: Transaction) {
-	const base = transaction.amount;
-
-	// Only apply tax to positive amounts (income)
-	if (base > 0 && transaction.taxRate) {
-		return +(base * (1 - transaction.taxRate)).toFixed(2);
-	}
-
-	return base;
 }
 
 /**
