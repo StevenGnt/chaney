@@ -24,6 +24,9 @@ interface TransactionEvent {
 
 const ISO_OPTIONS = { representation: 'date' } as const;
 
+// Inline function to build date key from a Date object
+const toDateKey = (date: Date) => formatISO(date, ISO_OPTIONS);
+
 /**
  * Projects the balance evolution for a single account over a given forecast range.
  *
@@ -53,7 +56,7 @@ export function projectAccountBalance(account: Account, range: ForecastRange): A
 
 	const points: BalancePoint[] = [
 		{
-			date: formatISO(effectiveStart, ISO_OPTIONS),
+			date: toDateKey(effectiveStart),
 			balance,
 		},
 	];
@@ -69,7 +72,7 @@ export function projectAccountBalance(account: Account, range: ForecastRange): A
 		upsertPoint(points, event.date, balance);
 	}
 
-	const finalDate = formatISO(forecastEnd, ISO_OPTIONS);
+	const finalDate = toDateKey(forecastEnd);
 	if (points[points.length - 1]?.date !== finalDate) {
 		points.push({ date: finalDate, balance });
 	}
@@ -102,22 +105,28 @@ function buildTransactionsEvents(account: Account, window: ForecastRange): Trans
 		// Only apply tax to positive amounts (income)
 		const amount = base > 0 && transaction.taxRate ? +(base * (1 - transaction.taxRate)).toFixed(2) : base;
 
+		// Collect events for this transaction
+		const transactionEvents: TransactionEvent[] = [];
+
 		switch (transaction.schedule.kind) {
 			case 'single': {
 				const occurrence = parseISO(transaction.schedule.date);
 				if (occurrence >= rangeStart && occurrence <= rangeEnd && occurrence >= parseISO(account.initialDate)) {
-					events.push(createEvent(occurrence, amount));
+					transactionEvents.push(createEvent(occurrence, amount));
 				}
 				break;
 			}
 			case 'recurring': {
 				const occurrences = expandRecurringSchedule(transaction, account.initialDate, window);
 				for (const occurrence of occurrences) {
-					events.push(createEvent(occurrence, amount));
+					transactionEvents.push(createEvent(occurrence, amount));
 				}
 				break;
 			}
 		}
+
+		// Push all events for this transaction at once
+		events.push(...transactionEvents);
 	}
 
 	return events.sort((left, right) => left.timestamp - right.timestamp);
@@ -133,7 +142,7 @@ function buildTransactionsEvents(account: Account, window: ForecastRange): Trans
 function createEvent(date: Date, amount: number): TransactionEvent {
 	return {
 		timestamp: date.getTime(),
-		date: formatISO(date, ISO_OPTIONS),
+		date: toDateKey(date),
 		amount,
 	};
 }
