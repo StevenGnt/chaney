@@ -249,5 +249,6 @@ Husky is configured to run lint-staged on pre-commit:
 
 - [ ] **Additional Features**
   - Show for a given day the list of transactions impacting the balance
+  - Improve transactions list for recurring operations
   - CRUD operations on accounts and transactions within the UI
   - Simulation of new projects and financial scenarios
