@@ -1,6 +1,6 @@
 import { formatISO, parseISO } from 'date-fns';
 
-import type { Account, DateRange } from '@/features/ForecastWorkspace/types';
+import type { Account, DateRange, RecurringTransaction } from '@/features/ForecastWorkspace/types';
 
 import { generateRecurringOccurrences } from './recurringSchedule';
 
@@ -59,16 +59,10 @@ export function projectAccountBalance(account: Account, range: ForecastRange): A
 		balanceAtForecastStart = account.initialBalance;
 	} else {
 		// Process events from account start to forecast start
-		for (const date of dates) {
-			const dateObj = parseISO(date);
-			if (dateObj >= forecastStart) {
-				break;
-			}
-			const amounts = eventsByDate.get(date) ?? [];
-			for (const amount of amounts) {
-				balanceAtForecastStart += amount;
-			}
-		}
+		balanceAtForecastStart += dates
+			.filter((date) => parseISO(date) < forecastStart)
+			.flatMap((date) => eventsByDate.get(date) ?? [])
+			.reduce((sum, amount) => sum + amount, 0);
 	}
 
 	// Generate points for every day in the forecast range
@@ -143,11 +137,7 @@ function buildTransactionsEvents(account: Account, window: ForecastRange): Map<s
 				break;
 			}
 			case 'recurring': {
-				const occurrences = generateRecurringOccurrences(transaction, {
-					accountStart,
-					windowStart: rangeStart,
-					windowEnd: rangeEnd,
-				});
+				const occurrences = generateRecurringOccurrences(transaction as RecurringTransaction, rangeStart, rangeEnd);
 				for (const occurrence of occurrences) {
 					dateKeys.push(toDateKey(occurrence));
 				}

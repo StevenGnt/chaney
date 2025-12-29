@@ -1,6 +1,6 @@
 import { parseISO } from 'date-fns';
 
-import type { Account, Transaction } from '@/features/ForecastWorkspace/types';
+import type { Account, RecurringTransaction, Transaction } from '@/features/ForecastWorkspace/types';
 import type { ForecastRange } from '@/lib/finance/projection';
 import { generateRecurringOccurrences } from '@/lib/finance/recurringSchedule';
 
@@ -93,15 +93,10 @@ function getFirstTransactionOccurrenceInRange(
 	}
 
 	// Handle recurring transactions
-	const accountStart = parseISO(accountStartISO);
 	const windowStart = parseISO(dateRange.start);
 	const windowEnd = parseISO(dateRange.end);
 
-	const occurrences = generateRecurringOccurrences(transaction, {
-		accountStart,
-		windowStart,
-		windowEnd,
-	});
+	const occurrences = generateRecurringOccurrences(transaction as RecurringTransaction, windowStart, windowEnd);
 
 	// Return the first occurrence, if any
 	return occurrences.length > 0 ? occurrences[0] : null;

@@ -19,22 +19,30 @@ export const singleScheduleSchema = z.object({
 export const recurringScheduleSchema = z.object({
 	kind: z.literal('recurring'),
 	frequency: recurrenceFrequencySchema,
-	every: z.number().int().positive().default(1),
 	startDate: isoDateSchema,
 	endDate: isoDateSchema.optional(),
 	occurrences: z.number().int().positive().optional(),
 	interruptions: z.array(dateRangeSchema).default([]),
 });
 
-export const transactionSchema = z.object({
+const baseTransactionSchema = z.object({
 	id: z.string(),
 	label: z.string(),
 	category: z.string(),
 	amount: z.number(),
-	schedule: z.union([singleScheduleSchema, recurringScheduleSchema]),
 	taxRate: z.number().min(0).max(1).optional(),
 	notes: z.string().optional(),
 });
+
+export const singleTransactionSchema = baseTransactionSchema.extend({
+	schedule: singleScheduleSchema,
+});
+
+export const recurringTransactionSchema = baseTransactionSchema.extend({
+	schedule: recurringScheduleSchema,
+});
+
+export const transactionSchema = z.union([singleTransactionSchema, recurringTransactionSchema]);
 
 export const accountSchema = z.object({
 	id: z.string(),
@@ -66,6 +74,8 @@ export type RecurrenceFrequency = z.infer<typeof recurrenceFrequencySchema>;
 export type Transaction = z.infer<typeof transactionSchema>;
 export type Account = z.infer<typeof accountSchema>;
 export type FinanceMock = z.infer<typeof financeMockSchema>;
+export type SingleTransaction = z.infer<typeof singleTransactionSchema>;
+export type RecurringTransaction = z.infer<typeof recurringTransactionSchema>;
 export type TransactionSchedule = z.infer<typeof singleScheduleSchema> | z.infer<typeof recurringScheduleSchema>;
 export type DateRange = z.infer<typeof dateRangeSchema>;
 export type Threshold = z.infer<typeof thresholdSchema>;

@@ -1,25 +1,6 @@
 import { addMonths, addWeeks, addYears, parseISO } from 'date-fns';
 
-import type { RecurrenceFrequency, Transaction } from '@/features/ForecastWorkspace/types';
-
-/**
- * Advances a date by the specified frequency and interval multiplier.
- *
- * @param date - Current date to advance from.
- * @param frequency - Recurrence frequency (weekly, monthly, or yearly).
- * @param every - Number of frequency units to advance (e.g., every 2 weeks).
- * @returns The advanced date.
- */
-export function advanceDate(date: Date, frequency: RecurrenceFrequency, every: number): Date {
-	switch (frequency) {
-		case 'weekly':
-			return addWeeks(date, every);
-		case 'monthly':
-			return addMonths(date, every);
-		case 'yearly':
-			return addYears(date, every);
-	}
-}
+import type { RecurringTransaction } from '@/features/ForecastWorkspace/types';
 
 /**
  * Checks if a date falls within any of the provided interruption windows.
@@ -28,14 +9,8 @@ export function advanceDate(date: Date, frequency: RecurrenceFrequency, every: n
  * @param windows - Array of interruption periods, each with start and end dates.
  * @returns True if the date is within any interruption window, false otherwise.
  */
-export function isInterrupted(date: Date, windows: { start: Date; end: Date }[]): boolean {
+function isInterrupted(date: Date, windows: { start: Date; end: Date }[]): boolean {
 	return windows.some((window) => date >= window.start && date <= window.end);
-}
-
-export interface RecurringScheduleOptions {
-	accountStart: Date;
-	windowStart: Date;
-	windowEnd: Date;
 }
 
 /**
@@ -43,59 +18,63 @@ export interface RecurringScheduleOptions {
  *
  * Handles:
  * - Schedule start/end dates
- * - Account start date constraints
  * - Interruptions
  * - Occurrence limits
  * - Date advancement by frequency
  *
+ * The recurring pattern always starts from the schedule's start date to maintain the pattern
+ * (e.g., monthly on the 5th will always be the 5th of each month, not shifted by window boundaries).
+ *
  * @param transaction - Transaction with a recurring schedule.
- * @param options - Options including account start and window boundaries.
+ * @param windowStart - Start date of the window (inclusive).
+ * @param windowEnd - End date of the window (inclusive).
  * @returns Array of occurrence dates within the window.
  */
-export function generateRecurringOccurrences(transaction: Transaction, options: RecurringScheduleOptions): Date[] {
-	if (transaction.schedule.kind !== 'recurring') {
-		return [];
-	}
-
+export function generateRecurringOccurrences(
+	transaction: RecurringTransaction,
+	windowStart: Date,
+	windowEnd: Date,
+): Date[] {
 	const schedule = transaction.schedule;
 	const scheduleStart = parseISO(schedule.startDate);
-	const scheduleEnd = schedule.endDate ? parseISO(schedule.endDate) : options.windowEnd;
-	const maxEnd = new Date(Math.min(scheduleEnd.getTime(), options.windowEnd.getTime()));
-	const startDate = new Date(Math.max(options.accountStart.getTime(), scheduleStart.getTime()));
-
-	// No valid range if start is after max end
-	if (startDate > maxEnd) {
-		return [];
-	}
+	const scheduleEnd = schedule.endDate ? parseISO(schedule.endDate) : null;
+	const maxOccurrences = schedule.occurrences ?? Infinity;
 
 	// Convert interruption periods to Date objects for comparison
 	const interruptions = schedule.interruptions.map((period) => ({
 		start: parseISO(period.start),
-		end: period.end ? parseISO(period.end) : options.windowEnd,
+		end: period.end ? parseISO(period.end) : windowEnd,
 	}));
 
 	const dates: Date[] = [];
 	let occurrences = 0;
-	let cursor = new Date(startDate);
+	// Always start from scheduleStart to maintain the recurring pattern
+	let cursor = new Date(scheduleStart);
 
-	while (cursor.getTime() <= maxEnd.getTime()) {
+	// Continue until we've hit maxOccurrences or passed all relevant boundaries
+	while (occurrences < maxOccurrences && (!scheduleEnd || cursor <= scheduleEnd) && cursor <= windowEnd) {
 		const isInterruptedDate = isInterrupted(cursor, interruptions);
 
 		if (!isInterruptedDate) {
-			const inWindow = cursor >= options.windowStart && cursor <= options.windowEnd;
-			if (inWindow) {
+			// Only include dates within the window (windowEnd is already checked in while condition)
+			if (cursor >= windowStart) {
 				dates.push(new Date(cursor));
+				occurrences++;
 			}
-			occurrences += 1;
-		}
-
-		// Stop if we've reached the maximum number of occurrences
-		if (schedule.occurrences && occurrences >= schedule.occurrences) {
-			break;
 		}
 
 		// Advance to the next occurrence date
-		cursor = advanceDate(cursor, schedule.frequency, schedule.every);
+		switch (schedule.frequency) {
+			case 'weekly':
+				cursor = addWeeks(cursor, 1);
+				break;
+			case 'monthly':
+				cursor = addMonths(cursor, 1);
+				break;
+			case 'yearly':
+				cursor = addYears(cursor, 1);
+				break;
+		}
 	}
 
 	return dates;
