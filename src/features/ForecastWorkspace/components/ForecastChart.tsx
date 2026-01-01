@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
 	CartesianGrid,
@@ -20,7 +20,8 @@ import { DEFAULT_COLOR } from '@/lib/constants';
 import type { AccountProjection } from '@/lib/finance/projection';
 import { formatCurrency, formatDateLabel, formatDateVerbose } from '@/lib/format';
 
-const DEFAULT_CURRENCY = 'EUR';
+import DayTransactions from './DayTransactions';
+
 const CHART_HEIGHT = 400;
 const GRID_STROKE = 'rgba(255,255,255,0.08)';
 const GRID_DASH = '3 3';
@@ -38,7 +39,7 @@ interface ForecastChartProps {
 
 export function ForecastChart({ projections, accounts, thresholds }: ForecastChartProps) {
 	const { t } = useTranslation();
-
+	const [activeDayTransactions, setActiveDayTransactions] = useState<string[] | null>(null);
 	const data = useMemo(() => buildChartDataset(projections), [projections]);
 
 	if (data.length === 0 || accounts.length === 0) {
@@ -49,12 +50,28 @@ export function ForecastChart({ projections, accounts, thresholds }: ForecastCha
 		);
 	}
 
-	const currency = accounts[0]?.currency ?? DEFAULT_CURRENCY;
+	const account = accounts[0]; // For now, only show the first account
+
+	const closeActiveDayTransactions = () => {
+		setActiveDayTransactions(null);
+	};
+
+	const onChartClick: React.ComponentProps<typeof LineChart>['onClick'] = (nextState) => {
+		if (activeDayTransactions) {
+			closeActiveDayTransactions();
+		} else {
+			const dayTransactions = projections[0].points.filter((point) => point.date === nextState.activeLabel);
+
+			if (dayTransactions.length > 0) {
+				setActiveDayTransactions(dayTransactions[0].transactions);
+			}
+		}
+	};
 
 	return (
 		<Section>
 			<ResponsiveContainer width="100%" height={CHART_HEIGHT}>
-				<LineChart data={data}>
+				<LineChart data={data} onClick={onChartClick}>
 					<CartesianGrid stroke={GRID_STROKE} strokeDasharray={GRID_DASH} />
 					<XAxis
 						dataKey="date"
@@ -64,12 +81,12 @@ export function ForecastChart({ projections, accounts, thresholds }: ForecastCha
 					/>
 					<YAxis
 						stroke={DEFAULT_AXIS_COLOR}
-						tickFormatter={(value) => formatCurrency(Number(value), currency)}
+						tickFormatter={(value) => formatCurrency(Number(value), account.currency)}
 						tick={{ fontSize: 12 }}
 					/>
 					<Tooltip
 						cursor={{ stroke: CURSOR_STROKE, strokeDasharray: CURSOR_DASH }}
-						content={<CustomTooltip accounts={accounts} currency={currency} />}
+						content={<CustomTooltip accounts={accounts} currency={account.currency} />}
 					/>
 					<Legend />
 					{thresholds.map((threshold) => (
@@ -98,6 +115,14 @@ export function ForecastChart({ projections, accounts, thresholds }: ForecastCha
 					))}
 				</LineChart>
 			</ResponsiveContainer>
+
+			{activeDayTransactions && (
+				<DayTransactions
+					account={account}
+					transactionsIds={activeDayTransactions}
+					onClose={closeActiveDayTransactions}
+				/>
+			)}
 		</Section>
 	);
 }

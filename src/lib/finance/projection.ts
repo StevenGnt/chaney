@@ -1,6 +1,6 @@
 import { formatISO, parseISO } from 'date-fns';
 
-import type { Account, DateRange, RecurringTransaction } from '@/features/ForecastWorkspace/types';
+import type { Account, DateRange, RecurringTransaction, Transaction } from '@/features/ForecastWorkspace/types';
 
 import { generateRecurringOccurrences } from './recurringSchedule';
 
@@ -11,6 +11,7 @@ export interface ForecastRange extends DateRange {
 export interface BalancePoint {
 	date: string;
 	balance: number;
+	transactions: string[];
 }
 
 export interface AccountProjection {
@@ -30,7 +31,7 @@ function toDateKey(date: Date): string {
 	return formatISO(date, ISO_OPTIONS);
 }
 
-/**
+/**getTransactionAmount
  * Projects the balance evolution for a single account over a given forecast range.
  *
  * @param account - Source account including initial balance, start date and transactions.
@@ -41,6 +42,18 @@ export function projectAccountBalance(account: Account, range: ForecastRange): A
 	const accountStart = parseISO(account.initialDate);
 	const forecastStart = parseISO(range.start);
 	const forecastEnd = parseISO(range.end);
+
+	function getTransactionAmount(transactionId: string): number {
+		const transaction = account.transactions.find((transaction) => transaction.id === transactionId);
+
+		if (!transaction) {
+			throw new Error(`Transaction ${transactionId} not found`);
+		}
+
+		const { amount, taxRate } = transaction;
+
+		return amount > 0 && taxRate ? +(amount * (1 - taxRate)).toFixed(2) : amount;
+	}
 
 	// Build events from account start date, keyed by ISO date
 	const eventsByDate = buildTransactionsEvents(account, {
@@ -54,14 +67,12 @@ export function projectAccountBalance(account: Account, range: ForecastRange): A
 	// Compute balance from account start to forecast start
 	let balanceAtForecastStart = account.initialBalance;
 
-	// If account starts in the future, use initial balance
-	if (accountStart > forecastStart) {
-		balanceAtForecastStart = account.initialBalance;
-	} else {
+	if (accountStart <= forecastStart) {
 		// Process events from account start to forecast start
 		balanceAtForecastStart += dates
 			.filter((date) => parseISO(date) < forecastStart)
 			.flatMap((date) => eventsByDate.get(date) ?? [])
+			.map((transactionId) => getTransactionAmount(transactionId))
 			.reduce((sum, amount) => sum + amount, 0);
 	}
 
@@ -81,15 +92,17 @@ export function projectAccountBalance(account: Account, range: ForecastRange): A
 
 		// Apply events for this date if any
 		if (eventDates.has(dateKey)) {
-			const amounts = eventsByDate.get(dateKey) ?? [];
-			for (const amount of amounts) {
-				currentBalance += amount;
+			const transactions = eventsByDate.get(dateKey) ?? [];
+
+			for (const transaction of transactions) {
+				currentBalance += getTransactionAmount(transaction);
 			}
 		}
 
 		points.push({
 			date: dateKey,
 			balance: currentBalance,
+			transactions: eventsByDate.get(dateKey) ?? [],
 		});
 
 		// Move to next day
@@ -109,11 +122,11 @@ export function projectAccountBalance(account: Account, range: ForecastRange): A
  * @param window - Forecast window limiting the generated events.
  * @returns A map of ISO dates to arrays of amounts for that date.
  */
-function buildTransactionsEvents(account: Account, window: ForecastRange): Map<string, number[]> {
+function buildTransactionsEvents(account: Account, window: ForecastRange): Map<string, string[]> {
 	const rangeStart = parseISO(window.start);
 	const rangeEnd = parseISO(window.end);
 	const accountStart = parseISO(account.initialDate);
-	const eventsByDate = new Map<string, number[]>();
+	const eventsByDate = new Map<string, Transaction[]>();
 
 	for (const transaction of account.transactions) {
 		const base = transaction.amount;
@@ -123,7 +136,7 @@ function buildTransactionsEvents(account: Account, window: ForecastRange): Map<s
 		}
 
 		// Only apply tax to positive amounts (income)
-		const amount = base > 0 && transaction.taxRate ? +(base * (1 - transaction.taxRate)).toFixed(2) : base;
+		// const amount = base > 0 && transaction.taxRate ? +(base * (1 - transaction.taxRate)).toFixed(2) : base;
 
 		// Collect date keys for this transaction
 		const dateKeys: string[] = [];
@@ -148,10 +161,11 @@ function buildTransactionsEvents(account: Account, window: ForecastRange): Map<s
 		// Add all events for this transaction at once
 		for (const dateKey of dateKeys) {
 			const existing = eventsByDate.get(dateKey);
+
 			if (existing) {
-				existing.push(amount);
+				existing.push(transaction.id);
 			} else {
-				eventsByDate.set(dateKey, [amount]);
+				eventsByDate.set(dateKey, [transaction.id]);
 			}
 		}
 	}

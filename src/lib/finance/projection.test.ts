@@ -55,7 +55,6 @@ describe('projectAccountBalance', () => {
 					schedule: {
 						kind: 'recurring',
 						frequency: 'monthly',
-						every: 1,
 						startDate: '2025-01-05',
 						interruptions: [],
 					},
@@ -68,7 +67,6 @@ describe('projectAccountBalance', () => {
 					schedule: {
 						kind: 'recurring',
 						frequency: 'weekly',
-						every: 1,
 						startDate: '2025-01-02',
 						interruptions: [{ start: '2025-02-10', end: '2025-02-20' }],
 					},
@@ -96,7 +94,6 @@ describe('projectAccountBalance', () => {
 					schedule: {
 						kind: 'recurring',
 						frequency: 'monthly',
-						every: 1,
 						startDate: '2025-01-15',
 						occurrences: 2,
 						interruptions: [],

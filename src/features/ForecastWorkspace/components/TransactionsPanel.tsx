@@ -1,15 +1,14 @@
-import clsx from 'clsx';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import Amount from '@/components/Amount';
 import { Hint } from '@/components/Hint';
+import { Message } from '@/components/Message';
 import { Section } from '@/components/Section';
 import type { Account } from '@/features/ForecastWorkspace/types';
 import { filterTransactions, type VisibleTransaction } from '@/features/ForecastWorkspace/utils/filterTransactions';
 import { DEFAULT_COLOR } from '@/lib/constants';
 import type { ForecastRange } from '@/lib/finance/projection';
-
-import { Message } from '../../../components/Message';
 
 interface TransactionsPanelProps {
 	accounts: Account[];
@@ -131,7 +130,7 @@ interface TransactionGroupProps {
 
 function TransactionGroup({ transactions, label }: TransactionGroupProps) {
 	return (
-		<div>
+		<div className="mb-5">
 			<p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-300">{label}</p>
 			<ul className="space-y-1">
 				{transactions.map((transaction) => (
@@ -153,13 +152,7 @@ function TransactionItem({ transaction }: TransactionItemProps) {
 				<p className="font-medium text-white">{transaction.label}</p>
 				<p className="text-xs text-slate-400">{transaction.category}</p>
 			</div>
-			<span className={clsx('text-xs font-semibold', transaction.amount >= 0 ? 'text-emerald-300' : 'text-rose-300')}>
-				{transaction.amount >= 0 ? '+' : ''}
-				{transaction.amount.toLocaleString(undefined, {
-					style: 'currency',
-					currency: transaction.currency,
-				})}
-			</span>
+			<Amount amount={transaction.amount} currency={transaction.currency} />
 		</li>
 	);
 }
