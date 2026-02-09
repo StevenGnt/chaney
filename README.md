@@ -95,12 +95,18 @@ npm run dev
 
 ## Finance Data Configuration
 
-To use your personal finance data instead of the example data:
+To use your personal finance data instead of the example data, you have two options:
+
+### Locally
 
 1. Copy the example file: `cp public/finance-data.example.json public/finance-data.json`
 2. Edit `public/finance-data.json` with your own accounts, transactions, and thresholds
 
 The app automatically uses your personal file if it exists (falling back to the example otherwise). Your personal data is git-ignored and never committed.
+
+### Remote URL
+
+Add an env.local file to override the VITE_FINANCE_MOCK_URL to any URL of your choice. This will be called by the mock service, and it expects a format compliant with the one shown through the typings (or you can check the example file).
 
 ## Available Scripts
 

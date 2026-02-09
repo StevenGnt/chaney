@@ -1,5 +1,7 @@
 import { financeMockSchema, type FinanceMock } from '@/features/ForecastWorkspace/types';
 
+const DEFAULT_FINANCE_ENDPOINT = '/finance-data.json';
+
 /**
  * Simulates network latency by delaying execution for a specified duration.
  *
@@ -27,7 +29,9 @@ function simulateLatency(duration = 150) {
 export async function fetchMockFinance(): Promise<FinanceMock> {
 	await simulateLatency();
 
-	const response = await fetch('/finance-data.json');
+	const url = import.meta.env.VITE_FINANCE_MOCK_URL ?? DEFAULT_FINANCE_ENDPOINT;
+	const response = await fetch(`${url}?t=${Math.random().toString()}`);
+
 	if (!response.ok) {
 		throw new Error(`Failed to fetch finance data: ${response.statusText}`);
 	}
