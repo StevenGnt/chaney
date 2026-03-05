@@ -14,7 +14,7 @@ function financeDataPlugin(): Plugin {
 		name: 'finance-data-plugin',
 		configureServer(server) {
 			server.middlewares.use((req, res, next) => {
-				if (req.method === 'GET' && req.url === '/finance-data.json') {
+				if (req.method === 'GET' && req.url?.startsWith('/finance-data.json')) {
 					const publicDir = path.resolve(__dirname, 'public');
 					const personalFile = path.join(publicDir, 'finance-data.json');
 					const exampleFile = path.join(publicDir, 'finance-data.example.json');
