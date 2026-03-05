@@ -23,5 +23,9 @@ export function useForecastQuery(range: ForecastRange) {
 			return { ...data, projections };
 		},
 		staleTime: 1000 * 60 * 5,
+		throwOnError: (error) => {
+			console.error('Failed loading finance', error);
+			return true;
+		},
 	});
 }
