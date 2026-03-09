@@ -4,7 +4,7 @@ import type { Account, RecurringTransaction, Transaction } from '@/features/Fore
 import type { ForecastRange } from '@/lib/finance/projection';
 import { generateRecurringOccurrences } from '@/lib/finance/recurringSchedule';
 
-export type TransactionGroupType = 'yearly' | 'monthly' | 'weekly' | 'single';
+export type TransactionGroupType = 'monthly' | 'weekly' | 'yearly' | 'single';
 
 export interface VisibleTransaction {
 	id: string;
@@ -37,11 +37,11 @@ export function filterTransactions(accounts: Account[], dateRange: ForecastRange
 			if (!firstOccurrence) continue;
 
 			// Determine transaction group type based on schedule frequency
-			const groupType: TransactionGroupType = transaction.schedule.kind === 'single'
-				? 'single'
-				: transaction.schedule.frequency;
+			const groupType: TransactionGroupType = transaction.schedule.kind === 'recurring'
+				? transaction.schedule.frequency
+				: 'single';
 
-				console.log(transaction.label, groupType)
+			console.log(transaction.label, groupType)
 
 			collected.push({
 				id: transaction.id,
