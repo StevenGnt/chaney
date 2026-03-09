@@ -6,7 +6,7 @@ import { Hint } from '@/components/Hint';
 import { Message } from '@/components/Message';
 import { Section } from '@/components/Section';
 import type { Account } from '@/features/ForecastWorkspace/types';
-import { filterTransactions, type VisibleTransaction } from '@/features/ForecastWorkspace/utils/filterTransactions';
+import { filterTransactions, type TransactionGroupType, type VisibleTransaction } from '@/features/ForecastWorkspace/utils/filterTransactions';
 import { DEFAULT_COLOR } from '@/lib/constants';
 import type { ForecastRange } from '@/lib/finance/projection';
 
@@ -80,22 +80,23 @@ interface AccountTransactionsGroupProps {
 	};
 }
 
+function getSortedTransactionsGroup(transactions: VisibleTransaction[], groupType: TransactionGroupType) {
+	return transactions
+		.filter((item) => item.groupType === groupType)
+		.sort((left, right) => left.firstOccurrence.getTime() - right.firstOccurrence.getTime());
+}
+
 function AccountTransactionsGroup({ group }: AccountTransactionsGroupProps) {
 	const { t } = useTranslation();
 
 	// Group transactions by type (monthly/weekly/single) and sort each group chronologically
 	const groupedByType = useMemo(() => {
-		const monthly = group.items
-			.filter((item) => item.groupType === 'monthly')
-			.sort((left, right) => left.firstOccurrence.getTime() - right.firstOccurrence.getTime());
-		const weekly = group.items
-			.filter((item) => item.groupType === 'weekly')
-			.sort((left, right) => left.firstOccurrence.getTime() - right.firstOccurrence.getTime());
-		const single = group.items
-			.filter((item) => item.groupType === 'single')
-			.sort((left, right) => left.firstOccurrence.getTime() - right.firstOccurrence.getTime());
-
-		return { monthly, weekly, single };
+		return {
+			monthly: getSortedTransactionsGroup(group.items, 'monthly'),
+			weekly: getSortedTransactionsGroup(group.items, 'weekly'),
+			yearly: getSortedTransactionsGroup(group.items, 'yearly'),
+			single: getSortedTransactionsGroup(group.items, 'single'),
+		}
 	}, [group.items]);
 
 	return (
@@ -108,12 +109,16 @@ function AccountTransactionsGroup({ group }: AccountTransactionsGroupProps) {
 					</span>
 				</span>
 			</summary>
+
 			<div className="space-y-2 border-t border-white/10 px-3 py-2">
 				{groupedByType.monthly.length > 0 && (
 					<TransactionGroup label={t('FORECAST.TRANSACTIONS.MONTHLY')} transactions={groupedByType.monthly} />
 				)}
 				{groupedByType.weekly.length > 0 && (
 					<TransactionGroup label={t('FORECAST.TRANSACTIONS.WEEKLY')} transactions={groupedByType.weekly} />
+				)}
+				{groupedByType.yearly.length > 0 && (
+					<TransactionGroup label={t('FORECAST.TRANSACTIONS.YEARLY')} transactions={groupedByType.yearly} />
 				)}
 				{groupedByType.single.length > 0 && (
 					<TransactionGroup label={t('FORECAST.TRANSACTIONS.SINGLE')} transactions={groupedByType.single} />
