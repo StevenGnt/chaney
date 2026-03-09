@@ -109,6 +109,7 @@ function AccountTransactionsGroup({ group }: AccountTransactionsGroupProps) {
 					</span>
 				</span>
 			</summary>
+
 			<div className="space-y-2 border-t border-white/10 px-3 py-2">
 				{groupedByType.monthly.length > 0 && (
 					<TransactionGroup label={t('FORECAST.TRANSACTIONS.MONTHLY')} transactions={groupedByType.monthly} />
@@ -116,7 +117,7 @@ function AccountTransactionsGroup({ group }: AccountTransactionsGroupProps) {
 				{groupedByType.weekly.length > 0 && (
 					<TransactionGroup label={t('FORECAST.TRANSACTIONS.WEEKLY')} transactions={groupedByType.weekly} />
 				)}
-				{groupedByType.weekly.length > 0 && (
+				{groupedByType.yearly.length > 0 && (
 					<TransactionGroup label={t('FORECAST.TRANSACTIONS.YEARLY')} transactions={groupedByType.yearly} />
 				)}
 				{groupedByType.single.length > 0 && (
