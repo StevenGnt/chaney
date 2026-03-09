@@ -91,11 +91,14 @@ function AccountTransactionsGroup({ group }: AccountTransactionsGroupProps) {
 		const weekly = group.items
 			.filter((item) => item.groupType === 'weekly')
 			.sort((left, right) => left.firstOccurrence.getTime() - right.firstOccurrence.getTime());
+		const yearly = group.items
+			.filter((item) => item.groupType === 'yearly')
+			.sort((left, right) => left.firstOccurrence.getTime() - right.firstOccurrence.getTime());
 		const single = group.items
 			.filter((item) => item.groupType === 'single')
 			.sort((left, right) => left.firstOccurrence.getTime() - right.firstOccurrence.getTime());
 
-		return { monthly, weekly, single };
+		return { monthly, weekly, single, yearly };
 	}, [group.items]);
 
 	return (
@@ -114,6 +117,9 @@ function AccountTransactionsGroup({ group }: AccountTransactionsGroupProps) {
 				)}
 				{groupedByType.weekly.length > 0 && (
 					<TransactionGroup label={t('FORECAST.TRANSACTIONS.WEEKLY')} transactions={groupedByType.weekly} />
+				)}
+				{groupedByType.weekly.length > 0 && (
+					<TransactionGroup label={t('FORECAST.TRANSACTIONS.YEARLY')} transactions={groupedByType.yearly} />
 				)}
 				{groupedByType.single.length > 0 && (
 					<TransactionGroup label={t('FORECAST.TRANSACTIONS.SINGLE')} transactions={groupedByType.single} />
