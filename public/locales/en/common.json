@@ -33,6 +33,7 @@
 			"COUNT_plural": "{{count}} transactions",
 			"MONTHLY": "Monthly",
 			"WEEKLY": "Weekly",
+			"YEARLY": "Yearly",
 			"SINGLE": "One-off"
 		}
 	}
