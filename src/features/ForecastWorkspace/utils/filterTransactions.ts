@@ -41,8 +41,6 @@ export function filterTransactions(accounts: Account[], dateRange: ForecastRange
 				? transaction.schedule.frequency
 				: 'single';
 
-			console.log(transaction.label, groupType)
-
 			collected.push({
 				id: transaction.id,
 				label: transaction.label,
