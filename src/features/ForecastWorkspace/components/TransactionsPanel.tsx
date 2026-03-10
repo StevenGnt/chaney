@@ -83,7 +83,18 @@ interface AccountTransactionsGroupProps {
 function getSortedTransactionsGroup(transactions: VisibleTransaction[], groupType: TransactionGroupType) {
 	return transactions
 		.filter((item) => item.groupType === groupType)
-		.sort((left, right) => left.firstOccurrence.getTime() - right.firstOccurrence.getTime());
+		.sort((left, right) => {
+			// Positives first
+			const leftPos = left.amount > 0;
+			const rightPos = right.amount > 0;
+
+			if (leftPos !== rightPos) {
+				return leftPos ? -1 : 1;
+			}
+
+			// Largest absolute value first
+			return Math.abs(right.amount) - Math.abs(left.amount);
+		});
 }
 
 function AccountTransactionsGroup({ group }: AccountTransactionsGroupProps) {
