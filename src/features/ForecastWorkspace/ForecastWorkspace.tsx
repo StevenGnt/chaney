@@ -15,10 +15,10 @@ import type { ForecastRange } from '@/lib/finance/projection';
 const DEFAULT_DURATION_MONTHS = 12;
 
 const BASE_DATE_RANGE_PRESETS = [
-	{ id: '3m', months: 3 },
 	{ id: '6m', months: 6 },
 	{ id: '12m', months: 12 },
 	{ id: '24m', months: 24 },
+	{ id: '48m', months: 48 },
 ] as const;
 
 interface ForecastDateRangeSelectorProps {
