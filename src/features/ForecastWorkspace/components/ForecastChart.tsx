@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
 	CartesianGrid,
@@ -8,19 +8,19 @@ import {
 	ReferenceLine,
 	ResponsiveContainer,
 	Tooltip,
+	type TooltipProps,
 	XAxis,
 	YAxis,
 } from 'recharts';
 
+import Amount from '@/components/Amount';
 import { Message } from '@/components/Message';
 import { Section } from '@/components/Section';
-import type { Account, Threshold } from '@/features/ForecastWorkspace/types';
+import type { Account, Threshold, Transaction } from '@/features/ForecastWorkspace/types';
 import { buildChartDataset } from '@/features/ForecastWorkspace/utils/chartDataset';
 import { DEFAULT_COLOR } from '@/lib/constants';
-import type { AccountProjection } from '@/lib/finance/projection';
+import type { AccountProjection, BalancePoint } from '@/lib/finance/projection';
 import { formatCurrency, formatDateLabel, formatDateVerbose } from '@/lib/format';
-
-import DayTransactions from './DayTransactions';
 
 const CHART_HEIGHT = 400;
 const GRID_STROKE = 'rgba(255,255,255,0.08)';
@@ -39,7 +39,6 @@ interface ForecastChartProps {
 
 export function ForecastChart({ projections, accounts, thresholds }: ForecastChartProps) {
 	const { t } = useTranslation();
-	const [activeDayTransactions, setActiveDayTransactions] = useState<string[] | null>(null);
 	const data = useMemo(() => buildChartDataset(projections), [projections]);
 
 	if (data.length === 0 || accounts.length === 0) {
@@ -55,26 +54,10 @@ export function ForecastChart({ projections, accounts, thresholds }: ForecastCha
 	const points = projections[0].points;
 	const newYearsDays = points.filter((point) => point.date.endsWith('01-01')).map((point) => point.date);
 
-	const closeActiveDayTransactions = () => {
-		setActiveDayTransactions(null);
-	};
-
-	const onChartClick: React.ComponentProps<typeof LineChart>['onClick'] = (nextState) => {
-		if (activeDayTransactions) {
-			closeActiveDayTransactions();
-		} else {
-			const dayTransactions = projections[0].points.filter((point) => point.date === nextState.activeLabel);
-
-			if (dayTransactions.length > 0) {
-				setActiveDayTransactions(dayTransactions[0].transactions);
-			}
-		}
-	};
-
 	return (
 		<Section>
 			<ResponsiveContainer width="100%" height={CHART_HEIGHT}>
-				<LineChart data={data} onClick={onChartClick}>
+				<LineChart data={data}>
 					<CartesianGrid stroke={GRID_STROKE} strokeDasharray={GRID_DASH} />
 					<XAxis
 						dataKey="date"
@@ -89,7 +72,21 @@ export function ForecastChart({ projections, accounts, thresholds }: ForecastCha
 					/>
 					<Tooltip
 						cursor={{ stroke: CURSOR_STROKE, strokeDasharray: CURSOR_DASH }}
-						content={<CustomTooltip accounts={accounts} currency={account.currency} />}
+						content={({ active, activeIndex, payload, label }: TooltipProps<any, any>) => {
+							if (!active || !activeIndex || !payload || payload.length === 0) {
+								return null;
+							}
+
+							return (
+								<CustomTooltip
+									payload={payload}
+									activeIndex={activeIndex}
+									label={label}
+									accounts={accounts}
+									points={points}
+								/>
+							);
+						}}
 					/>
 					<Legend />
 
@@ -131,48 +128,61 @@ export function ForecastChart({ projections, accounts, thresholds }: ForecastCha
 					))}
 				</LineChart>
 			</ResponsiveContainer>
-
-			{activeDayTransactions && (
-				<DayTransactions
-					account={account}
-					transactionsIds={activeDayTransactions}
-					onClose={closeActiveDayTransactions}
-				/>
-			)}
 		</Section>
 	);
 }
 
 interface CustomTooltipProps {
-	active?: boolean;
-	payload?: { color?: string; name?: string; value?: number }[];
-	label?: string;
+	payload: { color?: string; name?: string; value?: number }[];
+	label: string;
+	activeIndex: number;
 	accounts: Account[];
-	currency: string;
+	points: BalancePoint[];
 }
 
-function CustomTooltip({ active, payload, label, accounts, currency }: CustomTooltipProps) {
-	if (!active || !payload || payload.length === 0) {
-		return null;
-	}
-
+function CustomTooltip({ payload, label, activeIndex, accounts, points }: CustomTooltipProps) {
 	return (
 		<div className="rounded-xl border border-white/10 bg-slate-900/90 px-4 py-3 text-sm text-white shadow-xl backdrop-blur">
 			<p className="mb-2 text-xs text-slate-300">{label ? formatDateVerbose(label) : ''}</p>
 			<ul className="space-y-1">
 				{payload.map((entry) => {
-					if (entry.value == null) return null;
+					if (entry.value == null) {
+						return null;
+					}
+
 					const account = accounts.find((candidate) => candidate.name === entry.name);
 
+					if (!account) {
+						return null;
+					}
+
+					const dayTransactionsIds = points[activeIndex].transactions;
+
+					const dayTransactions = dayTransactionsIds.map((id: string) =>
+						account.transactions.find((transaction) => transaction.id === id),
+					) as Transaction[];
+
 					return (
-						<li key={entry.name} className="flex items-center justify-between gap-3">
-							<span className="flex items-center gap-2">
-								<span className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.color ?? account?.color }} />
-								{entry.name}
-							</span>
-							<span className="text-xs text-slate-200">
-								{formatCurrency(entry.value, account?.currency ?? currency)}
-							</span>
+						<li key={entry.name}>
+							<div className="flex items-center justify-between gap-3">
+								<span className="flex items-center gap-2">
+									<span className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.color ?? account?.color }} />
+									{entry.name}
+								</span>
+								<span className="text-xs text-slate-200">{formatCurrency(entry.value, account.currency)}</span>
+							</div>
+
+							{dayTransactions.length > 0 && (
+								<div className="flex items-center justify-between gap-3">
+									<ul>
+										{dayTransactions.map((transaction) => (
+											<li key={transaction.id}>
+												{transaction.label} <Amount amount={transaction.amount} currency={account.currency} />
+											</li>
+										))}
+									</ul>
+								</div>
+							)}
 						</li>
 					);
 				})}
