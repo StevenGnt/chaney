@@ -52,6 +52,9 @@ export function ForecastChart({ projections, accounts, thresholds }: ForecastCha
 
 	const account = accounts[0]; // For now, only show the first account
 
+	const points = projections[0].points;
+	const newYearsDays = points.filter((point) => point.date.endsWith('01-01')).map((point) => point.date);
+
 	const closeActiveDayTransactions = () => {
 		setActiveDayTransactions(null);
 	};
@@ -89,6 +92,7 @@ export function ForecastChart({ projections, accounts, thresholds }: ForecastCha
 						content={<CustomTooltip accounts={accounts} currency={account.currency} />}
 					/>
 					<Legend />
+
 					{thresholds.map((threshold) => (
 						<ReferenceLine
 							key={threshold.id}
@@ -96,11 +100,17 @@ export function ForecastChart({ projections, accounts, thresholds }: ForecastCha
 							stroke={threshold.color ?? DEFAULT_THRESHOLD_COLOR}
 							strokeDasharray="4 4"
 							label={{
-								value: `${threshold.label} (${formatCurrency(threshold.amount, threshold.currency)})`,
+								value: `${threshold.label} - ${formatCurrency(threshold.amount, threshold.currency)}`,
 								fill: threshold.color ?? DEFAULT_THRESHOLD_COLOR,
 							}}
 						/>
 					))}
+
+					{newYearsDays.length > 0 &&
+						newYearsDays.map((newYearDay) => (
+							<ReferenceLine key="abc" x={newYearDay} stroke="white" strokeDasharray="4" opacity="0.5" />
+						))}
+
 					{accounts.map(({ id, name, color }) => (
 						<Line
 							key={id}
