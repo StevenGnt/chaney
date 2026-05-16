@@ -108,7 +108,13 @@ export function ForecastChart({ projections, accounts, thresholds }: ForecastCha
 
 					{newYearsDays.length > 0 &&
 						newYearsDays.map((newYearDay) => (
-							<ReferenceLine key="abc" x={newYearDay} stroke="white" strokeDasharray="4" opacity="0.5" />
+							<ReferenceLine
+								key={'new-year-${newYearDay}'}
+								x={newYearDay}
+								stroke="white"
+								strokeDasharray="4"
+								opacity="0.5"
+							/>
 						))}
 
 					{accounts.map(({ id, name, color }) => (
