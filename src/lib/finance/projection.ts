@@ -19,6 +19,8 @@ export interface AccountProjection {
 	points: BalancePoint[];
 }
 
+type TransactionId = Transaction['id'];
+
 const ISO_OPTIONS = { representation: 'date' } as const;
 
 /**
@@ -122,21 +124,16 @@ export function projectAccountBalance(account: Account, range: ForecastRange): A
  * @param window - Forecast window limiting the generated events.
  * @returns A map of ISO dates to arrays of amounts for that date.
  */
-function buildTransactionsEvents(account: Account, window: ForecastRange): Map<string, string[]> {
+function buildTransactionsEvents(account: Account, window: ForecastRange): Map<string, TransactionId[]> {
 	const rangeStart = parseISO(window.start);
 	const rangeEnd = parseISO(window.end);
 	const accountStart = parseISO(account.initialDate);
-	const eventsByDate = new Map<string, Transaction[]>();
+	const eventsByDate = new Map<string, TransactionId[]>();
 
 	for (const transaction of account.transactions) {
-		const base = transaction.amount;
-
-		if (base === 0) {
+		if (transaction.amount === 0) {
 			continue;
 		}
-
-		// Only apply tax to positive amounts (income)
-		// const amount = base > 0 && transaction.taxRate ? +(base * (1 - transaction.taxRate)).toFixed(2) : base;
 
 		// Collect date keys for this transaction
 		const dateKeys: string[] = [];
