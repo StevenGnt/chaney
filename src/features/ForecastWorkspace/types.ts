@@ -47,7 +47,6 @@ export const transactionSchema = z.union([singleTransactionSchema, recurringTran
 export const accountSchema = z.object({
 	id: z.string(),
 	name: z.string(),
-	institution: z.string().optional(),
 	currency: currencySchema,
 	color: z.string().optional(),
 	initialBalance: z.number(),

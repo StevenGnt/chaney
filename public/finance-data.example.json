@@ -3,7 +3,6 @@
 		{
 			"id": "checking",
 			"name": "Main checking",
-			"institution": "Shoreline Bank",
 			"currency": "EUR",
 			"color": "#34d399",
 			"initialBalance": 7350,
@@ -94,7 +93,6 @@
 		{
 			"id": "savings",
 			"name": "Emergency savings",
-			"institution": "Nova Fund",
 			"currency": "EUR",
 			"color": "#60a5fa",
 			"initialBalance": 12000,
