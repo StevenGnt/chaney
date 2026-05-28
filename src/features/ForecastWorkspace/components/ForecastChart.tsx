@@ -8,7 +8,7 @@ import {
 	ReferenceLine,
 	ResponsiveContainer,
 	Tooltip,
-	type TooltipProps,
+	type TooltipContentProps,
 	XAxis,
 	YAxis,
 } from 'recharts';
@@ -19,7 +19,7 @@ import { Section } from '@/components/Section';
 import type { Account, Threshold, Transaction } from '@/features/ForecastWorkspace/types';
 import { buildChartDataset } from '@/features/ForecastWorkspace/utils/chartDataset';
 import { DEFAULT_COLOR } from '@/lib/constants';
-import type { AccountProjection, BalancePoint } from '@/lib/finance/projection';
+import type { AccountProjection } from '@/lib/finance/projection';
 import { formatCurrency, formatDateLabel, formatDateVerbose } from '@/lib/format';
 
 const CHART_HEIGHT = 400;
@@ -49,9 +49,11 @@ export function ForecastChart({ projections, accounts, thresholds }: ForecastCha
 		);
 	}
 
-	const account = accounts[0]; // For now, only show the first account
+	const ACCOUNT_INDEX = 0; // For now, only show the first account
 
-	const points = projections[0].points;
+	const account = accounts[ACCOUNT_INDEX];
+
+	const points = projections[ACCOUNT_INDEX].points;
 	const newYearsDays = points.filter((point) => point.date.endsWith('01-01')).map((point) => point.date);
 
 	return (
@@ -72,19 +74,43 @@ export function ForecastChart({ projections, accounts, thresholds }: ForecastCha
 					/>
 					<Tooltip
 						cursor={{ stroke: CURSOR_STROKE, strokeDasharray: CURSOR_DASH }}
-						content={({ active, activeIndex, payload, label }: TooltipProps<any, any>) => {
-							if (!active || !activeIndex || !payload || payload.length === 0) {
+						content={({ active, activeIndex, label, payload }: TooltipContentProps<number, string>) => {
+							if (!active || !activeIndex || !label) {
 								return null;
 							}
 
+							const accountData = payload[ACCOUNT_INDEX] as {
+								dataKey: string;
+								payload: {
+									date: string;
+									[accountId: string]: number | string;
+								};
+							};
+
+							const accountId = accountData.dataKey;
+							const account = accounts.find((candidate) => candidate.id === accountId);
+
+							if (!account) {
+								return null;
+							}
+
+							const dayValue = accountData.payload[accountId];
+							const { date } = accountData.payload;
+							const dayTransactionsIds = points.find((candidate) => candidate.date === date)?.transactions ?? [];
+
+							const tooltipAccounts = [
+								{
+									account,
+									dayValue: dayValue as number,
+									dayTransactions: dayTransactionsIds.reduce((output: Transaction[], id) => {
+										const match = account.transactions.find((transaction) => transaction.id === id);
+										return match ? [...output, match] : output;
+									}, []),
+								},
+							];
+
 							return (
-								<CustomTooltip
-									payload={payload}
-									activeIndex={activeIndex}
-									label={label}
-									accounts={accounts}
-									points={points}
-								/>
+								<CustomTooltipContent title={formatDateVerbose(label as string)} tooltipAccounts={tooltipAccounts} />
 							);
 						}}
 					/>
@@ -132,60 +158,43 @@ export function ForecastChart({ projections, accounts, thresholds }: ForecastCha
 	);
 }
 
-interface CustomTooltipProps {
-	payload: { color?: string; name?: string; value?: number }[];
-	label: string;
-	activeIndex: number;
-	accounts: Account[];
-	points: BalancePoint[];
+interface CustomTooltipContentProps {
+	title: string;
+	tooltipAccounts: {
+		account: Account;
+		dayValue: number;
+		dayTransactions: Transaction[];
+	}[];
 }
 
-function CustomTooltip({ payload, label, activeIndex, accounts, points }: CustomTooltipProps) {
+function CustomTooltipContent({ title, tooltipAccounts }: CustomTooltipContentProps) {
 	return (
 		<div className="rounded-xl border border-white/10 bg-slate-900/90 px-4 py-3 text-sm text-white shadow-xl backdrop-blur">
-			<p className="mb-2 text-xs text-slate-300">{label ? formatDateVerbose(label) : ''}</p>
+			{title && <p className="mb-2 text-xs text-slate-300">{title}</p>}
 			<ul className="space-y-1">
-				{payload.map((entry) => {
-					if (entry.value == null) {
-						return null;
-					}
+				{tooltipAccounts.map(({ account, dayValue, dayTransactions }) => (
+					<li key={account.id}>
+						<div className="flex items-center justify-between gap-3">
+							<span className="flex items-center gap-2">
+								<span className="h-2 w-2 rounded-full" style={{ backgroundColor: account.color }} />
+								{account.name}
+							</span>
+							<span className="text-xs text-slate-200">{formatCurrency(dayValue, account.currency)}</span>
+						</div>
 
-					const account = accounts.find((candidate) => candidate.name === entry.name);
-
-					if (!account) {
-						return null;
-					}
-
-					const dayTransactionsIds = points[activeIndex].transactions;
-
-					const dayTransactions = dayTransactionsIds.map((id: string) =>
-						account.transactions.find((transaction) => transaction.id === id),
-					) as Transaction[];
-
-					return (
-						<li key={entry.name}>
+						{dayTransactions.length > 0 && (
 							<div className="flex items-center justify-between gap-3">
-								<span className="flex items-center gap-2">
-									<span className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.color ?? account?.color }} />
-									{entry.name}
-								</span>
-								<span className="text-xs text-slate-200">{formatCurrency(entry.value, account.currency)}</span>
+								<ul>
+									{dayTransactions.map((transaction) => (
+										<li key={transaction.id}>
+											{transaction.label} <Amount amount={transaction.amount} currency={account.currency} />
+										</li>
+									))}
+								</ul>
 							</div>
-
-							{dayTransactions.length > 0 && (
-								<div className="flex items-center justify-between gap-3">
-									<ul>
-										{dayTransactions.map((transaction) => (
-											<li key={transaction.id}>
-												{transaction.label} <Amount amount={transaction.amount} currency={account.currency} />
-											</li>
-										))}
-									</ul>
-								</div>
-							)}
-						</li>
-					);
-				})}
+						)}
+					</li>
+				))}
 			</ul>
 		</div>
 	);
